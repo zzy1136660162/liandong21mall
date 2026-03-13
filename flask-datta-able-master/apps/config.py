@@ -50,8 +50,13 @@ class Config(object):
         try:
             
             # Relational DBMS: PSQL, MySql
+            # Use pymysql for MySQL
+            engine = DB_ENGINE
+            if engine == 'mysql':
+                engine = 'mysql+pymysql'
+            
             SQLALCHEMY_DATABASE_URI = '{}://{}:{}@{}:{}/{}'.format(
-                DB_ENGINE,
+                engine,
                 DB_USERNAME,
                 DB_PASS,
                 DB_HOST,
