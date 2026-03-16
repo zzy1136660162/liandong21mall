@@ -1,0 +1,171 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}用户详情{% endblock %}
+
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="page-header">
+                            <div class="row align-items-end">
+                                <div class="col-lg-8">
+                                    <div class="page-header-title">
+                                        <div class="d-inline">
+                                            <h4>用户详情</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <a href="{{ url_for('member.user_list') }}" class="btn btn-secondary">返回列表</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="page-body">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>基本信息</h5>
+                                        </div>
+                                        <div class="card-block">
+                                            <table class="table table-borderless">
+                                                <tr>
+                                                    <td width="40%">用户ID</td>
+                                                    <td>{{ user.id }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>昵称</td>
+                                                    <td>{{ user.nickname or '-' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>手机号</td>
+                                                    <td>{{ user.phone or '-' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>状态</td>
+                                                    <td>
+                                                        {% if user.status == 1 %}
+                                                        <span class="badge badge-success">正常</span>
+                                                        {% else %}
+                                                        <span class="badge badge-danger">禁用</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>注册时间</td>
+                                                    <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M') if user.created_at else '-' }}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>会员信息</h5>
+                                        </div>
+                                        <div class="card-block">
+                                            {% if member_info %}
+                                            <table class="table table-borderless">
+                                                <tr>
+                                                    <td width="40%">会员等级</td>
+                                                    <td><span class="badge badge-success">{{ member_info.levelName }}</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>折扣</td>
+                                                    <td>{{ (member_info.discount * 100)|int }}折</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>升级时间</td>
+                                                    <td>{{ member_info.upgradeTime or '-' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>有效期</td>
+                                                    <td>{{ member_info.validStart or '-' }} 至 {{ member_info.validEnd or '永久' }}</td>
+                                                </tr>
+                                            </table>
+                                            {% else %}
+                                            <p class="text-muted">该用户还不是会员</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>达人状态</h5>
+                                        </div>
+                                        <div class="card-block">
+                                            {% if talent_status and talent_status.status %}
+                                            <table class="table table-borderless">
+                                                <tr>
+                                                    <td width="40%">状态</td>
+                                                    <td>
+                                                        {% if talent_status.status == 'APPROVED' %}
+                                                        <span class="badge badge-success">已通过</span>
+                                                        {% elif talent_status.status == 'PENDING' %}
+                                                        <span class="badge badge-warning">审核中</span>
+                                                        {% else %}
+                                                        <span class="badge badge-danger">已拒绝</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% if talent_status.status == 'REJECTED' and talent_status.rejectReason %}
+                                                <tr>
+                                                    <td>拒绝原因</td>
+                                                    <td>{{ talent_status.rejectReason }}</td>
+                                                </tr>
+                                                {% endif %}
+                                                <tr>
+                                                    <td>申请时间</td>
+                                                    <td>{{ talent_status.applyTime or '-' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>审核时间</td>
+                                                    <td>{{ talent_status.auditTime or '-' }}</td>
+                                                </tr>
+                                            </table>
+                                            {% else %}
+                                            <p class="text-muted">该用户还未申请成为达人</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>收货地址</h5>
+                                        </div>
+                                        <div class="card-block">
+                                            {% if addresses %}
+                                            <ul class="list-group">
+                                                {% for addr in addresses %}
+                                                <li class="list-group-item">
+                                                    <strong>{{ addr.name }}</strong> {{ addr.phone }}<br>
+                                                    <small class="text-muted">{{ addr.fullAddress }}</small>
+                                                    {% if addr.isDefault %}
+                                                    <span class="badge badge-primary">默认</span>
+                                                    {% endif %}
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                            {% else %}
+                                            <p class="text-muted">暂无收货地址</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}会员等级配置{% endblock %}
+
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="main-body">
+                    <div class="page-wrapper">
+                <div class="page-header">
+                    <div class="row align-items-end">
+                        <div class="col-lg-8">
+                            <div class="page-header-title">
+                                <div class="d-inline">
+                                    <h4>会员等级配置</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <a href="{{ url_for('member.level_add') }}" class="btn btn-success">
+                                <i class="feather icon-plus"></i> 新增等级
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-block table-border-style">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>等级编码</th>
+                                                    <th>等级名称</th>
+                                                    <th>折扣</th>
+                                                    <th>升级条件</th>
+                                                    <th>权益</th>
+                                                    <th>排序</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for level in levels %}
+                                                <tr>
+                                                    <td><code>{{ level.level_code }}</code></td>
+                                                    <td><strong>{{ level.level_name }}</strong></td>
+                                                    <td>
+                                                        {% if level.discount %}
+                                                        <span class="badge badge-primary">{{ (level.discount * 100)|int }}折</span>
+                                                        {% else %}
+                                                        -
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ level.upgrade_condition or '-' }}</td>
+                                                    <td>
+                                                        {% if level.benefits %}
+                                                        {% for benefit in level.benefits %}
+                                                        <span class="badge badge-info">{{ benefit.name }}</span>
+                                                        {% endfor %}
+                                                        {% else %}
+                                                        -
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ level.sort }}</td>
+                                                    <td>
+                                                        <a href="{{ url_for('member.level_edit', level_id=level.id) }}" class="btn btn-sm btn-primary">编辑</a>
+                                                    </td>
+                                                </tr>
+                                                {% else %}
+                                                <tr>
+                                                    <td colspan="7" class="text-center">暂无数据</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
