@@ -1,0 +1,153 @@
+<view class="page">
+  <!-- 顶部渐变背景 -->
+  <view class="header-bg">
+    <view class="header-content">
+      <view class="header-icon">🎁</view>
+      <view class="header-title">免费申请样品</view>
+      <view class="header-subtitle">申请成功后商家将免费寄送样品</view>
+    </view>
+  </view>
+
+  <!-- 已选商品卡片 -->
+  <view class="card products-card">
+    <view class="card-header">
+      <view class="header-left">
+        <text class="required">*</text>
+        <text class="card-title">申请商品</text>
+      </view>
+      <text class="card-subtitle">{{selectedProducts.length}}件商品</text>
+    </view>
+    
+    <view class="products-list">
+      <view class="product-item" wx:for="{{selectedProducts}}" wx:key="id">
+        <view class="product-image-wrap">
+          <image class="product-image" src="{{item.image}}" mode="aspectFill"/>
+        </view>
+        <view class="product-info">
+          <text class="product-name">{{item.name}}</text>
+          <view class="product-meta">
+            <text class="product-price">¥{{item.price}}</text>
+            <text class="product-commission">佣金{{item.commissionRate}}%</text>
+          </view>
+        </view>
+        <view class="product-remove" bindtap="removeProduct" data-id="{{item.id}}">
+          <text class="remove-icon">✕</text>
+        </view>
+      </view>
+    </view>
+    
+    <view class="add-product" bindtap="addProduct">
+      <view class="add-btn">
+        <text class="add-icon">+</text>
+        <text class="add-text">添加更多商品</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 收件信息卡片 -->
+  <view class="card info-card">
+    <view class="card-header">
+      <view class="header-left">
+        <text class="required">*</text>
+        <text class="card-title">收件信息</text>
+      </view>
+      <view class="header-right" bindtap="selectAddress">
+        <text class="select-address">选择地址</text>
+        <text class="arrow">></text>
+      </view>
+    </view>
+    
+    <view class="form-list">
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-icon">👤</text>
+          <text class="label-text">收件人</text>
+        </view>
+        <input class="form-input" placeholder="请输入姓名" value="{{formData.name}}" bindinput="onNameInput"/>
+      </view>
+      
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-icon">📱</text>
+          <text class="label-text">手机号</text>
+        </view>
+        <input class="form-input" placeholder="请输入手机号" type="number" maxlength="11" value="{{formData.phone}}" bindinput="onPhoneInput"/>
+      </view>
+      
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-icon">📍</text>
+          <text class="label-text">所在地区</text>
+        </view>
+        <picker mode="region" bindchange="onRegionChange" value="{{formData.region}}">
+          <view class="picker-value {{formData.region.length === 0 ? 'placeholder' : ''}}">
+            {{formData.region.length > 0 ? formData.region[0] + ' ' + formData.region[1] + ' ' + formData.region[2] : '请选择省市区'}}
+            <text class="arrow">></text>
+          </view>
+        </picker>
+      </view>
+      
+      <view class="form-item address-item">
+        <view class="form-label">
+          <text class="label-icon">🏠</text>
+          <text class="label-text">详细地址</text>
+        </view>
+        <textarea class="form-textarea" placeholder="请输入街道、门牌号等详细地址" value="{{formData.address}}" bindinput="onAddressInput"/>
+      </view>
+    </view>
+  </view>
+
+  <!-- 申请备注卡片 -->
+  <view class="card remark-card">
+    <view class="card-header">
+      <view class="header-left">
+        <text class="card-title">申请备注</text>
+        <text class="optional">（选填）</text>
+      </view>
+    </view>
+    <view class="remark-wrap">
+      <textarea class="remark-input" placeholder="如有特殊要求请在此说明，如：希望尽快发货、指定快递等" value="{{formData.remark}}" bindinput="onRemarkInput" maxlength="200"/>
+      <view class="word-count">{{formData.remark.length}}/200</view>
+    </view>
+  </view>
+
+  <!-- 申请须知卡片 -->
+  <view class="card notice-card">
+    <view class="card-header">
+      <view class="header-left">
+        <text class="notice-icon">📋</text>
+        <text class="card-title">申请须知</text>
+      </view>
+    </view>
+    <view class="notice-list">
+      <view class="notice-item" wx:for="{{notices}}" wx:key="index">
+        <view class="notice-num">{{index + 1}}</view>
+        <text class="notice-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部安全区域 -->
+  <view class="safe-area"></view>
+</view>
+
+<!-- 底部提交栏 -->
+<view class="bottom-bar">
+  <view class="bottom-content">
+    <view class="total-info">
+      <view class="info-item">
+        <text class="info-label">已选商品</text>
+        <text class="info-value">{{selectedProducts.length}}件</text>
+      </view>
+      <view class="info-divider"></view>
+      <view class="info-item">
+        <text class="info-label">预计佣金</text>
+        <text class="info-value commission">¥{{totalCommission}}</text>
+      </view>
+    </view>
+    <button class="btn-submit {{canSubmit ? '' : 'disabled'}}" bindtap="submitApplication">
+      <text class="btn-text">提交申请</text>
+      <text class="btn-arrow">→</text>
+    </button>
+  </view>
+</view>

@@ -1,0 +1,67 @@
+<view class="page">
+  <view class="status-bar" style="height: {{statusBarHeight}}rpx;"></view>
+  <view class="nav-bar">
+    <view class="nav-back" bindtap="goBack"><text class="nav-icon">←</text></view>
+    <view class="nav-title">低价好卖</view>
+    <view class="nav-right"></view>
+  </view>
+  <view class="activity-banner">
+    <image class="banner-image" src="https://picsum.photos/750/300?random=500" mode="aspectFill"/>
+    <view class="banner-overlay">
+      <text class="banner-title">低价好卖</text>
+      <text class="banner-subtitle">9.9元包邮好物，低价高佣轻松卖</text>
+    </view>
+  </view>
+  <view class="activity-stats">
+    <view class="stat-item"><text class="stat-number">{{stats.productCount}}</text><text class="stat-label">低价商品</text></view>
+    <view class="stat-item"><text class="stat-number">{{stats.avgPrice}}</text><text class="stat-label">平均价格</text></view>
+    <view class="stat-item"><text class="stat-number">{{stats.avgCommission}}%</text><text class="stat-label">平均佣金</text></view>
+  </view>
+  <view class="price-filter">
+    <view class="price-title">价格区间</view>
+    <view class="price-options">
+      <view class="price-item {{currentPrice === 'all' ? 'active' : ''}}" bindtap="switchPrice" data-price="all"><text>全部</text></view>
+      <view class="price-item {{currentPrice === '9.9' ? 'active' : ''}}" bindtap="switchPrice" data-price="9.9"><text>¥9.9</text></view>
+      <view class="price-item {{currentPrice === '19.9' ? 'active' : ''}}" bindtap="switchPrice" data-price="19.9"><text>¥19.9</text></view>
+      <view class="price-item {{currentPrice === '29.9' ? 'active' : ''}}" bindtap="switchPrice" data-price="29.9"><text>¥29.9</text></view>
+      <view class="price-item {{currentPrice === '49.9' ? 'active' : ''}}" bindtap="switchPrice" data-price="49.9"><text>¥49.9</text></view>
+    </view>
+  </view>
+  <view class="filter-section">
+    <scroll-view class="filter-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="filter-list">
+        <view class="filter-item {{currentFilter === 'all' ? 'active' : ''}}" bindtap="switchFilter" data-filter="all"><text>综合</text></view>
+        <view class="filter-item {{currentFilter === 'sales' ? 'active' : ''}}" bindtap="switchFilter" data-filter="sales"><text>销量</text></view>
+        <view class="filter-item {{currentFilter === 'commission' ? 'active' : ''}}" bindtap="switchFilter" data-filter="commission"><text>佣金</text></view>
+        <view class="filter-item {{currentFilter === 'new' ? 'active' : ''}}" bindtap="switchFilter" data-filter="new"><text>新品</text></view>
+      </view>
+    </scroll-view>
+  </view>
+  <view class="product-list">
+    <view class="product-item" wx:for="{{products}}" wx:key="id" bindtap="goToProductDetail" data-id="{{item.id}}">
+      <view class="product-image-wrap">
+        <image class="product-image" src="{{item.image}}" mode="aspectFill"/>
+        <view class="price-tag">¥{{item.price}}</view>
+      </view>
+      <view class="product-info">
+        <view class="product-title">{{item.title}}</view>
+        <view class="product-tags">
+          <view class="tag free-shipping" wx:if="{{item.freeShipping}}">包邮</view>
+          <view class="tag high-commission" wx:if="{{item.highCommission}}">高佣</view>
+          <view class="tag hot" wx:if="{{item.hot}}">热销</view>
+        </view>
+        <view class="commission-row">
+          <text class="commission-text">赚¥{{item.commission}}</text>
+          <text class="commission-rate">{{item.rate}}佣</text>
+        </view>
+        <view class="price-row">
+          <text class="current-price">¥{{item.price}}</text>
+          <text class="original-price" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+          <text class="sales-text">{{item.sales}}</text>
+        </view>
+        <view class="add-btn" catchtap="addToShelf" data-id="{{item.id}}">加入货架</view>
+      </view>
+    </view>
+  </view>
+  <view class="safe-area"></view>
+</view>

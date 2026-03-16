@@ -1,0 +1,422 @@
+.page {
+  background: #f5f5f5;
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+}
+
+/* 状态栏占位 */
+.status-bar {
+  background: #fff;
+}
+
+/* 顶部导航栏 */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 20rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.nav-back {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-icon {
+  font-size: 36rpx;
+  color: #333;
+}
+
+.nav-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.nav-right {
+  width: 60rpx;
+}
+
+/* 活动Banner */
+.activity-banner {
+  position: relative;
+  width: 100%;
+  height: 280rpx;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+}
+
+.banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40rpx;
+}
+
+.banner-title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.3);
+  margin-bottom: 16rpx;
+}
+
+.banner-subtitle {
+  font-size: 28rpx;
+  color: rgba(255,255,255,0.9);
+  text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.3);
+}
+
+/* 活动数据 */
+.activity-stats {
+  display: flex;
+  justify-content: space-around;
+  background: #fff;
+  padding: 30rpx 0;
+  margin-bottom: 20rpx;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-number {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #ff4757;
+  margin-bottom: 8rpx;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 区块标题 */
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx;
+  background: #fff;
+  margin-bottom: 2rpx;
+}
+
+.title-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.sub-text {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 达人列表 */
+.talent-list {
+  background: #fff;
+  padding: 0 20rpx 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.talent-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.talent-item:last-child {
+  border-bottom: none;
+}
+
+.talent-rank {
+  width: 48rpx;
+  height: 48rpx;
+  background: #f0f0f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #666;
+  margin-right: 20rpx;
+}
+
+.talent-rank.top {
+  background: linear-gradient(135deg, #ff4757, #ff6b81);
+  color: #fff;
+}
+
+.talent-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+}
+
+.talent-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.talent-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.talent-tag {
+  font-size: 24rpx;
+  color: #ff4757;
+  background: #ffe4e9;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  width: fit-content;
+  margin-bottom: 8rpx;
+}
+
+.talent-sales {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.follow-btn {
+  padding: 12rpx 32rpx;
+  background: linear-gradient(135deg, #ff4757, #ff6b81);
+  border-radius: 32rpx;
+}
+
+.follow-btn text {
+  font-size: 26rpx;
+  color: #fff;
+}
+
+/* 筛选标签 */
+.filter-section {
+  background: #fff;
+  padding: 20rpx 0;
+  margin-bottom: 20rpx;
+}
+
+.filter-scroll {
+  white-space: nowrap;
+}
+
+.filter-list {
+  display: flex;
+  padding: 0 20rpx;
+}
+
+.filter-item {
+  padding: 16rpx 32rpx;
+  margin-right: 16rpx;
+  background: #f5f5f5;
+  border-radius: 32rpx;
+}
+
+.filter-item text {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.filter-item.active {
+  background: linear-gradient(135deg, #ff4757, #ff6b81);
+}
+
+.filter-item.active text {
+  color: #fff;
+  font-weight: 500;
+}
+
+/* 商品列表 */
+.product-list {
+  padding: 0 20rpx;
+}
+
+.product-item {
+  display: flex;
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+  padding: 20rpx;
+}
+
+.product-image-wrap {
+  width: 240rpx;
+  height: 240rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+}
+
+.product-tag {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  background: linear-gradient(135deg, #ff4757, #ff6b81);
+  color: #fff;
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.product-info {
+  flex: 1;
+  margin-left: 20rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 跟选信息 */
+.follow-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.follower-avatar {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  margin-right: 12rpx;
+}
+
+.follower-name {
+  font-size: 24rpx;
+  color: #666;
+  margin-right: 16rpx;
+}
+
+.follow-count {
+  font-size: 22rpx;
+  color: #ff4757;
+  background: #ffe4e9;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+/* 商品标签 */
+.product-tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 12rpx;
+}
+
+.tag {
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  font-size: 22rpx;
+  margin-right: 12rpx;
+  margin-bottom: 8rpx;
+}
+
+.tag.cashback {
+  background: #ffe4e9;
+  color: #ff4757;
+}
+
+.tag.trust {
+  background: #e8f5e9;
+  color: #2ed573;
+}
+
+.tag.brand {
+  background: #fff3e0;
+  color: #ffa502;
+}
+
+/* 标题 */
+.product-title {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.5;
+  margin-bottom: 12rpx;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 佣金信息 */
+.commission-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.commission-text {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #ff4757;
+  margin-right: 16rpx;
+}
+
+.commission-rate {
+  font-size: 24rpx;
+  color: #ff4757;
+  background: #ffe4e9;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+/* 价格销量 */
+.price-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.price-label {
+  font-size: 24rpx;
+  color: #999;
+  margin-right: 20rpx;
+}
+
+.sales-text {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 加入货架按钮 */
+.add-btn {
+  background: linear-gradient(135deg, #ff4757, #ff6b81);
+  color: #fff;
+  font-size: 28rpx;
+  padding: 16rpx 0;
+  border-radius: 32rpx;
+  text-align: center;
+  margin-top: auto;
+}
+
+/* 底部安全区域 */
+.safe-area {
+  height: 40rpx;
+}

@@ -1,11 +1,24 @@
 {
   "pages": [
+    "pages/xuanpinindex/xuanpinindex",
     "pages/index/index",
+    "pages/category/category",
+    "pages/activity/hot",
+    "pages/activity/follow",
+    "pages/activity/video",
+    "pages/activity/merchant",
+    "pages/activity/cheap",
+    "pages/product-detail/product-detail",
+    "pages/sample-detail/sample-detail",
+    "pages/sample-apply/sample-apply",
+    "pages/rank/rank",
+    "pages/my/my",
+    "pages/my-samples/my-samples",
     "pages/logs/logs"
   ],
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "Weixin",
+    "navigationBarTitleText": "选品中心",
     "navigationBarBackgroundColor": "#ffffff"
   },
   "style": "v2",

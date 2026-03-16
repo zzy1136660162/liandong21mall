@@ -1,0 +1,234 @@
+<view class="page">
+  <!-- 顶部白色区域 -->
+  <view class="header">
+    <!-- 搜索栏 -->
+    <view class="search-bar">
+      <view class="search-input-box" bindtap="onSearchFocus">
+        <text class="search-icon">🔍</text>
+        <input class="search-input" placeholder="搜索商品" placeholder-class="placeholder" 
+               bindinput="onSearchInput" value="{{searchKeyword}}" 
+               confirm-type="search" bindconfirm="onSearch"
+               bindfocus="onSearchFocus" bindblur="onSearchBlur"/>
+      </view>
+      <view class="search-btn" bindtap="onSearch">搜索</view>
+    </view>
+
+    <!-- 搜索面板 - 热门搜索和历史记录 -->
+    <view class="search-panel" wx:if="{{showSearchPanel}}">
+      <view class="panel-section" wx:if="{{searchHistory.length > 0}}">
+        <view class="panel-header">
+          <text class="panel-title">历史搜索</text>
+          <text class="clear-btn" bindtap="clearHistory">清除</text>
+        </view>
+        <view class="tag-list">
+          <view class="tag-item" wx:for="{{searchHistory}}" wx:key="index" bindtap="onHistoryTap" data-keyword="{{item}}">
+            {{item}}
+          </view>
+        </view>
+      </view>
+      <view class="panel-section">
+        <view class="panel-header">
+          <text class="panel-title">热门搜索</text>
+        </view>
+        <view class="tag-list">
+          <view class="tag-item hot" wx:for="{{hotSearches}}" wx:key="index" bindtap="onHotSearchTap" data-keyword="{{item}}">
+            {{item}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 分类标签 -->
+    <scroll-view class="category-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="category-list">
+        <view class="category-item {{currentCategory === 'all' ? 'active' : ''}}" bindtap="switchCategory" data-category="all">
+          <text class="category-text">首页</text>
+        </view>
+        <view class="category-item spring {{currentCategory === 'spring' ? 'active' : ''}}" bindtap="switchCategory" data-category="spring">
+          <text class="category-text">春焕新</text>
+        </view>
+        <view class="category-item {{currentCategory === 'food' ? 'active' : ''}}" bindtap="goToCategory" data-category="food">
+          <text class="category-text">零食饮料</text>
+        </view>
+        <view class="category-item {{currentCategory === 'home' ? 'active' : ''}}" bindtap="goToCategory" data-category="home">
+          <text class="category-text">家居百货</text>
+        </view>
+        <view class="category-item {{currentCategory === 'clothing' ? 'active' : ''}}" bindtap="goToCategory" data-category="clothing">
+          <text class="category-text">女装女鞋</text>
+        </view>
+        <view class="category-item {{currentCategory === 'beauty' ? 'active' : ''}}" bindtap="goToCategory" data-category="beauty">
+          <text class="category-text">美妆护肤</text>
+        </view>
+        <view class="category-item {{currentCategory === 'personal' ? 'active' : ''}}" bindtap="goToCategory" data-category="personal">
+          <text class="category-text">个护</text>
+        </view>
+        <view class="category-item {{currentCategory === 'health' ? 'active' : ''}}" bindtap="switchCategory" data-category="health">
+          <text class="category-text">医疗健康</text>
+        </view>
+        <view class="category-item {{currentCategory === 'baby' ? 'active' : ''}}" bindtap="switchCategory" data-category="baby">
+          <text class="category-text">母婴玩具</text>
+        </view>
+        <view class="category-item {{currentCategory === 'fresh' ? 'active' : ''}}" bindtap="switchCategory" data-category="fresh">
+          <text class="category-text">生鲜食品</text>
+        </view>
+        <view class="category-item {{currentCategory === 'men' ? 'active' : ''}}" bindtap="switchCategory" data-category="men">
+          <text class="category-text">男装男鞋</text>
+        </view>
+        <view class="category-item {{currentCategory === 'sports' ? 'active' : ''}}" bindtap="switchCategory" data-category="sports">
+          <text class="category-text">运动户外</text>
+        </view>
+        <view class="category-item {{currentCategory === 'digital' ? 'active' : ''}}" bindtap="switchCategory" data-category="digital">
+          <text class="category-text">数码家电</text>
+        </view>
+        <view class="category-item {{currentCategory === 'luxury' ? 'active' : ''}}" bindtap="switchCategory" data-category="luxury">
+          <text class="category-text">珠宝奢品</text>
+        </view>
+        <view class="category-item {{currentCategory === 'tea' ? 'active' : ''}}" bindtap="switchCategory" data-category="tea">
+          <text class="category-text">茶叶酒水</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- Banner 轮播图 -->
+  <view class="banner-section">
+    <swiper class="banner-swiper" indicator-dots autoplay circular interval="3500" duration="500" indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#ff5000">
+      <swiper-item wx:for="{{banners}}" wx:key="id" bindtap="onBannerTap" data-item="{{item}}">
+        <image class="banner-image" src="{{item.image}}" mode="aspectFill"/>
+        <view class="banner-content">
+          <text class="banner-title">{{item.title}}</text>
+          <text class="banner-subtitle" wx:if="{{item.subtitle}}">{{item.subtitle}}</text>
+        </view>
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <!-- 快捷入口 - 5个图标 -->
+  <view class="quick-entry">
+    <view class="entry-list">
+      <view class="entry-item" bindtap="onEntryTap" data-type="hot">
+        <image class="entry-icon" src="https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260313142047334_666195650315.png" mode="aspectFit"/>
+        <text class="entry-name">超级爆品</text>
+      </view>
+      <view class="entry-item" bindtap="onEntryTap" data-type="follow">
+        <image class="entry-icon" src="https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260313142240238_666195763220.png" mode="aspectFit"/>
+        <text class="entry-name">同行跟选</text>
+      </view>
+      <view class="entry-item" bindtap="onEntryTap" data-type="video">
+        <image class="entry-icon" src="https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260313142605000_666195967983.png" mode="aspectFit"/>
+        <text class="entry-name">视频热卖</text>
+      </view>
+      <view class="entry-item" bindtap="onEntryTap" data-type="merchant">
+        <image class="entry-icon" src="https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260313142853275_666196136259.png" mode="aspectFit"/>
+        <text class="entry-name">商家优选</text>
+      </view>
+      <view class="entry-item" bindtap="onEntryTap" data-type="cheap">
+        <image class="entry-icon" src="https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260313145940320_666197983305.png" mode="aspectFit"/>
+        <text class="entry-name">低价好卖</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 筛选栏 -->
+  <view class="filter-section">
+    <view class="filter-bar">
+      <view class="filter-item {{currentFilter === 'all' ? 'active' : ''}}" bindtap="switchFilter" data-filter="all">
+        <text>精选</text>
+      </view>
+      <view class="filter-item {{currentFilter === 'hot' ? 'active' : ''}}" bindtap="switchFilter" data-filter="hot">
+        <text>热销</text>
+      </view>
+      <view class="filter-item {{currentFilter === 'new' ? 'active' : ''}}" bindtap="switchFilter" data-filter="new">
+        <text>新品</text>
+      </view>
+      <view class="filter-item {{currentFilter === 'commission' ? 'active' : ''}}" bindtap="switchFilter" data-filter="commission">
+        <text>高佣</text>
+      </view>
+    </view>
+    <view class="filter-more" bindtap="toggleFilterPanel">
+      <text>筛选</text>
+      <text class="arrow">▼</text>
+    </view>
+  </view>
+
+  <!-- 二级筛选面板 -->
+  <view class="sub-filter-panel" wx:if="{{showFilterPanel}}">
+    <view class="sub-filter-section">
+      <text class="sub-filter-title">佣金比例</text>
+      <view class="sub-filter-options">
+        <view class="sub-filter-item {{currentFilters.commission === item.value ? 'active' : ''}}" 
+              wx:for="{{filterOptions.commission}}" wx:key="value"
+              bindtap="selectSubFilter" data-type="commission" data-value="{{item.value}}">
+          {{item.label}}
+        </view>
+      </view>
+    </view>
+    <view class="sub-filter-section">
+      <text class="sub-filter-title">价格区间</text>
+      <view class="sub-filter-options">
+        <view class="sub-filter-item {{currentFilters.price === item.value ? 'active' : ''}}" 
+              wx:for="{{filterOptions.price}}" wx:key="value"
+              bindtap="selectSubFilter" data-type="price" data-value="{{item.value}}">
+          {{item.label}}
+        </view>
+      </view>
+    </view>
+    <view class="sub-filter-section">
+      <text class="sub-filter-title">销量</text>
+      <view class="sub-filter-options">
+        <view class="sub-filter-item {{currentFilters.sales === item.value ? 'active' : ''}}" 
+              wx:for="{{filterOptions.sales}}" wx:key="value"
+              bindtap="selectSubFilter" data-type="sales" data-value="{{item.value}}">
+          {{item.label}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="product-list">
+    <view class="product-item" wx:for="{{products}}" wx:key="id">
+      <view class="product-content" bindtap="goToProductDetail" data-id="{{item.id}}">
+        <view class="product-img-wrap">
+          <image class="product-img" src="{{item.image}}" mode="aspectFill"/>
+          <view class="product-tag" wx:if="{{item.tag}}">{{item.tag}}</view>
+        </view>
+        <view class="product-info">
+          <view class="product-title">{{item.title}}</view>
+          
+          <!-- 服务标签 -->
+          <view class="service-tags" wx:if="{{item.tags}}">
+            <text class="service-tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
+          </view>
+          
+          <!-- 店铺信息 -->
+          <view class="shop-info">
+            <text class="shop-name">{{item.shop}}</text>
+            <text class="shop-score" wx:if="{{item.shopScore}}">{{item.shopScore}}分</text>
+          </view>
+          
+          <view class="product-price-wrap">
+            <text class="price-symbol">¥</text>
+            <text class="product-price">{{item.price}}</text>
+            <text class="product-original" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+          </view>
+          
+          <view class="product-commission-wrap">
+            <text class="commission-tag">佣金{{item.commissionRate}}%</text>
+            <text class="commission-amount">预计赚¥{{item.commissionAmount}}</text>
+          </view>
+          
+          <view class="product-bottom">
+            <view class="sales-info">
+              <text class="sales-text">已售{{item.salesText}}</text>
+              <text class="location" wx:if="{{item.location}}">{{item.location}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="btn-apply-wrap">
+        <view class="btn-apply" bindtap="applySample" data-id="{{item.id}}">申请样品</view>
+      </view>
+    </view>
+  </view>
+</view>

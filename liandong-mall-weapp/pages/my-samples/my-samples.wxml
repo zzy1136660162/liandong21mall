@@ -1,0 +1,127 @@
+<view class="container">
+  <!-- 状态筛选栏 -->
+  <view class="filter-bar">
+    <view class="filter-item {{currentFilter === 'all' ? 'active' : ''}}" bindtap="switchFilter" data-filter="all">
+      <text class="filter-text">全部</text>
+    </view>
+    <view class="filter-item {{currentFilter === 'pending' ? 'active' : ''}}" bindtap="switchFilter" data-filter="pending">
+      <text class="filter-text">待审核</text>
+    </view>
+    <view class="filter-item {{currentFilter === 'approved' ? 'active' : ''}}" bindtap="switchFilter" data-filter="approved">
+      <text class="filter-text">审核通过</text>
+    </view>
+    <view class="filter-item {{currentFilter === 'shipped' ? 'active' : ''}}" bindtap="switchFilter" data-filter="shipped">
+      <text class="filter-text">已寄出</text>
+    </view>
+    <view class="filter-item {{currentFilter === 'rejected' ? 'active' : ''}}" bindtap="switchFilter" data-filter="rejected">
+      <text class="filter-text">已拒绝</text>
+    </view>
+  </view>
+
+  <!-- 申请列表 -->
+  <view class="sample-list">
+    <view class="sample-card" wx:for="{{sampleList}}" wx:key="id">
+      <!-- 申请头部 -->
+      <view class="sample-header" bindtap="goToDetail" data-id="{{item.id}}">
+        <view class="header-left">
+          <text class="apply-id">申请编号: {{item.id}}</text>
+          <text class="apply-time">申请时间: {{item.applyTime}}</text>
+        </view>
+        <view class="status-badge {{item.status}}">
+          <text class="status-text">{{item.statusText}}</text>
+        </view>
+      </view>
+
+      <!-- 商品信息 -->
+      <view class="product-list">
+        <view class="product-item" wx:for="{{item.products}}" wx:key="id" wx:for-item="product">
+          <image class="product-image" src="{{product.image}}" mode="aspectFill"/>
+          <view class="product-info">
+            <text class="product-name">{{product.name}}</text>
+            <view class="product-meta">
+              <text class="product-price">¥{{product.price}}</text>
+              <text class="product-commission" wx:if="{{product.commission}}">佣金{{product.commission}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 物流状态展示 -->
+      <view class="shipping-section">
+        <view class="shipping-header">
+          <text class="section-label">📦 物流状态</text>
+          <view class="ship-status-badge {{item.shipStatus}}" bindtap="goToLogistics" data-tracking="{{item.trackingNo}}" data-company="{{item.logisticsCompany}}" data-status="{{item.shipStatus}}" data-time="{{item.receiveTime}}">
+            <text class="ship-status-text">{{item.shipStatusText}}</text>
+          </view>
+        </view>
+        
+        <!-- 物流详情（如已寄出或已签收） -->
+        <view class="shipping-detail" wx:if="{{item.shipStatus !== 'not_shipped'}}" bindtap="goToLogistics" data-tracking="{{item.trackingNo}}" data-company="{{item.logisticsCompany}}" data-status="{{item.shipStatus}}" data-time="{{item.receiveTime}}">
+          <view class="shipping-row" wx:if="{{item.logisticsCompany}}">
+            <text class="shipping-label">物流公司:</text>
+            <text class="shipping-company">{{item.logisticsCompany}}</text>
+          </view>
+          <view class="shipping-row" wx:if="{{item.trackingNo}}">
+            <text class="shipping-label">物流单号:</text>
+            <text class="tracking-no">{{item.trackingNo}}</text>
+            <text class="copy-btn" bindtap="copyTrackingNo" data-no="{{item.trackingNo}}">复制</text>
+          </view>
+          <view class="shipping-row" wx:if="{{item.receiveTime}}">
+            <text class="shipping-label">签收时间:</text>
+            <text class="receive-time">{{item.receiveTime}}</text>
+          </view>
+          <view class="shipping-progress" wx:if="{{item.shipStatus === 'shipped'}}">
+            <view class="progress-dot active"></view>
+            <view class="progress-line"></view>
+            <view class="progress-dot"></view>
+            <view class="progress-line"></view>
+            <view class="progress-dot"></view>
+          </view>
+          <view class="shipping-progress" wx:if="{{item.shipStatus === 'received'}}">
+            <view class="progress-dot active"></view>
+            <view class="progress-line active"></view>
+            <view class="progress-dot active"></view>
+            <view class="progress-line active"></view>
+            <view class="progress-dot active"></view>
+          </view>
+          <view class="progress-labels" wx:if="{{item.shipStatus !== 'not_shipped'}}">
+            <text class="progress-label">已发货</text>
+            <text class="progress-label">运输中</text>
+            <text class="progress-label {{item.shipStatus === 'received' ? 'active' : ''}}">已签收</text>
+          </view>
+        </view>
+        
+        <!-- 未寄出提示 -->
+        <view class="shipping-empty" wx:if="{{item.shipStatus === 'not_shipped'}}">
+          <text class="empty-hint" wx:if="{{item.status === 'pending'}}">审核通过后将安排发货</text>
+          <text class="empty-hint" wx:if="{{item.status === 'approved'}}">商家正在准备发货</text>
+          <text class="empty-hint" wx:if="{{item.status === 'rejected'}}">申请未通过，无需发货</text>
+        </view>
+      </view>
+
+      <!-- 底部操作 -->
+      <view class="sample-footer">
+        <view class="action-btns">
+          <view class="btn-detail" bindtap="goToDetail" data-id="{{item.id}}">查看详情</view>
+          <view class="btn-confirm" wx:if="{{item.shipStatus === 'shipped'}}" bindtap="confirmReceive" data-id="{{item.id}}">确认收货</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{sampleList.length === 0}}">
+      <view class="empty-icon">📦</view>
+      <text class="empty-text">暂无{{filterText}}的样品申请记录</text>
+      <text class="empty-subtext">去选品申请样品，开启带货之旅</text>
+      <button class="btn-go-apply" bindtap="goToApply">去选品申请样品</button>
+    </view>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{sampleList.length > 0 && hasMore}}">
+    <text class="load-text">加载更多...</text>
+  </view>
+  <view class="no-more" wx:if="{{sampleList.length > 0 && !hasMore}}">
+    <text class="no-more-text">没有更多了</text>
+  </view>
+</view>

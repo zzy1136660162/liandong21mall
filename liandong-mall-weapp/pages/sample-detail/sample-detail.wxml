@@ -1,0 +1,146 @@
+<view class="container">
+  <!-- 状态卡片 -->
+  <view class="status-card {{application.status === 'pending' ? 'status-pending' : application.status === 'approved' ? 'status-approved' : 'status-rejected'}}">
+    <view class="status-icon">
+      <text class="icon-text" wx:if="{{application.status === 'pending'}}">⏳</text>
+      <text class="icon-text" wx:if="{{application.status === 'approved'}}">✓</text>
+      <text class="icon-text" wx:if="{{application.status === 'rejected'}}">✕</text>
+    </view>
+    <view class="status-info">
+      <text class="status-title">{{application.statusText}}</text>
+      <text class="status-desc">{{statusDesc}}</text>
+    </view>
+  </view>
+
+  <!-- 审核备注 -->
+  <view class="content-card" wx:if="{{application.reviewRemark}}">
+    <view class="card-header">
+      <view class="card-icon remark">💬</view>
+      <text class="card-title">审核备注</text>
+    </view>
+    <view class="card-body">
+      <view class="remark-box">
+        <text class="remark-text">{{application.reviewRemark}}</text>
+        <text class="remark-time" wx:if="{{application.reviewTime}}">审核时间：{{application.reviewTime}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 商品信息 -->
+  <view class="content-card">
+    <view class="card-header">
+      <view class="card-icon product">🛍️</view>
+      <text class="card-title">申请商品</text>
+    </view>
+    <view class="card-body">
+      <view class="product-list">
+        <view class="product-item" wx:for="{{application.products}}" wx:key="id">
+          <image class="product-image" src="{{item.image}}" mode="aspectFill"/>
+          <view class="product-info">
+            <text class="product-name">{{item.name}}</text>
+            <view class="product-meta">
+              <text class="product-price">¥{{item.price}}</text>
+              <text class="product-commission" wx:if="{{item.commission}}">佣金{{item.commission}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 收件信息 -->
+  <view class="content-card">
+    <view class="card-header">
+      <view class="card-icon address">📍</view>
+      <text class="card-title">收件信息</text>
+    </view>
+    <view class="card-body">
+      <view class="info-list">
+        <view class="info-item">
+          <text class="info-label">收件人</text>
+          <text class="info-value">{{application.recipient.name}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">联系电话</text>
+          <text class="info-value">{{application.recipient.phone}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">收货地址</text>
+          <text class="info-value">{{application.recipient.province}}{{application.recipient.city}}{{application.recipient.district}}{{application.recipient.address}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 物流信息 -->
+  <view class="content-card" wx:if="{{application.shipStatus !== 'not_shipped'}}">
+    <view class="card-header">
+      <view class="card-icon shipping">🚚</view>
+      <text class="card-title">物流信息</text>
+    </view>
+    <view class="card-body">
+      <view class="shipping-box">
+        <view class="shipping-header">
+          <view class="shipping-company">
+            <view class="company-icon">📦</view>
+            <text class="company-name">{{application.logisticsCompany || '顺丰速运'}}</text>
+          </view>
+          <view class="shipping-status {{application.shipStatus}}">{{application.shipStatusText}}</view>
+        </view>
+        <view class="tracking-row" wx:if="{{application.trackingNo}}">
+          <text class="tracking-label">物流单号</text>
+          <text class="tracking-no">{{application.trackingNo}}</text>
+          <text class="copy-btn" bindtap="copyTrackingNo">复制</text>
+        </view>
+        <!-- 物流轨迹 -->
+        <view class="timeline" wx:if="{{application.trackingList && application.trackingList.length > 0}}">
+          <view class="timeline-item {{index === 0 ? 'active' : ''}}" wx:for="{{application.trackingList}}" wx:key="index">
+            <view class="timeline-dot"></view>
+            <view class="timeline-content">
+              <text class="timeline-text">{{item.content}}</text>
+              <text class="timeline-time">{{item.time}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 申请信息 -->
+  <view class="content-card">
+    <view class="card-header">
+      <view class="card-icon info">📋</view>
+      <text class="card-title">申请信息</text>
+    </view>
+    <view class="card-body">
+      <view class="info-grid">
+        <view class="info-box">
+          <text class="info-box-label">申请编号</text>
+          <text class="info-box-value">{{application.id}}</text>
+        </view>
+        <view class="info-box">
+          <text class="info-box-label">申请时间</text>
+          <text class="info-box-value">{{application.applyTime}}</text>
+        </view>
+        <view class="info-box" wx:if="{{application.reviewTime}}">
+          <text class="info-box-label">审核时间</text>
+          <text class="info-box-value">{{application.reviewTime}}</text>
+        </view>
+        <view class="info-box" wx:if="{{application.shipTime}}">
+          <text class="info-box-label">发货时间</text>
+          <text class="info-box-value">{{application.shipTime}}</text>
+        </view>
+        <view class="info-box" wx:if="{{application.receiveTime}}">
+          <text class="info-box-label">签收时间</text>
+          <text class="info-box-value">{{application.receiveTime}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="footer-bar" wx:if="{{application.shipStatus === 'shipped'}}">
+    <view class="btn btn-secondary" bindtap="contactService">联系客服</view>
+    <view class="btn btn-primary" bindtap="confirmReceive">确认收货</view>
+  </view>
+</view>

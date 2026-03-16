@@ -1,0 +1,81 @@
+<view class="page">
+  <!-- 顶部导航 -->
+  <view class="header">
+    <view class="nav-tabs">
+      <view class="nav-item {{currentTab === 'sales' ? 'active' : ''}}" bindtap="switchTab" data-tab="sales">
+        <text class="nav-text">销量榜</text>
+      </view>
+      <view class="nav-item {{currentTab === 'commission' ? 'active' : ''}}" bindtap="switchTab" data-tab="commission">
+        <text class="nav-text">佣金榜</text>
+      </view>
+      <view class="nav-item {{currentTab === 'rising' ? 'active' : ''}}" bindtap="switchTab" data-tab="rising">
+        <text class="nav-text">飙升榜</text>
+      </view>
+      <view class="nav-item {{currentTab === 'new' ? 'active' : ''}}" bindtap="switchTab" data-tab="new">
+        <text class="nav-text">新品榜</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 榜单说明 -->
+  <view class="rank-info">
+    <text class="info-text">{{rankInfo}}</text>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="product-list">
+    <view class="product-item" wx:for="{{products}}" wx:key="id" bindtap="goToProductDetail" data-id="{{item.id}}">
+      <!-- 排名标识 -->
+      <view class="rank-badge {{index < 3 ? 'top' : ''}}">
+        <text class="rank-number">{{index + 1}}</text>
+      </view>
+      
+      <view class="product-img-wrap">
+        <image class="product-img" src="{{item.image}}" mode="aspectFill"/>
+        <view class="product-tag" wx:if="{{item.tag}}">{{item.tag}}</view>
+      </view>
+      
+      <view class="product-info">
+        <view class="product-title">{{item.title}}</view>
+        
+        <!-- 服务标签 -->
+        <view class="service-tags" wx:if="{{item.tags}}">
+          <text class="service-tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
+        </view>
+        
+        <!-- 店铺信息 -->
+        <view class="shop-info">
+          <text class="shop-name">{{item.shop}}</text>
+          <text class="shop-score" wx:if="{{item.shopScore}}">{{item.shopScore}}分</text>
+        </view>
+        
+        <view class="product-price-wrap">
+          <text class="price-symbol">¥</text>
+          <text class="product-price">{{item.price}}</text>
+          <text class="product-original" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+        </view>
+        
+        <view class="product-commission-wrap">
+          <text class="commission-tag">佣金{{item.commissionRate}}%</text>
+          <text class="commission-amount">预计赚¥{{item.commissionAmount}}</text>
+        </view>
+        
+        <view class="product-bottom">
+          <view class="sales-info">
+            <text class="sales-text">已售{{item.salesText}}</text>
+            <text class="location" wx:if="{{item.location}}">{{item.location}}</text>
+          </view>
+          <view class="btn-apply" catchtap="applySample" data-id="{{item.id}}">申请样品</view>
+        </view>
+        
+        <!-- 榜单数据展示 -->
+        <view class="rank-data" wx:if="{{currentTab === 'sales'}}">
+          <text class="data-text">24小时销量 {{item.dailySales || item.salesText}}</text>
+        </view>
+        <view class="rank-data" wx:if="{{currentTab === 'rising'}}">
+          <text class="data-text rise">↑ 销量增长 {{item.riseRate || '200%'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

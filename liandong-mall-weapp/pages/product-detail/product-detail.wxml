@@ -1,0 +1,238 @@
+<view class="page">
+  <!-- 顶部导航栏 -->
+  <view class="nav-bar">
+    <view class="nav-back" bindtap="goBack">
+      <text class="nav-icon">←</text>
+    </view>
+    <view class="nav-title">商品详情</view>
+    <view class="nav-share" bindtap="shareProduct">
+      <text class="nav-icon">↗</text>
+    </view>
+  </view>
+
+  <!-- 商品图片轮播 -->
+  <view class="gallery-section">
+    <swiper class="gallery-swiper" indicator-dots autoplay circular interval="4000" duration="500" indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#ff4757">
+      <swiper-item wx:for="{{product.images}}" wx:key="index">
+        <image class="gallery-image" src="{{item}}" mode="aspectFill" bindtap="previewImage" data-url="{{item}}"/>
+      </swiper-item>
+    </swiper>
+    <!-- 促销标签 -->
+    <view class="promo-badge">
+      <text class="promo-text">超值装9斤</text>
+    </view>
+  </view>
+
+  <!-- 价格佣金区域 -->
+  <view class="price-section">
+    <view class="price-main">
+      <view class="price-tag">补贴价</view>
+      <text class="price-symbol">¥</text>
+      <text class="price-value">{{product.price}}</text>
+    </view>
+    <view class="commission-info">
+      <view class="commission-box">
+        <text class="commission-label">预计赚</text>
+        <text class="commission-value">¥{{product.commissionAmount}}</text>
+        <text class="commission-rate">佣金率{{product.commissionRate}}%</text>
+      </view>
+      <view class="promo-tag">
+        <text class="promo-tag-text">大牌大补</text>
+        <text class="promo-tag-sub">正品保障 官方补贴</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 商品信息 -->
+  <view class="info-section">
+    <view class="brand-row">
+      <view class="brand-tag">大牌大补</view>
+      <view class="brand-tag brand">品牌</view>
+      <text class="brand-name">{{product.shopName}}</text>
+      <text class="detail-arrow">详情 ></text>
+    </view>
+    <view class="title-row">
+      <text class="product-title">{{product.title}}</text>
+    </view>
+    <view class="tag-row">
+      <view class="stat-tag">
+        <text class="stat-icon">↓</text>
+        <text>90天降26%</text>
+      </view>
+      <view class="stat-tag">
+        <text>该商品店内高佣</text>
+      </view>
+      <view class="stat-tag">
+        <text>{{product.reviewCount}}人评价"质量好"</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 数据统计 -->
+  <view class="stats-section">
+    <view class="stat-item">
+      <text class="stat-label">好评率</text>
+      <text class="stat-value highlight">{{product.goodRate}}%</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-label">累计销量</text>
+      <text class="stat-value">{{product.sales}}</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-label">累计上架达人</text>
+      <text class="stat-value">{{product.darenCount}}万</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-label">库存</text>
+      <text class="stat-value">{{product.stock}}万</text>
+    </view>
+  </view>
+
+  <!-- 样品政策 -->
+  <view class="sample-section">
+    <view class="sample-row">
+      <text class="sample-label">样品</text>
+      <text class="sample-value">先买样，出单大于6单可返全款</text>
+    </view>
+    <view class="sample-row">
+      <text class="sample-label">保障</text>
+      <view class="guarantee-tags">
+        <view class="guarantee-tag">
+          <text class="guarantee-icon">✓</text>
+          <text>信任购</text>
+        </view>
+        <text class="guarantee-text">品质放心·售后无忧</text>
+      </view>
+    </view>
+    <view class="sample-row">
+      <text class="sample-label">物流</text>
+      <text class="sample-value">24小时内从{{product.location}}发货</text>
+      <text class="arrow">></text>
+    </view>
+  </view>
+
+  <!-- 团长信息 -->
+  <view class="tuanzhang-section">
+    <view class="tz-header">
+      <view class="tz-info">
+        <image class="tz-avatar" src="{{product.tuanzhangAvatar}}"/>
+        <view class="tz-detail">
+          <text class="tz-name">{{product.tuanzhangName}}</text>
+          <text class="tz-desc">{{product.tuanzhangDesc}}</text>
+        </view>
+      </view>
+      <view class="tz-contact" bindtap="contactTuanzhang">
+        <text>联系团长</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 店铺信息 -->
+  <view class="shop-section">
+    <view class="shop-header">
+      <image class="shop-logo" src="{{product.shopLogo}}"/>
+      <view class="shop-info">
+        <view class="shop-name-row">
+          <view class="shop-badge">快手旗舰</view>
+          <text class="shop-name">{{product.shopName}}</text>
+        </view>
+        <text class="shop-sales">近半年分销销量 {{product.shopSales}}</text>
+      </view>
+      <view class="shop-action" bindtap="goToShop">
+        <text>进店选品</text>
+      </view>
+    </view>
+    <view class="shop-scores">
+      <view class="score-item main">
+        <text class="score-value">{{product.shopScore}}</text>
+        <text class="score-label">店铺体验分</text>
+        <text class="score-rank">超92%同行</text>
+      </view>
+      <view class="score-item">
+        <text class="score-value">{{product.productScore}}</text>
+        <text class="score-label">商品体验</text>
+      </view>
+      <view class="score-item">
+        <text class="score-value">{{product.logisticsScore}}</text>
+        <text class="score-label">物流体验</text>
+      </view>
+      <view class="score-item">
+        <text class="score-value">{{product.serviceScore}}</text>
+        <text class="score-label">售后服务</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 推广数据 -->
+  <view class="data-section">
+    <view class="section-title">近30天推广数据</view>
+    <view class="data-stats">
+      <view class="data-item">
+        <text class="data-value">{{product.monthSales}}</text>
+        <text class="data-label">商品总销量</text>
+      </view>
+      <view class="data-item">
+        <text class="data-value">{{product.monthViews}}</text>
+        <text class="data-label">商品总浏览量</text>
+      </view>
+      <view class="data-item">
+        <text class="data-value">{{product.monthDaren}}</text>
+        <text class="data-label">推广总达人数</text>
+      </view>
+    </view>
+    <!-- 趋势图占位 -->
+    <view class="trend-chart">
+      <view class="chart-placeholder">
+        <text>📈 销量趋势图</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 商品评价 -->
+  <view class="review-section">
+    <view class="section-header">
+      <text class="section-title">商品评价 ({{product.reviewCount}}条)</text>
+      <text class="view-all">查看全部 ></text>
+    </view>
+    <view class="review-summary">
+      <view class="review-rate">
+        <text class="rate-value">{{product.goodRate}}%</text>
+        <view class="rate-stars">
+          <view class="star" wx:for="[1,2,3,4,5]" wx:key="index">★</view>
+        </view>
+      </view>
+      <view class="review-tags">
+        <view class="review-tag" wx:for="{{product.reviewTags}}" wx:key="index">
+          <text class="tag-check" wx:if="{{index===0}}">✓</text>
+          <text>{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部安全区域 -->
+  <view class="safe-area"></view>
+</view>
+
+<!-- 底部操作栏 -->
+<view class="bottom-bar">
+  <view class="bottom-actions">
+    <view class="action-item" bindtap="goToShelf">
+      <text class="action-icon">🛒</text>
+      <text class="action-text">货架</text>
+    </view>
+    <view class="action-item" bindtap="contactTuanzhang">
+      <text class="action-icon">💬</text>
+      <text class="action-text">联系团长</text>
+    </view>
+    <view class="action-item" bindtap="goToShop">
+      <text class="action-icon">🏪</text>
+      <text class="action-text">进店选品</text>
+    </view>
+    <view class="action-promo">
+      <text class="promo-title">买样后返</text>
+      <text class="promo-desc">履约全额返现</text>
+    </view>
+    <view class="action-btn btn-add" bindtap="addToShelf">加入货架</view>
+  </view>
+</view>

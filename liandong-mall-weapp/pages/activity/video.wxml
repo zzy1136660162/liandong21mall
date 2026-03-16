@@ -1,0 +1,59 @@
+<view class="page">
+  <view class="status-bar" style="height: {{statusBarHeight}}rpx;"></view>
+  <view class="nav-bar">
+    <view class="nav-back" bindtap="goBack"><text class="nav-icon">←</text></view>
+    <view class="nav-title">视频热卖</view>
+    <view class="nav-right"></view>
+  </view>
+  <view class="activity-banner">
+    <image class="banner-image" src="https://picsum.photos/750/300?random=300" mode="aspectFill"/>
+    <view class="banner-overlay">
+      <text class="banner-title">视频热卖</text>
+      <text class="banner-subtitle">短视频带货爆款，视频转化率超高</text>
+    </view>
+  </view>
+  <view class="activity-stats">
+    <view class="stat-item"><text class="stat-number">{{stats.videoCount}}</text><text class="stat-label">视频商品</text></view>
+    <view class="stat-item"><text class="stat-number">{{stats.playCount}}</text><text class="stat-label">总播放量</text></view>
+    <view class="stat-item"><text class="stat-number">{{stats.conversion}}%</text><text class="stat-label">转化率</text></view>
+  </view>
+  <view class="filter-section">
+    <scroll-view class="filter-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="filter-list">
+        <view class="filter-item {{currentFilter === 'all' ? 'active' : ''}}" bindtap="switchFilter" data-filter="all"><text>全部</text></view>
+        <view class="filter-item {{currentFilter === 'hot' ? 'active' : ''}}" bindtap="switchFilter" data-filter="hot"><text>热门视频</text></view>
+        <view class="filter-item {{currentFilter === 'new' ? 'active' : ''}}" bindtap="switchFilter" data-filter="new"><text>最新发布</text></view>
+        <view class="filter-item {{currentFilter === 'high' ? 'active' : ''}}" bindtap="switchFilter" data-filter="high"><text>高转化</text></view>
+      </view>
+    </scroll-view>
+  </view>
+  <view class="product-list">
+    <view class="product-item" wx:for="{{products}}" wx:key="id" bindtap="goToProductDetail" data-id="{{item.id}}">
+      <view class="video-wrap">
+        <image class="product-image" src="{{item.image}}" mode="aspectFill"/>
+        <view class="play-btn">▶</view>
+        <view class="video-info">
+          <text class="play-count">▶ {{item.playCount}}</text>
+          <text class="video-duration">{{item.duration}}</text>
+        </view>
+      </view>
+      <view class="product-info">
+        <view class="author-info">
+          <image class="author-avatar" src="{{item.authorAvatar}}" mode="aspectFill"/>
+          <text class="author-name">{{item.authorName}}</text>
+        </view>
+        <view class="product-title">{{item.title}}</view>
+        <view class="commission-row">
+          <text class="commission-text">赚¥{{item.commission}}</text>
+          <text class="commission-rate">{{item.rate}}佣</text>
+        </view>
+        <view class="price-row">
+          <text class="price-label">售价¥{{item.price}}</text>
+          <text class="sales-text">{{item.sales}}</text>
+        </view>
+        <view class="add-btn" catchtap="addToShelf" data-id="{{item.id}}">加入货架</view>
+      </view>
+    </view>
+  </view>
+  <view class="safe-area"></view>
+</view>
