@@ -4,7 +4,7 @@
  */
 
 // API 基础配置
-const API_BASE_URL = 'http://101.126.90.255:5000'; // Flask 后端地址
+const API_BASE_URL = 'http://127.0.0.1:5000'; // Flask 后端地址
 
 // 请求方法
 const METHOD = {

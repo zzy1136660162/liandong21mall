@@ -61,6 +61,35 @@
                             class="feather icon-server"></i></span><span class="pcoded-mtext">Table</span></a>
                 </li>
                 <li class="nav-item pcoded-menu-caption">
+                    <label>会员管理</label>
+                </li>
+                <li data-username="会员管理首页" 
+                    class="nav-item {% if segment == 'member' %} active {% endif %}">
+                    <a href="/admin/member/" class="nav-link">
+                        <span class="pcoded-micon"><i class="feather icon-grid"></i></span>
+                        <span class="pcoded-mtext">会员管理首页</span>
+                    </a>
+                </li>
+                <li data-username="会员管理 会员列表 会员等级 达人申请 达人管理" 
+                    class="nav-item pcoded-hasmenu {% if 'member' in segment %} active {% endif %}">
+                    <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-users"></i></span><span
+                            class="pcoded-mtext">会员管理</span></a>
+                    <ul class="pcoded-submenu">
+                        <li class="{% if 'member/user_list' in segment %}active{% endif %}">
+                            <a href="/admin/member/user/list" class="">会员列表</a>
+                        </li>
+                        <li class="{% if 'member/member_level' in segment %}active{% endif %}">
+                            <a href="/admin/member/level" class="">会员等级</a>
+                        </li>
+                        <li class="{% if 'member/talent_apply_list' in segment %}active{% endif %}">
+                            <a href="/admin/member/talent/apply" class="">达人申请</a>
+                        </li>
+                        <li class="{% if 'member/talent_list' in segment %}active{% endif %}">
+                            <a href="/admin/member/talent/list" class="">达人管理</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item pcoded-menu-caption">
                     <label>Chart & Maps</label>
                 </li>
                 <li data-username="Charts Morris" 

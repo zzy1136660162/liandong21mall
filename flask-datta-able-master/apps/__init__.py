@@ -8,6 +8,7 @@ import os
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_restx import Api
 from importlib import import_module
 
 
@@ -21,9 +22,33 @@ def register_extensions(app):
 
 
 def register_blueprints(app):
-    for module_name in ('authentication', 'home'):
+    for module_name in ('authentication', 'home', 'member'):
         module = import_module('apps.{}.routes'.format(module_name))
         app.register_blueprint(module.blueprint)
+
+
+def register_api(app):
+    """注册REST API"""
+    authorizations = {
+        'apikey': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    }
+    
+    api = Api(
+        app, 
+        version='1.0', 
+        title='联动21商城API',
+        description='会员达人模块API',
+        authorizations=authorizations,
+        security='apikey'
+    )
+    
+    from apps.member.api import api as member_user_api, talent_ns
+    api.add_namespace(member_user_api, path='/api/user')
+    api.add_namespace(talent_ns, path='/api/user/talent')
 
 
 def configure_database(app):
@@ -36,12 +61,14 @@ def configure_database(app):
 
             print('> Error: DBMS Exception: ' + str(e) )
 
-            # fallback to SQLite
             basedir = os.path.abspath(os.path.dirname(__file__))
             app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
 
-            print('> Fallback to SQLite ')
+            print('> Fallback to SQLite ')    
             db.create_all()
+        
+        from apps.member.models import init_member_levels
+        init_member_levels()
 
     @app.teardown_request
     def shutdown_session(exception=None):
@@ -54,6 +81,7 @@ def create_app(config):
     app.config.from_object(config)
     register_extensions(app)
     register_blueprints(app)
+    register_api(app)
     app.register_blueprint(github_blueprint, url_prefix="/login")    
     configure_database(app)
     return app

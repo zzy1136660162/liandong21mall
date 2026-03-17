@@ -1,0 +1,127 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}用户列表{% endblock %}
+
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="page-header">
+                            <div class="row align-items-end">
+                                <div class="col-lg-8">
+                                    <div class="page-header-title">
+                                        <div class="d-inline">
+                                            <h4>用户列表</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="page-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <form method="get" action="{{ url_for('member.user_list') }}" class="form-inline">
+                                                <input type="text" name="keyword" class="form-control" placeholder="搜索昵称/手机号" value="{{ keyword }}">
+                                                <button type="submit" class="btn btn-primary">搜索</button>
+                                                <a href="{{ url_for('member.user_list') }}" class="btn btn-secondary">重置</a>
+                                            </form>
+                                        </div>
+                                        <div class="card-block table-border-style">
+                                            <div class="table-responsive">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>ID</th>
+                                                            <th>昵称</th>
+                                                            <th>手机号</th>
+                                                            <th>会员等级</th>
+                                                            <th>达人状态</th>
+                                                            <th>状态</th>
+                                                            <th>注册时间</th>
+                                                            <th>操作</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for user in users %}
+                                                        <tr>
+                                                            <td>{{ user.id }}</td>
+                                                            <td>{{ user.nickname or '-' }}</td>
+                                                            <td>{{ user.phone or '-' }}</td>
+                                                            <td>
+                                                                {% if user.member %}
+                                                                <span class="badge badge-success">{{ user.member.level.level_name if user.member.level else 'VIP' }}</span>
+                                                                {% else %}
+                                                                <span class="badge badge-secondary">普通用户</span>
+                                                                {% endif %}
+                                                            </td>
+                                                            <td>
+                                                                {% if user.talent_apply %}
+                                                                    {% if user.talent_apply.status == 'APPROVED' %}
+                                                                    <span class="badge badge-success">已通过</span>
+                                                                    {% elif user.talent_apply.status == 'PENDING' %}
+                                                                    <span class="badge badge-warning">审核中</span>
+                                                                    {% else %}
+                                                                    <span class="badge badge-danger">已拒绝</span>
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                <span class="badge badge-secondary">未申请</span>
+                                                                {% endif %}
+                                                            </td>
+                                                            <td>
+                                                                {% if user.status == 1 %}
+                                                                <span class="badge badge-success">正常</span>
+                                                                {% else %}
+                                                                <span class="badge badge-danger">禁用</span>
+                                                                {% endif %}
+                                                            </td>
+                                                            <td>{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else '-' }}</td>
+                                                            <td>
+                                                                <a href="{{ url_for('member.user_detail', user_id=user.id) }}" class="btn btn-sm btn-primary">查看</a>
+                                                            </td>
+                                                        </tr>
+                                                        {% else %}
+                                                        <tr>
+                                                            <td colspan="8" class="text-center">暂无数据</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        {% if pagination.pages > 1 %}
+                                        <div class="card-footer">
+                                            <nav>
+                                                <ul class="pagination">
+                                                    {% if pagination.has_prev %}
+                                                    <li class="page-item"><a class="page-link" href="{{ url_for('member.user_list', page=pagination.prev_num, keyword=keyword) }}">上一页</a></li>
+                                                    {% endif %}
+                                                    {% for p in range(1, pagination.pages + 1) %}
+                                                        {% if p == pagination.page %}
+                                                        <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+                                                        {% elif p <= 3 or p > pagination.pages - 3 or (p >= pagination.page - 1 and p <= pagination.page + 1) %}
+                                                        <li class="page-item"><a class="page-link" href="{{ url_for('member.user_list', page=p, keyword=keyword) }}">{{ p }}</a></li>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    {% if pagination.has_next %}
+                                                    <li class="page-item"><a class="page-link" href="{{ url_for('member.user_list', page=pagination.next_num, keyword=keyword) }}">下一页</a></li>
+                                                    {% endif %}
+                                                </ul>
+                                            </nav>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

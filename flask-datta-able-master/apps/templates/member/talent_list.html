@@ -1,0 +1,88 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}达人列表{% endblock %}
+
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="main-body">
+                    <div class="page-wrapper">
+                <div class="page-header">
+                    <div class="row align-items-end">
+                        <div class="col-lg-8">
+                            <div class="page-header-title">
+                                <div class="d-inline">
+                                    <h4>达人列表</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-block table-border-style">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>用户ID</th>
+                                                    <th>真实姓名</th>
+                                                    <th>手机号</th>
+                                                    <th>地区</th>
+                                                    <th>个人简介</th>
+                                                    <th>认证时间</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for talent in talents %}
+                                                <tr>
+                                                    <td>{{ talent.id }}</td>
+                                                    <td>{{ talent.user_id }}</td>
+                                                    <td>{{ talent.real_name }}</td>
+                                                    <td>{{ talent.phone }}</td>
+                                                    <td>{{ talent.region or '-' }}</td>
+                                                    <td>{{ talent.intro[:20] if talent.intro else '-' }}...</td>
+                                                    <td>{{ talent.audit_time.strftime('%Y-%m-%d') if talent.audit_time else '-' }}</td>
+                                                    <td>
+                                                        <a href="{{ url_for('member.user_detail', user_id=talent.user_id) }}" class="btn btn-sm btn-primary">查看用户</a>
+                                                    </td>
+                                                </tr>
+                                                {% else %}
+                                                <tr>
+                                                    <td colspan="8" class="text-center">暂无达人数据</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                {% if pagination.pages > 1 %}
+                                <div class="card-footer">
+                                    <nav>
+                                        <ul class="pagination">
+                                            {% if pagination.has_prev %}
+                                            <li class="page-item"><a class="page-link" href="{{ url_for('member.talent_list', page=pagination.prev_num) }}">上一页</a></li>
+                                            {% endif %}
+                                            <li class="page-item active"><span class="page-link">第 {{ pagination.page }} 页 / 共 {{ pagination.pages }} 页</span></li>
+                                            {% if pagination.has_next %}
+                                            <li class="page-item"><a class="page-link" href="{{ url_for('member.talent_list', page=pagination.next_num) }}">下一页</a></li>
+                                            {% endif %}
+                                        </ul>
+                                    </nav>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{% if level %}编辑{% else %}新增{% endif %}会员等级{% endblock %}
+
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="main-body">
+                    <div class="page-wrapper">
+                <div class="page-header">
+                    <div class="row align-items-end">
+                        <div class="col-lg-8">
+                            <div class="page-header-title">
+                                <div class="d-inline">
+                                    <h4>{% if level %}编辑{% else %}新增{% endif %}会员等级</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <a href="{{ url_for('member.member_level') }}" class="btn btn-secondary">返回列表</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-block">
+                                    <form method="post">
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label">等级编码</label>
+                                            <div class="col-sm-10">
+                                                {% if level %}
+                                                <input type="text" class="form-control" value="{{ level.level_code }}" readonly>
+                                                <small class="text-muted">等级编码不可修改</small>
+                                                {% else %}
+                                                <input type="text" name="level_code" class="form-control" placeholder="如：gold" required>
+                                                <small class="text-muted">唯一标识，不可重复，如：normal/vip/partner/gold</small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label">等级名称</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" name="level_name" class="form-control" value="{{ level.level_name or '' }}" required>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label">折扣率</label>
+                                            <div class="col-sm-10">
+                                                <input type="number" name="discount" class="form-control" value="{{ level.discount or '1.00' }}" step="0.01" min="0" max="1" required>
+                                                <small class="text-muted">例如：0.95 表示95折，1.00 表示不打折</small>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label">升级条件</label>
+                                            <div class="col-sm-10">
+                                                <textarea name="upgrade_condition" class="form-control" rows="3">{{ level.upgrade_condition or '' }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label">权益配置(JSON)</label>
+                                            <div class="col-sm-10">
+                                                <textarea name="benefits" class="form-control" rows="5">{{ level.benefits|tojson if level and level.benefits else '[]' }}</textarea>
+                                                <small class="text-muted">格式：[{"type":"discount","name":"全场95折"}]</small>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-2 col-form-label">排序</label>
+                                            <div class="col-sm-10">
+                                                <input type="number" name="sort" class="form-control" value="{{ level.sort or 0 }}">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-sm-10 offset-sm-2">
+                                                <button type="submit" class="btn btn-primary">保存</button>
+                                                <a href="{{ url_for('member.member_level') }}" class="btn btn-secondary">取消</a>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
