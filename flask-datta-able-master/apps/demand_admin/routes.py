@@ -116,7 +116,7 @@ def update_status():
     db.session.add(progress)
     db.session.commit()
 
-    return jsonify({'code': 200, 'message': '状态更新成功'})
+    return redirect(url_for('demand_admin.detail', demand_id=demand_id))
 
 
 @blueprint.route('/statistics')

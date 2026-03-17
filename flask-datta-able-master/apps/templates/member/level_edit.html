@@ -61,10 +61,20 @@
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label class="col-sm-2 col-form-label">权益配置(JSON)</label>
+                                            <label class="col-sm-2 col-form-label">权益配置</label>
                                             <div class="col-sm-10">
-                                                <textarea name="benefits" class="form-control" rows="5">{{ level.benefits|tojson if level and level.benefits else '[]' }}</textarea>
-                                                <small class="text-muted">格式：[{"type":"discount","name":"全场95折"}]</small>
+                                                <div class="row">
+                                                    <div class="col-md-4 mb-2">
+                                                        <input type="text" name="benefit1" class="form-control" placeholder="权益1（如：全场95折）" value="{% if level and level.benefits %}{{ level.benefits[0].name if level.benefits|length > 0 else '' }}{% else %}{% endif %}">
+                                                    </div>
+                                                    <div class="col-md-4 mb-2">
+                                                        <input type="text" name="benefit2" class="form-control" placeholder="权益2（如：积分翻倍）" value="{% if level and level.benefits %}{{ level.benefits[1].name if level.benefits|length > 1 else '' }}{% else %}{% endif %}">
+                                                    </div>
+                                                    <div class="col-md-4 mb-2">
+                                                        <input type="text" name="benefit3" class="form-control" placeholder="权益3（如：分销佣金）" value="{% if level and level.benefits %}{{ level.benefits[2].name if level.benefits|length > 2 else '' }}{% else %}{% endif %}">
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">最多可添加3项权益</small>
                                             </div>
                                         </div>
                                         <div class="form-group row">

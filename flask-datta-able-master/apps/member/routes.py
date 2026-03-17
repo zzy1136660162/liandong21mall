@@ -3,6 +3,7 @@
 会员达人模块 - 后台管理路由
 """
 
+import json
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from apps.member.services import MemberService, TalentService, AddressService
@@ -64,6 +65,15 @@ def user_detail(user_id):
 def member_level():
     """会员等级配置"""
     levels = MemberLevel.query.order_by(MemberLevel.sort).all()
+    
+    # 处理数据库中可能存储的字符串格式JSON
+    for level in levels:
+        if level.benefits and isinstance(level.benefits, str):
+            try:
+                level.benefits = json.loads(level.benefits)
+            except json.JSONDecodeError:
+                level.benefits = []
+    
     return render_template('member/member_level.html', levels=levels)
 
 
@@ -73,11 +83,32 @@ def level_edit(level_id):
     """编辑会员等级"""
     level = MemberLevel.query.get_or_404(level_id)
     
+    # 处理数据库中可能存储的字符串格式JSON
+    if level.benefits and isinstance(level.benefits, str):
+        try:
+            level.benefits = json.loads(level.benefits)
+        except json.JSONDecodeError:
+            level.benefits = []
+    
     if request.method == 'POST':
         level.level_name = request.form.get('level_name')
         level.discount = request.form.get('discount')
         level.upgrade_condition = request.form.get('upgrade_condition')
-        level.benefits = request.form.get('benefits')
+        
+        # 处理权益配置，从表单字段构建JSON
+        benefits = []
+        benefit1 = request.form.get('benefit1')
+        benefit2 = request.form.get('benefit2')
+        benefit3 = request.form.get('benefit3')
+        
+        if benefit1:
+            benefits.append({'type': 'discount', 'name': benefit1})
+        if benefit2:
+            benefits.append({'type': 'points', 'name': benefit2})
+        if benefit3:
+            benefits.append({'type': 'commission', 'name': benefit3})
+        
+        level.benefits = benefits
         db.session.commit()
         flash('保存成功', 'success')
         return redirect(url_for('member.member_level'))
@@ -96,12 +127,25 @@ def level_add():
             flash('等级编码已存在', 'danger')
             return redirect(url_for('member.level_add'))
         
+        # 处理权益配置，从表单字段构建JSON
+        benefits = []
+        benefit1 = request.form.get('benefit1')
+        benefit2 = request.form.get('benefit2')
+        benefit3 = request.form.get('benefit3')
+        
+        if benefit1:
+            benefits.append({'type': 'discount', 'name': benefit1})
+        if benefit2:
+            benefits.append({'type': 'points', 'name': benefit2})
+        if benefit3:
+            benefits.append({'type': 'commission', 'name': benefit3})
+        
         level = MemberLevel(
             level_code=level_code,
             level_name=request.form.get('level_name'),
             discount=request.form.get('discount'),
             upgrade_condition=request.form.get('upgrade_condition'),
-            benefits=request.form.get('benefits'),
+            benefits=benefits,
             sort=request.form.get('sort', 0)
         )
         db.session.add(level)
