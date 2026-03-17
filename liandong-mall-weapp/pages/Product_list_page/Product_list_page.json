@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "商品列表",
+  "navigationBarBackgroundColor": "#FFF9E6",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#FFF9E6",
+  "backgroundTextStyle": "dark",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 50
+}
