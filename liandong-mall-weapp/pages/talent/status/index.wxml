@@ -1,0 +1,79 @@
+<!-- 达人申请状态页 -->
+<view class="status-container">
+  <!-- 状态图标 -->
+  <view class="status-icon-view">
+    <!-- 审核中 -->
+    <view class="status-icon pending" wx:if="{{status === 'PENDING'}}">
+      <text class="icon">⏳</text>
+    </view>
+    <!-- 已通过 -->
+    <view class="status-icon approved" wx:elif="{{status === 'APPROVED'}}">
+      <text class="icon">✓</text>
+    </view>
+    <!-- 已拒绝 -->
+    <view class="status-icon rejected" wx:elif="{{status === 'REJECTED'}}">
+      <text class="icon">✕</text>
+    </view>
+    <!-- 未申请 -->
+    <view class="status-icon none" wx:else>
+      <text class="icon">?</text>
+    </view>
+  </view>
+
+  <!-- 状态标题 -->
+  <view class="status-title">
+    <text wx:if="{{status === 'PENDING'}}">审核中</text>
+    <text wx:elif="{{status === 'APPROVED'}}">审核通过</text>
+    <text wx:elif="{{status === 'REJECTED'}}">审核未通过</text>
+    <text wx:else>未申请</text>
+  </view>
+
+  <!-- 状态描述 -->
+  <view class="status-desc">
+    <text wx:if="{{status === 'PENDING'}}">您的达人申请已提交，工作人员将在1-3个工作日内完成审核</text>
+    <text wx:elif="{{status === 'APPROVED'}}">恭喜您已成为平台认证达人！现在可以进入达人中心开始选品了</text>
+    <text wx:elif="{{status === 'REJECTED'}}">您的申请未通过审核，请查看原因后重新提交申请</text>
+    <text wx:else>您还未申请成为达人</text>
+  </view>
+
+  <!-- 拒绝原因 -->
+  <view class="reject-reason" wx:if="{{status === 'REJECTED' && rejectReason}}">
+    <view class="reason-title">拒绝原因</view>
+    <text class="reason-text">{{rejectReason}}</text>
+  </view>
+
+  <!-- 申请信息 -->
+  <view class="apply-info" wx:if="{{status}}">
+    <view class="info-item">
+      <text class="info-label">申请时间</text>
+      <text class="info-value">{{applyTime || '-'}}</text>
+    </view>
+    <view class="info-item" wx:if="{{auditTime}}">
+      <text class="info-label">审核时间</text>
+      <text class="info-value">{{auditTime}}</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-section">
+    <!-- 审核中 -->
+    <button class="action-btn primary" wx:if="{{status === 'PENDING'}}" bindtap="goBack">
+      <text>返回</text>
+    </button>
+
+    <!-- 已通过 -->
+    <button class="action-btn primary" wx:elif="{{status === 'APPROVED'}}" bindtap="goToTalentCenter">
+      <text>进入达人中心</text>
+    </button>
+
+    <!-- 已拒绝 -->
+    <button class="action-btn primary" wx:elif="{{status === 'REJECTED'}}" bindtap="reApply">
+      <text>重新申请</text>
+    </button>
+
+    <!-- 未申请 -->
+    <button class="action-btn primary" wx:else bindtap="goToApply">
+      <text>立即申请</text>
+    </button>
+  </view>
+</view>

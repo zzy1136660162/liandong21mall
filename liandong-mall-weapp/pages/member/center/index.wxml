@@ -1,0 +1,86 @@
+<!-- 会员中心页 -->
+<view class="member-container">
+  <!-- 会员等级卡片 -->
+  <view class="member-card">
+    <view class="card-header">
+      <text class="card-title">{{memberInfo.levelName || '普通用户'}}</text>
+      <view class="vip-badge" wx:if="{{memberInfo.isMember}}">
+        <text class="vip-icon">👑</text>
+        <text class="vip-text">VIP</text>
+      </view>
+    </view>
+    <view class="card-body">
+      <text class="discount-text" wx:if="{{memberInfo.isMember}}">全场商品享{{memberInfo.discount * 100}}折优惠</text>
+      <text class="discount-text" wx:else>完成首单购买即可升级为VIP会员</text>
+    </view>
+    <view class="card-footer" wx:if="{{memberInfo.validEnd}}">
+      <text class="valid-text">有效期至：{{memberInfo.validEnd}}</text>
+    </view>
+    <view class="card-footer" wx:else>
+      <text class="valid-text">有效期：永久</text>
+    </view>
+  </view>
+
+  <!-- 会员权益 -->
+  <view class="benefits-section" wx:if="{{memberInfo.isMember}}">
+    <view class="section-title">会员权益</view>
+    <view class="benefits-grid">
+      <view class="benefit-item" wx:for="{{memberInfo.benefits}}" wx:key="index">
+        <view class="benefit-icon">
+          <text wx:if="{{item.type === 'discount'}}">🎁</text>
+          <text wx:elif="{{item.type === 'points'}}">💰</text>
+          <text wx:elif="{{item.type === 'priority'}}">🚀</text>
+          <text wx:else="{{}}">✨</text>
+        </view>
+        <text class="benefit-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 升级规则 -->
+  <view class="upgrade-section">
+    <view class="section-title">升级规则</view>
+    <view class="upgrade-steps">
+      <!-- 普通用户 -->
+      <view class="step-item {{currentLevel === 'normal' ? 'active' : ''}}">
+        <view class="step-icon">
+          <text wx:if="{{currentLevel !== 'normal'}}">✓</text>
+          <text wx:else="{{}}">1</text>
+        </view>
+        <view class="step-content">
+          <text class="step-title">普通用户</text>
+          <text class="step-desc">注册即成为普通用户</text>
+        </view>
+      </view>
+      <view class="step-line {{currentLevel !== 'normal' ? 'active' : ''}}"></view>
+      
+      <!-- VIP会员 -->
+      <view class="step-item {{currentLevel === 'vip' ? 'active' : ''}} {{currentLevel === 'normal' ? 'pending' : ''}}">
+        <view class="step-icon">
+          <text wx:if="{{currentLevel === 'partner'}}">✓</text>
+          <text wx:else="{{}}">2</text>
+        </view>
+        <view class="step-content">
+          <text class="step-title">VIP会员</text>
+          <text class="step-desc">完成首单购买自动升级，享受全场95折优惠</text>
+        </view>
+      </view>
+      <view class="step-line {{currentLevel === 'partner' ? 'active' : ''}}"></view>
+      
+      <!-- 合伙人 -->
+      <view class="step-item {{currentLevel === 'partner' ? 'active' : ''}} {{currentLevel !== 'partner' ? 'pending' : ''}}">
+        <view class="step-icon">3</view>
+        <view class="step-content">
+          <text class="step-title">合伙人</text>
+          <text class="step-desc">推广业绩达标后可申请成为合伙人</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 当前等级说明 -->
+  <view class="current-level-info" wx:if="{{memberInfo.upgradeCondition}}">
+    <view class="info-title">当前等级说明</view>
+    <text class="info-text">{{memberInfo.upgradeCondition}}</text>
+  </view>
+</view>

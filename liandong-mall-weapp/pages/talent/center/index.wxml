@@ -1,0 +1,83 @@
+<!-- 达人中心页 -->
+<view class="center-container">
+  <!-- 顶部渐变区域 -->
+  <view class="header">
+    <!-- 达人信息卡片 -->
+    <view class="talent-card">
+      <view class="talent-badge">
+        <text class="badge-icon">🏅</text>
+        <text class="badge-text">认证达人</text>
+      </view>
+      <view class="talent-info">
+        <image class="avatar" src="{{talentInfo.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'}}" mode="aspectFill"></image>
+        <view class="info-detail">
+          <text class="name">{{talentInfo.realName || '-'}}</text>
+          <text class="region">{{talentInfo.region || '-'}}</text>
+          <text class="auth-time">认证时间：{{talentInfo.auditTime || '-'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能入口 -->
+  <view class="function-section">
+    <view class="section-title">达人功能</view>
+    
+    <view class="function-list">
+      <!-- 选品池 -->
+      <view class="function-item" bindtap="goToSelectionPool">
+        <view class="item-icon">
+          <text>🛒</text>
+        </view>
+        <view class="item-content">
+          <text class="item-name">选品池</text>
+          <text class="item-desc">挑选优质商品进行推广</text>
+        </view>
+        <text class="item-arrow">></text>
+      </view>
+
+      <!-- 样品申请 -->
+      <view class="function-item" bindtap="goToSampleApply">
+        <view class="item-icon">
+          <text>📦</text>
+        </view>
+        <view class="item-content">
+          <text class="item-name">样品申请</text>
+          <text class="item-desc">申请样品进行测试体验</text>
+        </view>
+        <text class="item-arrow">></text>
+      </view>
+
+      <!-- 研发需求 -->
+      <view class="function-item" bindtap="goToRdDemand">
+        <view class="item-icon">
+          <text>🔬</text>
+        </view>
+        <view class="item-content">
+          <text class="item-name">研发需求</text>
+          <text class="item-desc">发布定制研发需求</text>
+        </view>
+        <text class="item-arrow">></text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 数据概览 -->
+  <view class="stats-section">
+    <view class="section-title">数据概览</view>
+    <view class="stats-grid">
+      <view class="stat-item">
+        <text class="stat-value">{{stats.promotionCount}}</text>
+        <text class="stat-label">推广单</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-value">{{stats.sampleCount}}</text>
+        <text class="stat-label">样品单</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-value">{{stats.demandCount}}</text>
+        <text class="stat-label">研发单</text>
+      </view>
+    </view>
+  </view>
+</view>

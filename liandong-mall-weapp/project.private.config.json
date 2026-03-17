@@ -3,7 +3,7 @@
     "projectname": "liandong-mall-weapp",
     "setting": {
         "compileHotReLoad": true,
-        "urlCheck": true,
+        "urlCheck": false,
         "coverView": true,
         "lazyloadPlaceholderEnable": false,
         "skylineRenderEnable": false,
@@ -23,11 +23,18 @@
         "miniprogram": {
             "list": [
                 {
-                    "name": "pages/index/index",
-                    "pathName": "pages/Product_list_page/Product_list_page",
+                    "name": "个人中心",
+                    "pathName": "pages/member/center/index",
                     "query": "",
                     "scene": null,
                     "launchMode": "default"
+                },
+                {
+                    "name": "商品列表",
+                    "pathName": "pages/Product_list_page/Product_list_page",
+                    "query": "",
+                    "launchMode": "default",
+                    "scene": null
                 }
             ]
         }

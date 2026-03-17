@@ -1,0 +1,81 @@
+<!-- 登录页面 -->
+<view class="login-container">
+  <!-- 顶部装饰 -->
+  <view class="header-decoration">
+    <view class="circle circle-1"></view>
+    <view class="circle circle-2"></view>
+  </view>
+
+  <!-- Logo 区域 -->
+  <view class="logo-section">
+    <image class="logo" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" mode="aspectFit"></image>
+    <text class="app-name">联东商城</text>
+    <text class="app-slogan">品质生活，从这里开始</text>
+  </view>
+
+  <!-- 登录表单 -->
+  <view class="login-form">
+    <view class="form-item">
+      <text class="input-icon">📱</text>
+      <input 
+        class="input-field" 
+        type="number" 
+        placeholder="请输入手机号" 
+        maxlength="11"
+        value="{{phone}}"
+        bindinput="onPhoneInput"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="input-icon">🔐</text>
+      <input 
+        class="input-field code-input" 
+        type="number" 
+        placeholder="请输入验证码" 
+        maxlength="6"
+        value="{{code}}"
+        bindinput="onCodeInput"
+      />
+      <button 
+        class="code-btn" 
+        bindtap="sendCode" 
+        disabled="{{codeDisabled}}"
+      >
+        {{codeText}}
+      </button>
+    </view>
+
+    <button class="login-btn" bindtap="handleLogin" disabled="{{loading}}">
+      {{loading ? '登录中...' : '登录'}}
+    </button>
+
+    <view class="agreement">
+      <checkbox checked="{{agreed}}" bindtap="toggleAgreement" class="agreement-checkbox"></checkbox>
+      <text class="agreement-text">我已阅读并同意</text>
+      <text class="agreement-link" bindtap="goToAgreement">《用户协议》</text>
+      <text class="agreement-text">和</text>
+      <text class="agreement-link" bindtap="goToPrivacy">《隐私政策》</text>
+    </view>
+  </view>
+
+  <!-- 其他登录方式 -->
+  <view class="other-login">
+    <view class="divider">
+      <view class="divider-line"></view>
+      <text class="divider-text">其他登录方式</text>
+      <view class="divider-line"></view>
+    </view>
+    <view class="login-methods">
+      <view class="method-item" bindtap="wechatLogin">
+        <image class="method-icon" src="/assets/images/wechat-icon.png" mode="aspectFit"></image>
+        <text class="method-name">微信登录</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部提示 -->
+  <view class="footer-tip">
+    <text>登录即表示您同意我们的服务条款</text>
+  </view>
+</view>

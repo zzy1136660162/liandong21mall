@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/Product_list_page/Product_list_page",
+    "pages/login/index",
     "pages/xuanpinindex/xuanpinindex",
     "pages/index/index",
     "pages/category/category",
@@ -15,8 +16,12 @@
     "pages/rank/rank",
     "pages/my/my",
     "pages/my-samples/my-samples",
+    "pages/mine/index",
+    "pages/member/center/index",
+    "pages/talent/apply/index",
+    "pages/talent/center/index",
+    "pages/talent/status/index",
     "pages/logs/logs"
-    
   ],
   "window": {
     "navigationBarTextStyle": "black",
