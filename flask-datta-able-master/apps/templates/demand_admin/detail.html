@@ -1,0 +1,192 @@
+{% extends "layouts/base.html" %}
+{% block title %}需求详情{% endblock %}
+{% block content %}
+
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>需求详情 - {{ demand.demand_no }}</h5>
+                                        <a href="{{ url_for('demand_admin.list_demands') }}" class="btn btn-secondary btn-sm">返回列表</a>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6>基本信息</h6>
+                                                <table class="table table-bordered">
+                                                    <tr>
+                                                        <th width="30%">需求编号</th>
+                                                        <td>{{ demand.demand_no }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>需求标题</th>
+                                                        <td>{{ demand.title }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>功能诉求</th>
+                                                        <td>{{ demand.functional_appeal }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>目标人群</th>
+                                                        <td>{{ demand.target_audience }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>剂型偏好</th>
+                                                        <td>{{ demand.dosage_form_preference or '-' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>预算范围</th>
+                                                        <td>{{ demand.budget_range }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>期望交付时间</th>
+                                                        <td>{{ demand.expected_delivery_time.strftime('%Y-%m-%d') if demand.expected_delivery_time else '-' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>备注</th>
+                                                        <td>{{ demand.remark or '-' }}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6>提交人信息</h6>
+                                                <table class="table table-bordered">
+                                                    <tr>
+                                                        <th width="30%">提交人ID</th>
+                                                        <td>{{ demand.submitter_id }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>联系人姓名</th>
+                                                        <td>{{ demand.submitter_name or '-' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>联系电话</th>
+                                                        <td>{{ demand.submitter_phone or '-' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>提交时间</th>
+                                                        <td>{{ demand.submit_time.strftime('%Y-%m-%d %H:%M:%S') if demand.submit_time else '-' }}</td>
+                                                    </tr>
+                                                </table>
+
+                                                <h6 class="mt-4">状态管理</h6>
+                                                <table class="table table-bordered">
+                                                    <tr>
+                                                        <th width="30%">当前状态</th>
+                                                        <td>
+                                                            {% if demand.status == 0 %}
+                                                            <span class="badge badge-warning">待处理</span>
+                                                            {% elif demand.status == 1 %}
+                                                            <span class="badge badge-info">确认中</span>
+                                                            {% elif demand.status == 2 %}
+                                                            <span class="badge badge-primary">研发中</span>
+                                                            {% elif demand.status == 3 %}
+                                                            <span class="badge badge-secondary">样品制作</span>
+                                                            {% elif demand.status == 4 %}
+                                                            <span class="badge badge-success">已完成</span>
+                                                            {% elif demand.status == 5 %}
+                                                            <span class="badge badge-danger">已取消</span>
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>处理人</th>
+                                                        <td>{{ demand.handler_name or '-' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>处理备注</th>
+                                                        <td>{{ demand.admin_remark or '-' }}</td>
+                                                    </tr>
+                                                </table>
+
+                                                <button class="btn btn-primary mt-2" data-toggle="modal" data-target="#updateStatusModal">
+                                                    更新状态
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <h6 class="mt-4">进度记录</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>时间</th>
+                                                        <th>状态</th>
+                                                        <th>操作人</th>
+                                                        <th>备注</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for progress in progress_list %}
+                                                    <tr>
+                                                        <td>{{ progress.create_time.strftime('%Y-%m-%d %H:%M:%S') if progress.create_time else '-' }}</td>
+                                                        <td>{{ progress.status_text }}</td>
+                                                        <td>{{ progress.operator_name or '-' }}</td>
+                                                        <td>{{ progress.remark or '-' }}</td>
+                                                    </tr>
+                                                    {% else %}
+                                                    <tr>
+                                                        <td colspan="4" class="text-center">暂无进度记录</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="updateStatusModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" action="{{ url_for('demand_admin.update_status') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">更新状态</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="demand_id" value="{{ demand.id }}">
+                    <div class="form-group">
+                        <label>新状态</label>
+                        <select name="status" class="form-control" required>
+                            {% for option in status_options %}
+                            <option value="{{ option.value }}" {% if option.value == demand.status %}selected{% endif %}>
+                                {{ option.label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>处理人</label>
+                        <input type="text" name="operator_name" class="form-control" value="管理员">
+                    </div>
+                    <div class="form-group">
+                        <label>备注</label>
+                        <textarea name="remark" class="form-control" rows="3">{{ demand.admin_remark or '' }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

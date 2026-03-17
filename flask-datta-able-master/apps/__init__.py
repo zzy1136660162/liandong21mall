@@ -22,9 +22,10 @@ def register_extensions(app):
 
 
 def register_blueprints(app):
-    for module_name in ('authentication', 'home', 'member'):
+    for module_name in ('authentication', 'home', 'member', 'demand', 'demand_admin'):
         module = import_module('apps.{}.routes'.format(module_name))
-        app.register_blueprint(module.blueprint)
+        if hasattr(module, 'blueprint'):
+            app.register_blueprint(module.blueprint)
 
 
 def register_api(app):

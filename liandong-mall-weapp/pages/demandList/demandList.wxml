@@ -1,0 +1,111 @@
+<view class="container">
+  <!-- 状态筛选 -->
+  <view class="filter-bar">
+    <scroll-view class="filter-scroll" scroll-x="true">
+      <view 
+        class="filter-item {{currentStatus === '' ? 'active' : ''}}" 
+        bindtap="filterByStatus"
+        data-status=""
+      >
+        全部
+      </view>
+      <view 
+        class="filter-item {{currentStatus === '0' ? 'active' : ''}}" 
+        bindtap="filterByStatus"
+        data-status="0"
+      >
+        待处理
+      </view>
+      <view 
+        class="filter-item {{currentStatus === '1' ? 'active' : ''}}" 
+        bindtap="filterByStatus"
+        data-status="1"
+      >
+        确认中
+      </view>
+      <view 
+        class="filter-item {{currentStatus === '2' ? 'active' : ''}}" 
+        bindtap="filterByStatus"
+        data-status="2"
+      >
+        研发中
+      </view>
+      <view 
+        class="filter-item {{currentStatus === '3' ? 'active' : ''}}" 
+        bindtap="filterByStatus"
+        data-status="3"
+      >
+        样品制作
+      </view>
+      <view 
+        class="filter-item {{currentStatus === '4' ? 'active' : ''}}" 
+        bindtap="filterByStatus"
+        data-status="4"
+      >
+        已完成
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 需求列表 -->
+  <view class="demand-list" wx:if="{{demandList.length > 0}}">
+    <view 
+      class="demand-card" 
+      wx:for="{{demandList}}" 
+      wx:key="id"
+      bindtap="goToDetail"
+      data-id="{{item.id}}"
+    >
+      <view class="card-header">
+        <view class="demand-no">{{item.demandNo}}</view>
+        <view class="status-tag status-{{item.statusClass}}">{{item.statusText}}</view>
+      </view>
+      
+      <view class="card-body">
+        <view class="demand-title">{{item.title}}</view>
+        <view class="demand-info">
+          <view class="info-item">
+            <text class="info-label">目标人群：</text>
+            <text class="info-value">{{item.targetAudience}}</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">预算范围：</text>
+            <text class="info-value">{{item.budgetRange}}</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">期望交付：</text>
+            <text class="info-value">{{item.expectedDeliveryTime}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <view class="card-footer">
+        <text class="submit-time">提交时间：{{item.submitTime}}</text>
+        <view class="card-actions">
+          <text class="action-btn withdraw-btn" wx:if="{{item.status === 0}}" catchtap="withdrawDemand" data-id="{{item.id}}" data-index="{{index}}">撤回</text>
+          <text class="action-btn reapply-btn" wx:if="{{item.status === 5}}" catchtap="reapplyDemand" data-id="{{item.id}}" data-index="{{index}}">重新申请</text>
+          <text class="action-btn delete-btn" wx:if="{{item.status === 5}}" catchtap="deleteDemand" data-id="{{item.id}}" data-index="{{index}}">删除</text>
+          <text class="arrow">></text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{hasMore}}">
+      <text bindtap="loadMore">点击加载更多</text>
+    </view>
+    <view class="no-more" wx:else>
+      <text>没有更多了</text>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:else>
+    <view class="empty-icon-placeholder">📋</view>
+    <text class="empty-text">暂无研发需求</text>
+    <button class="btn btn-primary empty-btn" bindtap="goToSubmit">立即提交需求</button>
+  </view>
+</view>
+
+<!-- 浮动提交按钮 -->
+<view class="fab" bindtap="goToSubmit">+</view>

@@ -1,49 +1,68 @@
-// index.js
-const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
+const app = getApp();
 
 Page({
   data: {
-    motto: 'Hello World',
-    userInfo: {
-      avatarUrl: defaultAvatarUrl,
-      nickName: '',
-    },
-    hasUserInfo: false,
-    canIUseGetUserProfile: wx.canIUse('getUserProfile'),
-    canIUseNicknameComp: wx.canIUse('input.type.nickname'),
+    recentDemands: []
   },
-  bindViewTap() {
-    wx.navigateTo({
-      url: '../logs/logs'
-    })
+
+  onLoad() {
+    this.loadRecentDemands();
   },
-  onChooseAvatar(e) {
-    const { avatarUrl } = e.detail
-    const { nickName } = this.data.userInfo
-    this.setData({
-      "userInfo.avatarUrl": avatarUrl,
-      hasUserInfo: nickName && avatarUrl && avatarUrl !== defaultAvatarUrl,
-    })
+
+  onShow() {
+    this.loadRecentDemands();
   },
-  onInputChange(e) {
-    const nickName = e.detail.value
-    const { avatarUrl } = this.data.userInfo
-    this.setData({
-      "userInfo.nickName": nickName,
-      hasUserInfo: nickName && avatarUrl && avatarUrl !== defaultAvatarUrl,
-    })
-  },
-  getUserProfile(e) {
-    // 推荐使用wx.getUserProfile获取用户信息，开发者每次通过该接口获取用户个人信息均需用户确认，开发者妥善保管用户快速填写的头像昵称，避免重复弹窗
-    wx.getUserProfile({
-      desc: '展示用户信息', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
+
+  // 加载最近的需求
+  loadRecentDemands() {
+    const submitterId = app.globalData.userId;
+    
+    app.request({
+      url: `/demand/list?submitterId=${submitterId}&page=1&pageSize=3`,
       success: (res) => {
-        console.log(res)
+        const demands = res.data.list.map(item => ({
+          ...item,
+          statusClass: this.getStatusClass(item.status)
+        }));
         this.setData({
-          userInfo: res.userInfo,
-          hasUserInfo: true
-        })
+          recentDemands: demands
+        });
       }
-    })
+    });
   },
-})
+
+  // 获取状态样式类名
+  getStatusClass(status) {
+    const classMap = {
+      0: 'pending',
+      1: 'confirming',
+      2: 'developing',
+      3: 'sampling',
+      4: 'completed',
+      5: 'cancelled'
+    };
+    return classMap[status] || 'pending';
+  },
+
+  // 跳转到提交页面
+  goToSubmit() {
+    wx.navigateTo({
+      url: '/pages/demandSubmit/demandSubmit'
+    });
+  },
+
+  // 跳转到列表页面
+  goToList() {
+    wx.switchTab({
+      url: '/pages/demandList/demandList'
+    });
+  },
+
+  // 跳转到详情页面
+  goToDetail(e) {
+    const id = e.currentTarget.dataset.id;
+    wx.navigateTo({
+      url: `/pages/demandDetail/demandDetail?id=${id}`
+    });
+  }
+});
