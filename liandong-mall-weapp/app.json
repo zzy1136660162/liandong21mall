@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/Product_list_page/Product_list_page",
     "pages/xuanpinindex/xuanpinindex",
     "pages/index/index",
     "pages/category/category",
@@ -15,6 +16,7 @@
     "pages/my/my",
     "pages/my-samples/my-samples",
     "pages/logs/logs"
+    
   ],
   "window": {
     "navigationBarTextStyle": "black",
