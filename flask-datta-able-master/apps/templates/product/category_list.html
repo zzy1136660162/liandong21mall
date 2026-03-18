@@ -1,0 +1,170 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 商品分类管理 {% endblock %}
+
+{% block content %}
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <div class="main-body">
+            <div class="page-wrapper">
+                <div class="page-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>商品分类管理</h5>
+                                    <div class="card-header-right">
+                                        <button class="btn btn-primary" data-toggle="modal" data-target="#addCategoryModal">
+                                            <i class="feather icon-plus"></i> 添加分类
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-block">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>分类名称</th>
+                                                    <th>分类编码</th>
+                                                    <th>图标</th>
+                                                    <th>排序</th>
+                                                    <th>状态</th>
+                                                    <th>创建时间</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for category in categories %}
+                                                <tr>
+                                                    <td>{{ category.id }}</td>
+                                                    <td>{{ category.category_name }}</td>
+                                                    <td>{{ category.category_code }}</td>
+                                                    <td>
+                                                        {% if category.icon %}
+                                                        <img src="{{ category.icon }}" alt="图标" style="width: 40px; height: 40px;">
+                                                        {% else %}
+                                                        -
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ category.sort }}</td>
+                                                    <td>
+                                                        {% if category.status == 1 %}
+                                                        <span class="badge badge-success">启用</span>
+                                                        {% else %}
+                                                        <span class="badge badge-danger">禁用</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ category.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-info" onclick="editCategory({{ category.id }})">
+                                                            <i class="feather icon-edit"></i> 编辑
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger" onclick="deleteCategory({{ category.id }})">
+                                                            <i class="feather icon-trash-2"></i> 删除
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加分类</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addCategoryForm">
+                    <div class="form-group">
+                        <label>分类名称</label>
+                        <input type="text" class="form-control" name="categoryName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>分类编码</label>
+                        <input type="text" class="form-control" name="categoryCode" required>
+                    </div>
+                    <div class="form-group">
+                        <label>图标URL</label>
+                        <input type="text" class="form-control" name="icon">
+                    </div>
+                    <div class="form-group">
+                        <label>排序</label>
+                        <input type="number" class="form-control" name="sort" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select class="form-control" name="status">
+                            <option value="1">启用</option>
+                            <option value="0">禁用</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="addCategory()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function addCategory() {
+    const formData = new FormData(document.getElementById('addCategoryForm'));
+    const data = Object.fromEntries(formData);
+    
+    fetch('/admin/product/category/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.code === 200) {
+            alert('添加成功');
+            location.reload();
+        } else {
+            alert(result.message);
+        }
+    });
+}
+
+function editCategory(id) {
+    alert('编辑分类功能待实现');
+}
+
+function deleteCategory(id) {
+    if (confirm('确定要删除该分类吗？')) {
+        fetch(`/admin/product/category/delete/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === 200) {
+                alert('删除成功');
+                location.reload();
+            } else {
+                alert(result.message);
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

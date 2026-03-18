@@ -1,0 +1,119 @@
+<view class="selection-page">
+  <view class="page-background"></view>
+  
+  <view class="page-header">
+    <view class="header-content">
+      <view class="header-top">
+        <view class="brand-section">
+          <view class="brand-name">选品中心</view>
+          <view class="brand-line"></view>
+        </view>
+        <view class="header-actions">
+          <view class="action-btn">
+            <text class="action-icon">🔍</text>
+          </view>
+          <view class="action-btn">
+            <text class="action-icon">⚙️</text>
+          </view>
+        </view>
+      </view>
+      <view class="header-desc">精选优质商品，满足您的需求</view>
+    </view>
+  </view>
+
+  <view class="page-content">
+    <view class="filter-section">
+      <view class="filter-tabs">
+        <view 
+          wx:for="{{filterTabs}}" 
+          wx:key="id"
+          class="filter-tab {{currentFilter === item.id ? 'active' : ''}}"
+          bindtap="switchFilter"
+          data-id="{{item.id}}"
+        >
+          <text class="filter-text">{{item.name}}</text>
+          <view class="filter-indicator" wx:if="{{currentFilter === item.id}}"></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-header">
+      <view class="section-title">
+        <text class="title-text">{{currentFilterName}}</text>
+        <view class="title-decoration"></view>
+      </view>
+      <view class="section-more" bindtap="viewMore">
+        <text class="more-text">查看全部</text>
+        <text class="more-arrow">→</text>
+      </view>
+    </view>
+
+    <view class="product-grid">
+      <view 
+        wx:for="{{products}}" 
+        wx:key="id"
+        class="product-card"
+        bindtap="goToDetail"
+        data-id="{{item.id}}"
+      >
+        <view class="card-visual">
+          <view class="image-container">
+            <image class="product-image" src="{{item.image}}" mode="aspectFill" lazy-load="{{true}}" />
+            <view class="image-overlay">
+              <view class="overlay-badges">
+                <view class="badge hot" wx:if="{{item.isHot}}">热门</view>
+                <view class="badge new" wx:if="{{item.isNew}}">新品</view>
+              </view>
+              <view class="overlay-actions">
+                <view class="action-favorite" bindtap="toggleFavorite" data-id="{{item.id}}" catchtap="true">
+                  <text class="favorite-icon {{item.favorite ? 'active' : ''}}">{{item.favorite ? '♥' : '♡'}}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <view class="card-content">
+          <view class="product-name">{{item.name}}</view>
+          <view class="product-meta">
+            <text class="meta-item" wx:if="{{item.sales}}">已售 {{item.sales}}</text>
+            <text class="meta-divider" wx:if="{{item.sales && item.stock < 50}}">·</text>
+            <text class="meta-item stock" wx:if="{{item.stock < 50}}">仅剩 {{item.stock}}</text>
+          </view>
+          
+          <view class="card-footer">
+            <view class="price-section">
+              <text class="currency">¥</text>
+              <text class="price">{{item.price}}</text>
+            </view>
+            <view class="add-btn" bindtap="addToCart" data-id="{{item.id}}" catchtap="true">
+              <text class="add-icon">＋</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="loading-state" wx:if="{{loading}}">
+      <view class="loading-dots">
+        <view class="dot"></view>
+        <view class="dot"></view>
+        <view class="dot"></view>
+      </view>
+    </view>
+
+    <view class="end-state" wx:if="{{noMore && products.length > 0}}">
+      <view class="end-line"></view>
+      <text class="end-text">已加载全部</text>
+      <view class="end-line"></view>
+    </view>
+
+    <view class="empty-state" wx:if="{{products.length === 0 && !loading}}">
+      <text class="empty-emoji">✨</text>
+      <text class="empty-title">暂无商品</text>
+      <text class="empty-desc">探索更多精彩好物</text>
+    </view>
+  </view>
+
+  <custom-tab activeTab="{{2}}" bindtabchange="onTabChange" />
+</view>

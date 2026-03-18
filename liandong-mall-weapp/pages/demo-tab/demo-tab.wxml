@@ -1,0 +1,152 @@
+<view class="demo-page">
+  <view class="page-background"></view>
+  
+  <view class="page-header">
+    <view class="header-content">
+      <view class="header-top">
+        <view class="brand-section">
+          <view class="brand-name">Tab 组件</view>
+          <view class="brand-line"></view>
+        </view>
+        <view class="header-actions">
+          <view class="action-btn">
+            <text class="action-icon">🔍</text>
+          </view>
+          <view class="action-btn">
+            <text class="action-icon">⚙️</text>
+          </view>
+        </view>
+      </view>
+      <view class="header-desc">自定义底部导航栏组件示例</view>
+    </view>
+  </view>
+
+  <view class="page-content">
+    <view class="hero-section">
+      <view class="hero-card">
+        <view class="hero-icon">📱</view>
+        <view class="hero-content">
+          <view class="hero-title">自定义 Tab 组件</view>
+          <view class="hero-desc">精致极简的设计风格，支持角标、动画反馈等功能</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="features-section">
+      <view class="section-header">
+        <view class="section-title">
+          <text class="title-text">核心特性</text>
+          <view class="title-decoration"></view>
+        </view>
+      </view>
+
+      <view class="features-grid">
+        <view class="feature-card">
+          <view class="feature-icon">✨</view>
+          <view class="feature-title">极简设计</view>
+          <view class="feature-desc">黑白配色，简洁优雅</view>
+        </view>
+        <view class="feature-card">
+          <view class="feature-icon">🔔</view>
+          <view class="feature-title">角标支持</view>
+          <view class="feature-desc">显示购物车数量等信息</view>
+        </view>
+        <view class="feature-card">
+          <view class="feature-icon">🎯</view>
+          <view class="feature-title">点击反馈</view>
+          <view class="feature-desc">缩放动画，交互流畅</view>
+        </view>
+        <view class="feature-card">
+          <view class="feature-icon">📐</view>
+          <view class="feature-title">安全适配</view>
+          <view class="feature-desc">自动适配 iPhone X+</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="tabs-section">
+      <view class="section-header">
+        <view class="section-title">
+          <text class="title-text">标签页配置</text>
+          <view class="title-decoration"></view>
+        </view>
+      </view>
+
+      <view class="tabs-list">
+        <view 
+          wx:for="{{tabConfig}}" 
+          wx:key="id"
+          class="tab-config-item"
+        >
+          <view class="tab-icon-wrapper">
+            <image class="tab-icon" src="{{item.selectedIcon}}" mode="aspectFit" />
+          </view>
+          <view class="tab-info">
+            <view class="tab-name">{{item.name}}</view>
+            <view class="tab-path">{{item.path}}</view>
+          </view>
+          <view class="tab-status">
+            <text class="status-text">其他</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="usage-section">
+      <view class="section-header">
+        <view class="section-title">
+          <text class="title-text">使用方法</text>
+          <view class="title-decoration"></view>
+        </view>
+      </view>
+
+      <view class="usage-steps">
+        <view class="step-card">
+          <view class="step-number">1</view>
+          <view class="step-content">
+            <view class="step-title">引入组件</view>
+            <view class="step-code">"usingComponents": { "custom-tab": "/components/custom-tab/custom-tab" }</view>
+          </view>
+        </view>
+        <view class="step-card">
+          <view class="step-number">2</view>
+          <view class="step-content">
+            <view class="step-title">使用组件</view>
+            <view class="step-code">&lt;custom-tab activeTab="{{activeTab}}" bindtabchange="onTabChange" /&gt;</view>
+          </view>
+        </view>
+        <view class="step-card">
+          <view class="step-number">3</view>
+          <view class="step-content">
+            <view class="step-title">处理事件</view>
+            <view class="step-code">onTabChange(e) { this.setData({ activeTab: e.detail.activeTab }) }</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="status-section">
+      <view class="section-header">
+        <view class="section-title">
+          <text class="title-text">当前状态</text>
+          <view class="title-decoration"></view>
+        </view>
+      </view>
+
+      <view class="status-card">
+        <view class="status-row">
+          <text class="status-label">当前选中：</text>
+          <text class="status-value">{{activeTabName}}</text>
+        </view>
+        <view class="status-row">
+          <text class="status-label">组件版本：</text>
+          <text class="status-value">v1.0.0</text>
+        </view>
+        <view class="status-row">
+          <text class="status-label">最后更新：</text>
+          <text class="status-value">2026-03-18</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

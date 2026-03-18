@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "研发中心",
+  "usingComponents": {
+    "custom-tab": "/components/custom-tab/custom-tab"
+  }
+}
