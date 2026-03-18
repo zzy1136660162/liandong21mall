@@ -562,6 +562,7 @@ class SearchAPI(Resource):
         keyword = request.args.get('keyword', '')
         page = request.args.get('page', 1, type=int)
         page_size = request.args.get('pageSize', 10, type=int)
+        sort = request.args.get('sort', 'default')
         
         if not keyword:
             return {'code': 400, 'message': '请输入搜索关键词'}, 400
@@ -570,7 +571,18 @@ class SearchAPI(Resource):
             Product.name.like(f'%{keyword}%')
         )
         
-        pagination = query.order_by(Product.sales.desc()).paginate(
+        if sort == 'sales':
+            query = query.order_by(Product.sales.desc())
+        elif sort == 'commission':
+            query = query.order_by(Product.commission_rate.desc())
+        elif sort == 'new':
+            query = query.order_by(Product.create_time.desc())
+        elif sort == 'price':
+            query = query.order_by(Product.price.asc())
+        else:
+            query = query.order_by(Product.sales.desc())
+        
+        pagination = query.paginate(
             page=page, per_page=page_size, error_out=False
         )
         
@@ -599,6 +611,43 @@ class HotSearchAPI(Resource):
             'data': {
                 'keywords': keywords
             }
+        }
+
+
+@api.route('/search/suggestions')
+class SearchSuggestionsAPI(Resource):
+    """获取搜索联想 - GET /search/suggestions"""
+    def get(self):
+        keyword = request.args.get('keyword', '')
+        
+        if not keyword or len(keyword) < 1:
+            return {'code': 200, 'data': []}
+        
+        products = Product.query.filter(
+            Product.status == 1,
+            Product.name.like(f'%{keyword}%')
+        ).limit(10).all()
+        
+        suggestions = []
+        seen = set()
+        for p in products:
+            if p.name not in seen:
+                suggestions.append(p.name)
+                seen.add(p.name)
+        
+        common_suffixes = ['', '1', '2', '3', '套装', '正品', '新款', '爆款']
+        for suffix in common_suffixes:
+            if len(suggestions) >= 5:
+                break
+            suggestion = keyword + suffix
+            if suggestion not in seen:
+                suggestions.append(suggestion)
+                seen.add(suggestion)
+        
+        return {
+            'code': 200,
+            'message': 'success',
+            'data': suggestions[:5]
         }
 
 

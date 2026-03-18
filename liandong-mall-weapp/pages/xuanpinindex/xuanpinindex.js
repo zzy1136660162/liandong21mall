@@ -2,14 +2,11 @@ const productService = require('../../services/productService');
 
 Page({
   data: {
-    searchKeyword: '',
     currentCategory: 'all',
     currentFilter: 'all',
     products: [],
     allProducts: [],
     searchHistory: [],
-    hotSearches: ['洗衣液', '抽纸', '面膜', '口红', '零食'],
-    showSearchPanel: false,
     page: 1,
     pageSize: 10,
     loading: false,
@@ -212,17 +209,66 @@ Page({
 
   // 搜索输入
   onSearchInput(e) {
+    const keyword = e.detail.value;
     this.setData({
-      searchKeyword: e.detail.value
+      searchKeyword: keyword,
+      showSuggestions: keyword.length > 0
     });
+    
+    if (keyword.length > 0) {
+      this.getSearchSuggestions(keyword);
+    } else {
+      this.setData({ searchSuggestions: [] });
+    }
+  },
+
+  // 获取搜索联想（本地实现）
+  getSearchSuggestions(keyword) {
+    const allKeywords = [
+      '洗衣液', '洗衣粉', '洗衣凝珠', '洗衣皂',
+      '抽纸', '卷纸', '湿巾', '厨房纸',
+      '面膜', '面霜', '乳液', '精华', '口红', '唇膏',
+      '零食', '坚果', '饼干', '糖果', '巧克力',
+      '饮料', '矿泉水', '果汁', '奶茶', '咖啡',
+      '手机', '耳机', '充电宝', '数据线', '手机壳',
+      '奶粉', '尿不湿', '奶瓶', '婴儿油', '儿童玩具',
+      '猪肉', '牛肉', '鸡肉', '海鲜', '水果', '蔬菜',
+      '床品', '四件套', '被子', '枕头', '凉席'
+    ];
+    
+    const suggestions = allKeywords.filter(k => k.includes(keyword)).slice(0, 5);
+    this.setData({ searchSuggestions: suggestions });
+  },
+
+  // 点击联想词
+  onSuggestionTap(e) {
+    const keyword = e.currentTarget.dataset.keyword;
+    this.setData({
+      searchKeyword: keyword,
+      showSuggestions: false,
+      showSearchPanel: false
+    });
+    this.doSearch(keyword);
   },
 
   // 显示搜索面板
-  onSearchFocus() {
+  showSearchPanel() {
+    console.log('显示搜索面板');
     this.setData({ showSearchPanel: true });
   },
 
   // 隐藏搜索面板
+  hideSearchPanel() {
+    this.setData({ showSearchPanel: false });
+  },
+
+  // 显示搜索面板（focus时）
+  onSearchFocus() {
+    console.log('onSearchFocus');
+    this.setData({ showSearchPanel: true });
+  },
+
+  // 隐藏搜索面板（blur时）
   onSearchBlur() {
     // 延迟隐藏，给点击事件留出时间
     setTimeout(() => {
@@ -250,19 +296,15 @@ Page({
     this.setData({ searchHistory: [] });
   },
 
-  // 搜索
-  async onSearch() {
-    const keyword = this.data.searchKeyword.trim();
-    this.setData({ showSearchPanel: false });
-    
-    if (!keyword) {
-      this.setData({
-        page: 1,
-        products: []
-      });
-      this.loadProducts(true);
-      return;
-    }
+  // 执行搜索
+  async doSearch(keyword, sort = 'default') {
+    if (!keyword) return;
+
+    this.setData({ 
+      searchStatus: 'searching',
+      showSearchPanel: false,
+      showSuggestions: false
+    });
 
     this.saveSearchHistory(keyword);
 
@@ -270,7 +312,8 @@ Page({
       wx.showLoading({ title: '搜索中...' });
       const res = await productService.searchProducts(keyword, {
         page: 1,
-        pageSize: this.data.pageSize
+        pageSize: this.data.pageSize,
+        sort: sort
       });
       wx.hideLoading();
       
@@ -283,7 +326,7 @@ Page({
           commissionRate: item.commissionRate,
           commissionAmount: item.commissionAmount.toString(),
           sales: item.sales,
-          salesText: item.monthlySales.replace('月销', '').replace('件', ''),
+          salesText: item.monthlySales ? item.monthlySales.replace('月销', '').replace('件', '') : '0',
           tags: item.tags,
           isBrand: item.isBrand,
           hasCashback: item.hasCashback
@@ -292,7 +335,9 @@ Page({
         this.setData({
           products: products,
           page: 2,
-          hasMore: products.length === this.data.pageSize
+          hasMore: products.length === this.data.pageSize,
+          searchStatus: 'result',
+          currentSort: sort
         });
 
         if (products.length === 0) {
@@ -305,11 +350,48 @@ Page({
     } catch (error) {
       wx.hideLoading();
       console.error('搜索失败:', error);
-      wx.showToast({
-        title: '搜索失败',
-        icon: 'none'
-      });
+      wx.showToast({ title: '搜索失败', icon: 'none' });
+      this.setData({ searchStatus: 'home' });
     }
+  },
+
+  // 点击搜索按钮
+  async onSearch() {
+    const keyword = this.data.searchKeyword.trim();
+    console.log('搜索:', keyword);
+    
+    if (!keyword) {
+      wx.showToast({ title: '请输入搜索关键词', icon: 'none' });
+      return;
+    }
+
+    this.doSearch(keyword, this.data.currentSort);
+  },
+
+  // 排序筛选
+  onSortChange(e) {
+    const sort = e.currentTarget.dataset.value;
+    const keyword = this.data.searchKeyword;
+    
+    this.setData({ currentSort: sort });
+    
+    if (this.data.searchStatus === 'result' && keyword) {
+      this.doSearch(keyword, sort);
+    }
+  },
+
+  // 清空搜索，回到首页
+  clearSearch() {
+    this.setData({
+      searchKeyword: '',
+      searchStatus: 'home',
+      showSearchPanel: false,
+      showSuggestions: false,
+      products: this.data.allProducts,
+      page: 1,
+      hasMore: true
+    });
+    this.loadProducts(true);
   },
 
   // 切换分类
@@ -326,6 +408,13 @@ Page({
     const category = e.currentTarget.dataset.category;
     wx.navigateTo({
       url: '/pages/category/category?category=' + category
+    });
+  },
+
+  // 跳转到搜索页面
+  goToSearch() {
+    wx.navigateTo({
+      url: '/pages/search/search'
     });
   },
 

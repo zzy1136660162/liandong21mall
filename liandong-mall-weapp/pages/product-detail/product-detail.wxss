@@ -44,7 +44,6 @@
 /* 商品图片轮播 */
 .gallery-section {
   position: relative;
-  margin-top: 88rpx;
 }
 
 .gallery-swiper {

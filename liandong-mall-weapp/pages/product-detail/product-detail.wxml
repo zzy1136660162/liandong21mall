@@ -1,15 +1,4 @@
 <view class="page">
-  <!-- 顶部导航栏 -->
-  <view class="nav-bar">
-    <view class="nav-back" bindtap="goBack">
-      <text class="nav-icon">←</text>
-    </view>
-    <view class="nav-title">商品详情</view>
-    <view class="nav-share" bindtap="shareProduct">
-      <text class="nav-icon">↗</text>
-    </view>
-  </view>
-
   <!-- 商品图片轮播 -->
   <view class="gallery-section">
     <swiper class="gallery-swiper" indicator-dots autoplay circular interval="4000" duration="500" indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#ff4757">

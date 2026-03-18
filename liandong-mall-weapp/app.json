@@ -3,6 +3,7 @@
     "pages/Product_list_page/Product_list_page",
     "pages/login/index",
     "pages/xuanpinindex/xuanpinindex",
+    "pages/search/search",
     "pages/index/index",
     "pages/category/category",
     "pages/activity/hot",
