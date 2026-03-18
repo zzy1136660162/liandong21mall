@@ -24,7 +24,8 @@
     "pages/demandSubmit/demandSubmit",
     "pages/demandList/demandList",
     "pages/demandDetail/demandDetail",
-    "pages/demandProgress/demandProgress"
+    "pages/demandProgress/demandProgress",
+    "pages/chat/chat"
   ],
   "window": {
     "navigationBarTextStyle": "black",

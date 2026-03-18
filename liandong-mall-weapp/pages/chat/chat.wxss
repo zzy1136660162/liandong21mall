@@ -1,0 +1,263 @@
+/* 聊天页面样式 */
+page {
+  height: 100%;
+  background-color: #f5f5f5;
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* 顶部导航 */
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 30rpx;
+  background: linear-gradient(135deg, #1890ff, #36cfc9);
+  color: #fff;
+}
+
+.back-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-btn .icon {
+  font-size: 40rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 500;
+}
+
+.human-btn {
+  padding: 10rpx 20rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 30rpx;
+  font-size: 24rpx;
+}
+
+/* 消息列表 */
+.message-list {
+  flex: 1;
+  padding: 20rpx;
+  overflow-y: auto;
+}
+
+.message-item {
+  display: flex;
+  margin-bottom: 30rpx;
+  align-items: flex-start;
+}
+
+.message-item.user {
+  flex-direction: row-reverse;
+}
+
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin: 0 20rpx;
+  background: #e8e8e8;
+}
+
+.avatar-service {
+  background: linear-gradient(135deg, #1890ff, #36cfc9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-service::after {
+  content: '客';
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.message-content {
+  max-width: 70%;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-item.user .message-content {
+  align-items: flex-end;
+}
+
+.bubble {
+  padding: 20rpx 24rpx;
+  border-radius: 20rpx;
+  word-wrap: break-word;
+}
+
+.bubble.user {
+  background: #1890ff;
+  color: #fff;
+  border-bottom-right-radius: 4rpx;
+}
+
+.bubble.agent {
+  background: #fff;
+  color: #333;
+  border-bottom-left-radius: 4rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.bubble.system {
+  background: #f6ffed;
+  color: #52c41a;
+  border: 1rpx solid #b7eb8f;
+}
+
+.message-text {
+  font-size: 30rpx;
+  line-height: 1.6;
+}
+
+.message-time {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+/* 建议选项 */
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 10rpx;
+}
+
+.suggestion-item {
+  padding: 10rpx 20rpx;
+  background: #e6f7ff;
+  color: #1890ff;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  border: 1rpx solid #91d5ff;
+}
+
+/* 加载动画 */
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  padding: 20rpx;
+}
+
+.loading-dots {
+  display: flex;
+  gap: 10rpx;
+}
+
+.dot {
+  width: 16rpx;
+  height: 16rpx;
+  background: #ccc;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+/* 快捷问题 */
+.quick-questions {
+  padding: 20rpx;
+  background: #fff;
+  border-top: 1rpx solid #e8e8e8;
+}
+
+.quick-title {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 15rpx;
+  display: block;
+}
+
+.quick-scroll {
+  white-space: nowrap;
+}
+
+.quick-item {
+  display: inline-block;
+  padding: 15rpx 25rpx;
+  margin-right: 15rpx;
+  background: #f5f5f5;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  color: #666;
+  border: 1rpx solid #e8e8e8;
+}
+
+.quick-item:active {
+  background: #e6f7ff;
+  color: #1890ff;
+  border-color: #91d5ff;
+}
+
+/* 输入区域 */
+.input-area {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 30rpx;
+  background: #fff;
+  border-top: 1rpx solid #e8e8e8;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+}
+
+.input-wrapper {
+  flex: 1;
+  background: #f5f5f5;
+  border-radius: 40rpx;
+  padding: 15rpx 25rpx;
+  margin-right: 20rpx;
+}
+
+.message-input {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.send-btn {
+  width: 120rpx;
+  height: 70rpx;
+  line-height: 70rpx;
+  background: #ccc;
+  color: #fff;
+  border-radius: 35rpx;
+  font-size: 28rpx;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+.send-btn.active {
+  background: #1890ff;
+}
+
+.send-btn:active {
+  opacity: 0.8;
+}

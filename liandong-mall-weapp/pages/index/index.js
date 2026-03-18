@@ -64,5 +64,12 @@ Page({
     wx.navigateTo({
       url: `/pages/demandDetail/demandDetail?id=${id}`
     });
+  },
+
+  // 跳转到客服页面
+  goToChat() {
+    wx.navigateTo({
+      url: '/pages/chat/chat'
+    });
   }
 });
