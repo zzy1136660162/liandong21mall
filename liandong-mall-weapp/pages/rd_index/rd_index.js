@@ -1,48 +1,52 @@
-// index.js
-const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
+// rd_index.js
+const app = getApp()
 
 Page({
   data: {
-    motto: 'Hello World',
-    userInfo: {
-      avatarUrl: defaultAvatarUrl,
-      nickName: '',
-    },
-    hasUserInfo: false,
-    canIUseGetUserProfile: wx.canIUse('getUserProfile'),
-    canIUseNicknameComp: wx.canIUse('input.type.nickname'),
+    recentDemands: []
   },
-  bindViewTap() {
-    wx.navigateTo({
-      url: '../logs/logs'
-    })
+  onLoad() {
+    this.loadRecentDemands()
   },
-  onChooseAvatar(e) {
-    const { avatarUrl } = e.detail
-    const { nickName } = this.data.userInfo
-    this.setData({
-      "userInfo.avatarUrl": avatarUrl,
-      hasUserInfo: nickName && avatarUrl && avatarUrl !== defaultAvatarUrl,
-    })
-  },
-  onInputChange(e) {
-    const nickName = e.detail.value
-    const { avatarUrl } = this.data.userInfo
-    this.setData({
-      "userInfo.nickName": nickName,
-      hasUserInfo: nickName && avatarUrl && avatarUrl !== defaultAvatarUrl,
-    })
-  },
-  getUserProfile(e) {
-    wx.getUserProfile({
-      desc: '展示用户信息',
+  loadRecentDemands() {
+    wx.request({
+      url: `${app.globalData.apiBaseUrl}/demand/list`,
+      method: 'GET',
+      data: {
+        page: 1,
+        pageSize: 3
+      },
       success: (res) => {
-        console.log(res)
-        this.setData({
-          userInfo: res.userInfo,
-          hasUserInfo: true
-        })
+        if (res.data.code === 200 && res.data.data) {
+          this.setData({
+            recentDemands: res.data.data.list || []
+          })
+        }
+      },
+      fail: (err) => {
+        console.error('加载需求列表失败', err)
       }
+    })
+  },
+  goToSubmit() {
+    wx.navigateTo({
+      url: '/pages/demandSubmit/demandSubmit'
+    })
+  },
+  goToList() {
+    wx.navigateTo({
+      url: '/pages/demandList/demandList'
+    })
+  },
+  goToDetail(e) {
+    const { id } = e.currentTarget.dataset
+    wx.navigateTo({
+      url: `/pages/demandDetail/demandDetail?id=${id}`
+    })
+  },
+  goToChat() {
+    wx.navigateTo({
+      url: '/pages/chat/chat'
     })
   }
 })
