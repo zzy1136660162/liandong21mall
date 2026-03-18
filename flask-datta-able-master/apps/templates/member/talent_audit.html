@@ -25,7 +25,7 @@
                 </div>
                 <div class="page-body">
                     <div class="row">
-                        <div class="col-sm-8">
+                        <div class="col-sm-7">
                             <div class="card">
                                 <div class="card-header">
                                     <h5>申请信息</h5>
@@ -80,7 +80,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-5">
                             {% if apply.status == 'PENDING' %}
                             <div class="card">
                                 <div class="card-header">
@@ -117,6 +117,14 @@
                                     <h5>审核结果</h5>
                                 </div>
                                 <div class="card-block">
+                                    <p><strong>审核状态：</strong></p>
+                                    <p class="text-muted">
+                                        {% if apply.status == 'APPROVED' %}
+                                        <span class="badge badge-success">已通过</span>
+                                        {% elif apply.status == 'REJECTED' %}
+                                        <span class="badge badge-danger">已拒绝</span>
+                                        {% endif %}
+                                    </p>
                                     {% if apply.status == 'REJECTED' %}
                                     <p><strong>拒绝原因：</strong></p>
                                     <p class="text-muted">{{ apply.reject_reason or '未填写' }}</p>

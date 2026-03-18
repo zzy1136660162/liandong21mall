@@ -1,0 +1,80 @@
+<view class="container">
+  <view class="status-card">
+    <view class="status-info">
+      <text class="status-label">当前状态</text>
+      <text class="status-value status-{{statusClass}}">{{detail.statusText}}</text>
+    </view>
+    <view class="demand-no">需求编号：{{detail.demandNo}}</view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">需求信息</view>
+    <view class="info-row">
+      <text class="info-label">需求标题</text>
+      <text class="info-value">{{detail.title}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">功能诉求</text>
+      <text class="info-value">{{detail.functionalAppeal}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">目标人群</text>
+      <text class="info-value">{{detail.targetAudience}}</text>
+    </view>
+    <view class="info-row" wx:if="{{detail.dosageFormPreference}}">
+      <text class="info-label">剂型偏好</text>
+      <text class="info-value">{{detail.dosageFormPreference}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">预算范围</text>
+      <text class="info-value">{{detail.budgetRange}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">期望交付</text>
+      <text class="info-value">{{detail.expectedDeliveryTime}}</text>
+    </view>
+    <view class="info-row" wx:if="{{detail.remark}}">
+      <text class="info-label">备注</text>
+      <text class="info-value">{{detail.remark}}</text>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{detail.adminRemark || detail.handlerName}}">
+    <view class="section-title">处理信息</view>
+    <view class="info-row" wx:if="{{detail.handlerName}}">
+      <text class="info-label">处理人</text>
+      <text class="info-value">{{detail.handlerName}}</text>
+    </view>
+    <view class="info-row" wx:if="{{detail.adminRemark}}">
+      <text class="info-label">处理备注</text>
+      <text class="info-value highlight">{{detail.adminRemark}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">提交信息</view>
+    <view class="info-row">
+      <text class="info-label">联系人</text>
+      <text class="info-value">{{detail.submitterName || '未填写'}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">联系电话</text>
+      <text class="info-value">{{detail.submitterPhone || '未填写'}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">提交时间</text>
+      <text class="info-value">{{detail.submitTime}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">更新时间</text>
+      <text class="info-value">{{detail.updateTime}}</text>
+    </view>
+  </view>
+
+  <view class="action-section">
+    <button class="btn btn-primary" bindtap="viewProgress">查看进度</button>
+    <button class="btn btn-danger" bindtap="withdrawDemand" wx:if="{{detail.status === 0}}">撤回需求</button>
+    <button class="btn btn-warning" bindtap="reapplyDemand" wx:if="{{detail.status === 5}}">重新申请</button>
+    <button class="btn btn-secondary" bindtap="deleteDemand" wx:if="{{detail.status === 5}}">删除需求</button>
+  </view>
+</view>

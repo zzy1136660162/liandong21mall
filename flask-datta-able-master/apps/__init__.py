@@ -22,9 +22,10 @@ def register_extensions(app):
 
 
 def register_blueprints(app):
-    for module_name in ('authentication', 'home', 'member', 'product', 'sample'):
+    for module_name in ('authentication', 'home', 'member', 'demand', 'demand_admin'):
         module = import_module('apps.{}.routes'.format(module_name))
-        app.register_blueprint(module.blueprint)
+        if hasattr(module, 'blueprint'):
+            app.register_blueprint(module.blueprint)
 
 
 def register_api(app):
@@ -47,12 +48,8 @@ def register_api(app):
     )
     
     from apps.member.api import api as member_user_api, talent_ns
-    from apps.product.api import api as product_api
-    from apps.sample.api import api as sample_api
     api.add_namespace(member_user_api, path='/api/user')
     api.add_namespace(talent_ns, path='/api/user/talent')
-    api.add_namespace(product_api, path='/api/products')
-    api.add_namespace(sample_api, path='/api/samples')
 
 
 def configure_database(app):

@@ -21,7 +21,10 @@
     "pages/talent/apply/index",
     "pages/talent/center/index",
     "pages/talent/status/index",
-    "pages/logs/logs"
+    "pages/demandSubmit/demandSubmit",
+    "pages/demandList/demandList",
+    "pages/demandDetail/demandDetail",
+    "pages/demandProgress/demandProgress"
   ],
   "window": {
     "navigationBarTextStyle": "black",
@@ -29,7 +32,5 @@
     "navigationBarBackgroundColor": "#ffffff"
   },
   "style": "v2",
-  "componentFramework": "glass-easel",
-  "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "sitemapLocation": "sitemap.json"
 }

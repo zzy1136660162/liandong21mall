@@ -1,0 +1,48 @@
+<view class="container">
+  <!-- 需求基本信息 -->
+  <view class="card header-card">
+    <view class="header-title">{{demandTitle}}</view>
+    <view class="header-info">
+      <text class="status-tag status-{{statusClass}}">{{statusText}}</text>
+      <text class="demand-no">{{demandNo}}</text>
+    </view>
+  </view>
+
+  <!-- 进度时间线 -->
+  <view class="card">
+    <view class="section-title">研发进度</view>
+    
+    <view class="timeline" wx:if="{{progressList.length > 0}}">
+      <view class="timeline-item" wx:for="{{progressList}}" wx:key="id">
+        <view class="timeline-dot"></view>
+        <view class="timeline-content">
+          <view class="timeline-header">
+            <text class="timeline-time">{{item.createTime}}</text>
+            <text class="timeline-operator">{{item.operatorName}} ({{item.operatorTypeText}})</text>
+          </view>
+          <view class="timeline-text">{{item.progressRemark}}</view>
+          <view class="timeline-status" wx:if="{{item.statusBefore !== null && item.statusAfter !== null}}">
+            <text class="status-change">
+              {{item.statusBeforeText}} → {{item.statusAfterText}}
+            </text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:else>
+      <text class="empty-text">暂无进度记录</text>
+    </view>
+  </view>
+
+  <!-- 提示信息 -->
+  <view class="tips-card">
+    <view class="tips-title">温馨提示</view>
+    <view class="tips-list">
+      <text class="tips-item">• 我们会及时更新研发进度，请保持关注</text>
+      <text class="tips-item">• 如有疑问可联系客服：400-xxx-xxxx</text>
+      <text class="tips-item">• 您也可以在我的需求中查看所有记录</text>
+    </view>
+  </view>
+</view>

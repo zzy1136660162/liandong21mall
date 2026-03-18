@@ -50,7 +50,11 @@
                                                     <td><strong>{{ level.level_name }}</strong></td>
                                                     <td>
                                                         {% if level.discount %}
+                                                        {% if level.discount == 1.00 %}
+                                                        <span class="badge badge-secondary">无</span>
+                                                        {% else %}
                                                         <span class="badge badge-primary">{{ (level.discount * 100)|int }}折</span>
+                                                        {% endif %}
                                                         {% else %}
                                                         -
                                                         {% endif %}

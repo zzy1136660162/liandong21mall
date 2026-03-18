@@ -1,0 +1,149 @@
+.header-card {
+  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
+  color: #fff;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  line-height: 1.5;
+}
+
+.header-info {
+  display: flex;
+  align-items: center;
+}
+
+.header-info .status-tag {
+  margin-right: 20rpx;
+}
+
+.header-info .demand-no {
+  font-size: 24rpx;
+  opacity: 0.8;
+  font-family: monospace;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 40rpx;
+  padding-left: 20rpx;
+  border-left: 8rpx solid #1890ff;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 40rpx;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 12rpx;
+  top: 16rpx;
+  bottom: 0;
+  width: 2rpx;
+  background: #e8e8e8;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 40rpx;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -34rpx;
+  top: 16rpx;
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  background: #1890ff;
+  border: 4rpx solid #fff;
+  box-shadow: 0 0 0 2rpx #1890ff;
+}
+
+.timeline-item:first-child .timeline-dot {
+  background: #52c41a;
+  box-shadow: 0 0 0 2rpx #52c41a;
+}
+
+.timeline-content {
+  background: #f8f8f8;
+  padding: 24rpx;
+  border-radius: 12rpx;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+  flex-wrap: wrap;
+}
+
+.timeline-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.timeline-operator {
+  font-size: 24rpx;
+  color: #1890ff;
+  background: #e6f7ff;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.timeline-text {
+  font-size: 30rpx;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 12rpx;
+}
+
+.timeline-status {
+  margin-top: 12rpx;
+}
+
+.status-change {
+  font-size: 24rpx;
+  color: #666;
+  background: #fff;
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  display: inline-block;
+}
+
+.tips-card {
+  background: #fffbe6;
+  border: 2rpx solid #ffe58f;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-top: 20rpx;
+}
+
+.tips-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #d48806;
+  margin-bottom: 20rpx;
+}
+
+.tips-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.tips-item {
+  font-size: 26rpx;
+  color: #d48806;
+  line-height: 1.8;
+}
