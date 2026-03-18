@@ -14,7 +14,7 @@
     </view>
 
     <!-- 搜索面板 - 热门搜索和历史记录 -->
-    <view class="search-panel" wx:if="{{showSearchPanel}}">
+    <view class="search-panel" wx:if="{{showSearchPanel}}" catchtap="onPanelTap">
       <view class="panel-section" wx:if="{{searchHistory.length > 0}}">
         <view class="panel-header">
           <text class="panel-title">历史搜索</text>

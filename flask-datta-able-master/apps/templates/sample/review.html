@@ -1,0 +1,291 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}审核管理{% endblock %}
+
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="page-header">
+                            <div class="row align-items-end">
+                                <div class="col-lg-8">
+                                    <div class="page-header-title">
+                                        <div class="d-inline">
+                                            <h4>审核管理</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="page-body">
+                            <div class="card">
+                                <div class="card-block">
+                                    <div class="row mb-3">
+                                        <div class="col-lg-12">
+                                            <button class="btn btn-success" id="batchPassBtn" onclick="batchReview('pass')">批量通过</button>
+                                            <button class="btn btn-danger" id="batchRejectBtn" onclick="batchReview('reject')">批量拒绝</button>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th><input type="checkbox" id="checkAll"></th>
+                                                    <th>申请单号</th>
+                                                    <th>申请人</th>
+                                                    <th>联系电话</th>
+                                                    <th>商品信息</th>
+                                                    <th>数量</th>
+                                                    <th>收货地址</th>
+                                                    <th>申请时间</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="reviewTable">
+                                                <tr>
+                                                    <td colspan="9" class="text-center">加载中...</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <nav>
+                                        <ul class="pagination" id="pagination"></ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="reviewModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">审核申请</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="reviewId">
+                <div class="form-group">
+                    <label>审核备注</label>
+                    <textarea class="form-control" id="reviewRemark" rows="3" placeholder="请输入审核备注"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="submitReview('pass')">通过</button>
+                <button type="button" class="btn btn-danger" onclick="submitReview('reject')">拒绝</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">申请详情</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="detailContent">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+let currentPage = 1;
+let pageSize = 10;
+
+function loadData(page = 1) {
+    currentPage = page;
+    
+    fetch(`/api/samples/review?page=${page}&page_size=${pageSize}`)
+        .then(response => response.json())
+        .then(res => {
+            if (res.code === 200) {
+                renderTable(res.data.list);
+                renderPagination(res.data.total);
+            }
+        });
+}
+
+function renderTable(data) {
+    const tbody = document.getElementById('reviewTable');
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">暂无待审核申请</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = data.map(item => `
+        <tr>
+            <td><input type="checkbox" class="review-check" value="${item.id}"></td>
+            <td>${item.apply_no}</td>
+            <td>${item.user_name || '-'}</td>
+            <td>${item.user_phone || '-'}</td>
+            <td>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="${item.product_image}" style="width: 40px; height: 40px; object-fit: cover;" onerror="this.src='/static/assets/images/no-image.png'">
+                    <span>${item.product_name || '-'}</span>
+                </div>
+            </td>
+            <td>${item.quantity}</td>
+            <td><div style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.address || '-'}</div></td>
+            <td>${item.created_at || '-'}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="viewDetail(${item.id})">查看</button>
+                <button class="btn btn-sm btn-success" onclick="openReview(${item.id})">审核</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderPagination(total) {
+    const totalPages = Math.ceil(total / pageSize);
+    const ul = document.getElementById('pagination');
+    let html = '';
+
+    if (currentPage > 1) {
+        html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadData(${currentPage - 1})">上一页</a></li>`;
+    }
+
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === currentPage) {
+            html += `<li class="page-item active"><a class="page-link" href="javascript:void(0)">${i}</a></li>`;
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadData(${i})">${i}</a></li>`;
+        }
+    }
+
+    if (currentPage < totalPages) {
+        html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadData(${currentPage + 1})">下一页</a></li>`;
+    }
+
+    ul.innerHTML = html;
+}
+
+function openReview(id) {
+    document.getElementById('reviewId').value = id;
+    document.getElementById('reviewRemark').value = '';
+    $('#reviewModal').modal('show');
+}
+
+function submitReview(action) {
+    const id = document.getElementById('reviewId').value;
+    const remark = document.getElementById('reviewRemark').value;
+
+    fetch('/api/samples/review', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id: parseInt(id), action: action, remark: remark})
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.code === 200) {
+            $('#reviewModal').modal('hide');
+            loadData(currentPage);
+            alert(action === 'pass' ? '审核通过' : '审核已拒绝');
+        } else {
+            alert(res.message || '操作失败');
+        }
+    });
+}
+
+function batchReview(action) {
+    const checks = document.querySelectorAll('.review-check:checked');
+    const ids = Array.from(checks).map(c => parseInt(c.value));
+
+    if (ids.length === 0) {
+        alert('请选择要审核的申请');
+        return;
+    }
+
+    const remark = prompt('请输入审核备注（可选）') || '';
+
+    fetch('/api/samples/batch-review', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ids: ids, action: action, remark: remark})
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.code === 200) {
+            loadData(currentPage);
+            alert('批量审核成功');
+        } else {
+            alert(res.message || '操作失败');
+        }
+    });
+}
+
+function viewDetail(id) {
+    fetch(`/api/samples/apply/${id}`)
+        .then(response => response.json())
+        .then(res => {
+            if (res.code === 200) {
+                const item = res.data;
+                const statusMap = {
+                    0: '待审核',
+                    1: '审核通过',
+                    2: '审核拒绝',
+                    3: '已取消'
+                };
+                const shipStatusMap = {
+                    0: '待发货',
+                    1: '已发货',
+                    2: '已签收'
+                };
+                document.getElementById('detailContent').innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>申请单号：</strong>${item.apply_no}</p>
+                            <p><strong>申请人：</strong>${item.user_name || '-'}</p>
+                            <p><strong>联系电话：</strong>${item.user_phone || '-'}</p>
+                            <p><strong>收货地址：</strong>${item.address || '-'}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>商品名称：</strong>${item.product_name || '-'}</p>
+                            <p><strong>申请数量：</strong>${item.quantity}</p>
+                            <p><strong>审核状态：</strong>${statusMap[item.status]}</p>
+                            <p><strong>发货状态：</strong>${shipStatusMap[item.ship_status]}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <p><strong>申请备注：</strong>${item.remark || '-'}</p>
+                            <p><strong>审核备注：</strong>${item.review_remark || '-'}</p>
+                            <p><strong>物流公司：</strong>${item.ship_company || '-'}</p>
+                            <p><strong>物流单号：</strong>${item.ship_no || '-'}</p>
+                            <p><strong>申请时间：</strong>${item.created_at || '-'}</p>
+                        </div>
+                    </div>
+                `;
+                $('#detailModal').modal('show');
+            }
+        });
+}
+
+document.getElementById('checkAll').addEventListener('change', function() {
+    const checks = document.querySelectorAll('.review-check');
+    checks.forEach(check => check.checked = this.checked);
+});
+
+loadData();
+</script>
+{% endblock %}

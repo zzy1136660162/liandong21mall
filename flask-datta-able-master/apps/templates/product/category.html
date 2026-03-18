@@ -1,0 +1,248 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}商品分类{% endblock %}
+
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="page-header">
+                            <div class="row align-items-end">
+                                <div class="col-lg-8">
+                                    <div class="page-header-title">
+                                        <div class="d-inline">
+                                            <h4>商品分类</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <button class="btn btn-primary" onclick="showAddModal()">新增分类</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="page-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="card">
+                                        <div class="card-block table-border-style">
+                                            <div class="table-responsive">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>ID</th>
+                                                            <th>分类名称</th>
+                                                            <th>层级</th>
+                                                            <th>图标</th>
+                                                            <th>排序</th>
+                                                            <th>状�?/th>
+                                                            <th>商品数量</th>
+                                                            <th>操作</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="categoryTable">
+                                                        <tr>
+                                                            <td colspan="8" class="text-center">加载�?..</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 新增/编辑分类弹窗 -->
+<div class="modal" id="categoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">新增分类</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="categoryForm">
+                    <input type="hidden" id="categoryId">
+                    <div class="form-group">
+                        <label>上级分类</label>
+                        <select class="form-control" id="parentId">
+                            <option value="0">顶级分类</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>分类名称 *</label>
+                        <input type="text" class="form-control" id="categoryName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>图标</label>
+                        <input type="text" class="form-control" id="categoryIcon" placeholder="图标URL">
+                    </div>
+                    <div class="form-group">
+                        <label>排序</label>
+                        <input type="number" class="form-control" id="categorySort" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>状�?/label>
+                        <select class="form-control" id="categoryStatus">
+                            <option value="1">启用</option>
+                            <option value="0">禁用</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveCategory()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+let categories = [];
+
+function loadCategories() {
+    fetch('/api/products/category/list?parent_id=0')
+        .then(res => res.json())
+        .then(res => {
+            if (res.code === 200) {
+                categories = res.data;
+                renderTable();
+            }
+        });
+}
+
+function renderTable() {
+    const tbody = document.getElementById('categoryTable');
+    if (!categories || categories.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">暂无数据</td></tr>';
+        return;
+    }
+    
+    let html = '';
+    categories.forEach(cat => {
+        html += `
+            <tr>
+                <td>${cat.id}</td>
+                <td><span class="badge badge-primary">${cat.name}</span></td>
+                <td>一�?/td>
+                <td>${cat.icon ? '<img src="' + cat.icon + '" style="width:30px;">' : '-'}</td>
+                <td>${cat.sort}</td>
+                <td>${cat.status === 1 ? '<span class="badge badge-success">启用</span>' : '<span class="badge badge-danger">禁用</span>'}</td>
+                <td><span class="badge badge-info">${cat.product_count || 0}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-primary" onclick="showEditModal(${cat.id})">编辑</button>
+                    <button class="btn btn-sm btn-success" onclick="showAddSub(${cat.id}, '${cat.name}')">添加子分�?/button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteCategory(${cat.id})">删除</button>
+                </td>
+            </tr>
+        `;
+        // 渲染二级分类
+        if (cat.children && cat.children.length > 0) {
+            cat.children.forEach(sub => {
+                html += `
+                    <tr style="background-color: #f9f9f9;">
+                        <td>${sub.id}</td>
+                        <td>�?${sub.name}</td>
+                        <td>二级</td>
+                        <td>${sub.icon ? '<img src="' + sub.icon + '" style="width:30px;">' : '-'}</td>
+                        <td>${sub.sort}</td>
+                        <td>${sub.status === 1 ? '<span class="badge badge-success">启用</span>' : '<span class="badge badge-danger">禁用</span>'}</td>
+                        <td><span class="badge badge-info">${sub.product_count || 0}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="showEditModal(${sub.id})">编辑</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCategory(${sub.id})">删除</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+    });
+    tbody.innerHTML = html;
+}
+
+function showAddModal() {
+    document.getElementById('modalTitle').innerText = '新增分类';
+    document.getElementById('categoryId').value = '';
+    document.getElementById('categoryForm').reset();
+    document.getElementById('parentId').value = 0;
+    $('#categoryModal').modal('show');
+}
+
+function showAddSub(parentId, parentName) {
+    document.getElementById('modalTitle').innerText = '新增子分�?- ' + parentName;
+    document.getElementById('categoryId').value = '';
+    document.getElementById('categoryForm').reset();
+    document.getElementById('parentId').value = parentId;
+    $('#categoryModal').modal('show');
+}
+
+function showEditModal(id) {
+    const cat = categories.find(c => c.id === id) || (categories.flatMap(c => c.children || []).find(c => c.id === id));
+    if (!cat) return;
+    
+    document.getElementById('modalTitle').innerText = '编辑分类';
+    document.getElementById('categoryId').value = cat.id;
+    document.getElementById('categoryName').value = cat.name;
+    document.getElementById('categoryIcon').value = cat.icon || '';
+    document.getElementById('categorySort').value = cat.sort;
+    document.getElementById('categoryStatus').value = cat.status;
+    document.getElementById('parentId').value = cat.parent_id;
+    $('#categoryModal').modal('show');
+}
+
+function saveCategory() {
+    const id = document.getElementById('categoryId').value;
+    const data = {
+        name: document.getElementById('categoryName').value,
+        parent_id: parseInt(document.getElementById('parentId').value),
+        level: parseInt(document.getElementById('parentId').value) === 0 ? 1 : 2,
+        icon: document.getElementById('categoryIcon').value,
+        sort: parseInt(document.getElementById('categorySort').value),
+        status: parseInt(document.getElementById('categoryStatus').value)
+    };
+    
+    const url = id ? `/api/products/category/${id}` : '/api/products/category/list';
+    const method = id ? 'PUT' : 'POST';
+    
+    fetch(url, {
+        method: method,
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    }).then(res => res.json()).then(res => {
+        if (res.code === 200) {
+            $('#categoryModal').modal('hide');
+            loadCategories();
+        } else {
+            alert(res.message || '操作失败');
+        }
+    });
+}
+
+function deleteCategory(id) {
+    if (!confirm('确定要删除这个分类吗�?)) return;
+    fetch(`/api/products/category/${id}`, {method: 'DELETE'})
+        .then(res => res.json())
+        .then(res => {
+            if (res.code === 200) {
+                loadCategories();
+            } else {
+                alert(res.message || '删除失败');
+            }
+        });
+}
+
+loadCategories();
+</script>
+{% endblock %}

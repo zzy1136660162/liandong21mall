@@ -1,0 +1,360 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}佣金管理{% endblock %}
+
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="page-header">
+                            <div class="row align-items-end">
+                                <div class="col-lg-8">
+                                    <div class="page-header-title">
+                                        <div class="d-inline">
+                                            <h4>佣金管理</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <button class="btn btn-success" onclick="batchUpdate()">批量修改佣金</button>
+                                    <button class="btn btn-info" onclick="exportCommission()">导出配置</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="page-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <form method="get" class="form-inline">
+                                                <select name="category_id" class="form-control mr-2">
+                                                    <option value="">全部分类</option>
+                                                </select>
+                                                <input type="text" name="keyword" class="form-control mr-2" placeholder="搜索商品名称">
+                                                <button type="submit" class="btn btn-primary">搜索</button>
+                                            </form>
+                                        </div>
+                                        <div class="card-block table-border-style">
+                                            <div class="table-responsive">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th><input type="checkbox" id="checkAll"></th>
+                                                            <th>ID</th>
+                                                            <th>商品名称</th>
+                                                            <th>基础佣金</th>
+                                                            <th>普通达人</th>
+                                                            <th>优质达人</th>
+                                                            <th>头部达人</th>
+                                                            <th>结算类型</th>
+                                                            <th>操作</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="commissionTable">
+                                                        <tr>
+                                                            <td colspan="9" class="text-center">加载中...</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <nav>
+                                                <ul class="pagination" id="pagination"></ul>
+                                            </nav>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 佣金编辑弹窗 -->
+<div class="modal" id="commissionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑佣金</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="commissionForm">
+                    <input type="hidden" id="productId">
+                    <div class="form-group">
+                        <label>商品名称</label>
+                        <input type="text" class="form-control" id="productName" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>基础佣金比例 (%) *</label>
+                        <input type="number" class="form-control" id="commissionRate" step="0.01" min="0" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label>普通达人佣金比例 (%) *</label>
+                        <input type="number" class="form-control" id="normalRate" step="0.01" min="0" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label>优质达人佣金比例 (%) *</label>
+                        <input type="number" class="form-control" id="premiumRate" step="0.01" min="0" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label>头部达人佣金比例 (%) *</label>
+                        <input type="number" class="form-control" id="topRate" step="0.01" min="0" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label>结算类型</label>
+                        <select class="form-control" id="settlementType">
+                            <option value="1">月结</option>
+                            <option value="2">周结</option>
+                            <option value="3">实时</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveCommission()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 批量编辑弹窗 -->
+<div class="modal" id="batchModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">批量修改佣金</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="batchForm">
+                    <div class="alert alert-warning">
+                        已选择 <span id="selectedCount">0</span> 个商品
+                    </div>
+                    <div class="form-group">
+                        <label>基础佣金比例 (%)</label>
+                        <input type="number" class="form-control" id="batchCommissionRate" step="0.01" min="0" max="100" placeholder="留空则不修改">
+                    </div>
+                    <div class="form-group">
+                        <label>普通达人佣金比例 (%)</label>
+                        <input type="number" class="form-control" id="batchNormalRate" step="0.01" min="0" max="100" placeholder="留空则不修改">
+                    </div>
+                    <div class="form-group">
+                        <label>优质达人佣金比例 (%)</label>
+                        <input type="number" class="form-control" id="batchPremiumRate" step="0.01" min="0" max="100" placeholder="留空则不修改">
+                    </div>
+                    <div class="form-group">
+                        <label>头部达人佣金比例 (%)</label>
+                        <input type="number" class="form-control" id="batchTopRate" step="0.01" min="0" max="100" placeholder="留空则不修改">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveBatch()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+let currentPage = 1;
+let pageSize = 10;
+let selectedIds = [];
+
+function loadProducts() {
+    const params = new URLSearchParams(window.location.search);
+    const keyword = params.get('keyword') || '';
+    
+    fetch(`/api/products/list/admin?page=${currentPage}&page_size=${pageSize}&keyword=${keyword}`)
+        .then(res => res.json())
+        .then(res => {
+            if (res.code === 200) {
+                renderTable(res.data.list);
+                renderPagination(res.data.total);
+            }
+        });
+}
+
+function renderTable(list) {
+    const tbody = document.getElementById('commissionTable');
+    if (!list || list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center">暂无数据</td></tr>';
+        return;
+    }
+    
+    const settlementMap = {1: '月结', 2: '周结', 3: '实时'};
+    
+    tbody.innerHTML = list.map(item => `
+        <tr>
+            <td><input type="checkbox" class="product-check" value="${item.id}" ${selectedIds.includes(item.id) ? 'checked' : ''}></td>
+            <td>${item.id}</td>
+            <td>
+                <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.name}">
+                    ${item.name}
+                </div>
+            </td>
+            <td><span class="badge badge-primary">${item.commission_rate}%</span></td>
+            <td><span class="badge badge-info">${item.normal_rate}%</span></td>
+            <td><span class="badge badge-success">${item.premium_rate}%</span></td>
+            <td><span class="badge badge-warning">${item.top_rate}%</span></td>
+            <td>${settlementMap[item.settlement_type] || '月结'}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="editCommission(${item.id})">编辑</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderPagination(total) {
+    const totalPages = Math.ceil(total / pageSize);
+    const ul = document.getElementById('pagination');
+    let html = '';
+    
+    if (currentPage > 1) {
+        html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="goPage(${currentPage - 1})">上一页</a></li>`;
+    }
+    
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === currentPage) {
+            html += `<li class="page-item active"><a class="page-link" href="javascript:void(0)">${i}</a></li>`;
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="goPage(${i})">${i}</a></li>`;
+        }
+    }
+    
+    if (currentPage < totalPages) {
+        html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="goPage(${currentPage + 1})">下一页</a></li>`;
+    }
+    
+    ul.innerHTML = html;
+}
+
+function goPage(page) {
+    currentPage = page;
+    loadProducts();
+}
+
+function editCommission(id) {
+    fetch(`/api/products/list/admin?page=1&page_size=100`)
+        .then(res => res.json())
+        .then(res => {
+            if (res.code === 200) {
+                const item = res.data.list.find(p => p.id === id);
+                if (item) {
+                    document.getElementById('productId').value = item.id;
+                    document.getElementById('productName').value = item.name;
+                    document.getElementById('commissionRate').value = item.commission_rate;
+                    document.getElementById('normalRate').value = item.normal_rate;
+                    document.getElementById('premiumRate').value = item.premium_rate;
+                    document.getElementById('topRate').value = item.top_rate;
+                    document.getElementById('settlementType').value = item.settlement_type;
+                    $('#commissionModal').modal('show');
+                }
+            }
+        });
+}
+
+function saveCommission() {
+    const id = document.getElementById('productId').value;
+    const data = {
+        commission_rate: parseFloat(document.getElementById('commissionRate').value),
+        normal_rate: parseFloat(document.getElementById('normalRate').value),
+        premium_rate: parseFloat(document.getElementById('premiumRate').value),
+        top_rate: parseFloat(document.getElementById('topRate').value),
+        settlement_type: parseInt(document.getElementById('settlementType').value)
+    };
+    
+    fetch(`/api/products/commission/update/${id}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    }).then(res => res.json()).then(res => {
+        if (res.code === 200) {
+            $('#commissionModal').modal('hide');
+            loadProducts();
+        } else {
+            alert(res.message || '保存失败');
+        }
+    });
+}
+
+function batchUpdate() {
+    const checkboxes = document.querySelectorAll('.product-check:checked');
+    selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+    
+    if (selectedIds.length === 0) {
+        alert('请先选择商品');
+        return;
+    }
+    
+    document.getElementById('selectedCount').innerText = selectedIds.length;
+    $('#batchModal').modal('show');
+}
+
+function saveBatch() {
+    const data = {};
+    const fields = ['commission_rate', 'normal_rate', 'premium_rate', 'top_rate'];
+    const prefix = 'batch';
+    
+    fields.forEach(field => {
+        const value = parseFloat(document.getElementById(prefix + field.charAt(0).toUpperCase() + field.slice(1)).value);
+        if (!isNaN(value)) {
+            data[field] = value;
+        }
+    });
+    
+    if (Object.keys(data).length === 0) {
+        alert('请至少填写一个佣金比例');
+        return;
+    }
+    
+    fetch('/api/products/commission/batch-update', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ids: selectedIds, ...data})
+    }).then(res => res.json()).then(res => {
+        if (res.code === 200) {
+            $('#batchModal').modal('hide');
+            selectedIds = [];
+            loadProducts();
+        } else {
+            alert(res.message || '批量保存失败');
+        }
+    }).catch(err => {
+        alert('批量保存失败');
+    });
+}
+
+function exportCommission() {
+    window.location.href = '/api/products/commission/export';
+}
+
+document.getElementById('checkAll').addEventListener('change', function() {
+    document.querySelectorAll('.product-check').forEach(cb => cb.checked = this.checked);
+    if (this.checked) {
+        fetch(`/api/products/list/admin?page=1&page_size=1000`)
+            .then(res => res.json())
+            .then(res => {
+                if (res.code === 200) {
+                    selectedIds = res.data.list.map(p => p.id);
+                }
+            });
+    } else {
+        selectedIds = [];
+    }
+});
+
+loadProducts();
+</script>
+{% endblock %}

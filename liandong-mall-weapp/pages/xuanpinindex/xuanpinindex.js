@@ -1,3 +1,5 @@
+const productService = require('../../services/productService');
+
 Page({
   data: {
     searchKeyword: '',
@@ -8,6 +10,10 @@ Page({
     searchHistory: [],
     hotSearches: ['洗衣液', '抽纸', '面膜', '口红', '零食'],
     showSearchPanel: false,
+    page: 1,
+    pageSize: 10,
+    loading: false,
+    hasMore: true,
     // Banner轮播图
     banners: [
       {
@@ -107,7 +113,78 @@ Page({
   },
 
   // 加载商品数据
-  loadProducts() {
+  async loadProducts(refresh = false) {
+    if (this.data.loading) return;
+    
+    this.setData({ loading: true });
+    
+    try {
+      const page = refresh ? 1 : this.data.page;
+      const params = {
+        page,
+        pageSize: this.data.pageSize
+      };
+      
+      // 添加分类筛选
+      if (this.data.currentCategory !== 'all') {
+        params.category = this.data.currentCategory;
+      }
+      
+      // 添加关键词搜索
+      if (this.data.searchKeyword) {
+        params.keyword = this.data.searchKeyword;
+      }
+      
+      // 添加排序
+      if (this.data.currentFilter === 'commission') {
+        params.sortBy = 'commission';
+        params.sortOrder = 'desc';
+      } else if (this.data.currentFilter === 'sales') {
+        params.sortBy = 'sales';
+        params.sortOrder = 'desc';
+      }
+      
+      const res = await productService.getProducts(params);
+      
+      if (res.code === 200) {
+        const products = res.data.list.map(item => ({
+          id: item.id,
+          image: item.image,
+          title: item.name,
+          price: item.price.toString(),
+          commissionRate: item.commissionRate,
+          commissionAmount: item.commissionAmount.toString(),
+          sales: item.sales,
+          salesText: item.monthlySales.replace('月销', '').replace('件', ''),
+          tags: item.tags,
+          isBrand: item.isBrand,
+          hasCashback: item.hasCashback
+        }));
+        
+        this.setData({
+          products: refresh ? products : [...this.data.products, ...products],
+          allProducts: refresh ? products : [...this.data.allProducts, ...products],
+          page: page + 1,
+          hasMore: products.length === this.data.pageSize,
+          loading: false
+        });
+      } else {
+        throw new Error(res.message || '获取商品失败');
+      }
+    } catch (error) {
+      console.error('加载商品失败:', error);
+      this.setData({ loading: false });
+      wx.showToast({
+        title: '加载失败，使用默认数据',
+        icon: 'none'
+      });
+      // 使用默认数据
+      this.loadDefaultProducts();
+    }
+  },
+
+  // 加载默认商品数据（当API失败时使用）
+  loadDefaultProducts() {
     const products = [
       {
         id: 1,
@@ -124,115 +201,6 @@ Page({
         shop: '立白官方旗舰店',
         shopScore: 4.9,
         location: '广东广州'
-      },
-      {
-        id: 2,
-        image: 'https://picsum.photos/400/400?random=2',
-        title: '维达超韧抽纸3层130抽24包整箱装家用实惠',
-        price: '45.9',
-        originalPrice: '59.9',
-        commissionRate: 18,
-        commissionAmount: '8.26',
-        sales: 85000,
-        salesText: '8.5万',
-        tag: '官方',
-        tags: ['正品保障', '极速退款'],
-        shop: '维达官方旗舰店',
-        shopScore: 4.8,
-        location: '浙江杭州'
-      },
-      {
-        id: 3,
-        image: 'https://picsum.photos/400/400?random=3',
-        title: '漫花悬挂式抽纸整箱批发家用实惠装10提',
-        price: '29.9',
-        originalPrice: '49.9',
-        commissionRate: 25,
-        commissionAmount: '7.48',
-        sales: 56000,
-        salesText: '5.6万',
-        tags: ['正品保障', '7天无理由'],
-        shop: '漫花旗舰店',
-        shopScore: 4.7,
-        location: '江苏苏州'
-      },
-      {
-        id: 4,
-        image: 'https://picsum.photos/400/400?random=4',
-        title: 'SK-II神仙水精华液护肤套装补水保湿230ml',
-        price: '899',
-        originalPrice: '1299',
-        commissionRate: 15,
-        commissionAmount: '134.85',
-        sales: 23000,
-        salesText: '2.3万',
-        tag: '精选',
-        tags: ['正品保障', '假一赔十', '专柜直发'],
-        shop: 'SK-II官方旗舰店',
-        shopScore: 4.9,
-        location: '上海'
-      },
-      {
-        id: 5,
-        image: 'https://picsum.photos/400/400?random=5',
-        title: '花西子散粉定妆粉饼持久控油防水防汗不脱妆',
-        price: '149',
-        originalPrice: '199',
-        commissionRate: 22,
-        commissionAmount: '32.78',
-        sales: 156000,
-        salesText: '15.6万',
-        tags: ['正品保障', '7天无理由', '国货之光'],
-        shop: '花西子旗舰店',
-        shopScore: 4.8,
-        location: '浙江杭州'
-      },
-      {
-        id: 6,
-        image: 'https://picsum.photos/400/400?random=6',
-        title: '完美日记眼影盘动物盘十二色眼影小猫盘',
-        price: '99',
-        originalPrice: '159',
-        commissionRate: 20,
-        commissionAmount: '19.8',
-        sales: 210000,
-        salesText: '21万',
-        tag: '爆款',
-        tags: ['正品保障', '7天无理由'],
-        shop: '完美日记旗舰店',
-        shopScore: 4.7,
-        location: '广东广州'
-      },
-      {
-        id: 7,
-        image: 'https://picsum.photos/400/400?random=7',
-        title: '兰蔻小黑瓶精华肌底液修护保湿50ml',
-        price: '680',
-        originalPrice: '850',
-        commissionRate: 12,
-        commissionAmount: '81.6',
-        sales: 32000,
-        salesText: '3.2万',
-        tags: ['正品保障', '专柜直发'],
-        shop: '兰蔻官方旗舰店',
-        shopScore: 4.9,
-        location: '上海'
-      },
-      {
-        id: 8,
-        image: 'https://picsum.photos/400/400?random=8',
-        title: '雅诗兰黛小棕瓶精华液抗老修护50ml第七代',
-        price: '720',
-        originalPrice: '900',
-        commissionRate: 10,
-        commissionAmount: '72',
-        sales: 45000,
-        salesText: '4.5万',
-        tag: '大牌',
-        tags: ['正品保障', '假一赔十'],
-        shop: '雅诗兰黛官方旗舰店',
-        shopScore: 4.9,
-        location: '上海'
       }
     ];
 
@@ -256,9 +224,10 @@ Page({
 
   // 隐藏搜索面板
   onSearchBlur() {
+    // 延迟隐藏，给点击事件留出时间
     setTimeout(() => {
       this.setData({ showSearchPanel: false });
-    }, 200);
+    }, 300);
   },
 
   // 点击热门搜索
@@ -282,30 +251,62 @@ Page({
   },
 
   // 搜索
-  onSearch() {
+  async onSearch() {
     const keyword = this.data.searchKeyword.trim();
     this.setData({ showSearchPanel: false });
     
     if (!keyword) {
       this.setData({
-        products: this.data.allProducts
+        page: 1,
+        products: []
       });
+      this.loadProducts(true);
       return;
     }
 
     this.saveSearchHistory(keyword);
 
-    const filteredProducts = this.data.allProducts.filter(product => {
-      return product.title.includes(keyword) ||
-             (product.tag && product.tag.includes(keyword)) ||
-             (product.shop && product.shop.includes(keyword));
-    });
+    try {
+      wx.showLoading({ title: '搜索中...' });
+      const res = await productService.searchProducts(keyword, {
+        page: 1,
+        pageSize: this.data.pageSize
+      });
+      wx.hideLoading();
+      
+      if (res.code === 200) {
+        const products = res.data.list.map(item => ({
+          id: item.id,
+          image: item.image,
+          title: item.name,
+          price: item.price.toString(),
+          commissionRate: item.commissionRate,
+          commissionAmount: item.commissionAmount.toString(),
+          sales: item.sales,
+          salesText: item.monthlySales.replace('月销', '').replace('件', ''),
+          tags: item.tags,
+          isBrand: item.isBrand,
+          hasCashback: item.hasCashback
+        }));
+        
+        this.setData({
+          products: products,
+          page: 2,
+          hasMore: products.length === this.data.pageSize
+        });
 
-    this.setData({ products: filteredProducts });
-
-    if (filteredProducts.length === 0) {
+        if (products.length === 0) {
+          wx.showToast({
+            title: '未找到相关商品',
+            icon: 'none'
+          });
+        }
+      }
+    } catch (error) {
+      wx.hideLoading();
+      console.error('搜索失败:', error);
       wx.showToast({
-        title: '未找到相关商品',
+        title: '搜索失败',
         icon: 'none'
       });
     }
@@ -464,5 +465,22 @@ Page({
     wx.navigateTo({
       url: '/pages/sample-apply/sample-apply?productId=' + productId
     });
+  },
+
+  // 下拉刷新
+  async onPullDownRefresh() {
+    this.setData({
+      page: 1,
+      products: []
+    });
+    await this.loadProducts(true);
+    wx.stopPullDownRefresh();
+  },
+
+  // 上拉加载更多
+  onReachBottom() {
+    if (this.data.hasMore && !this.data.loading) {
+      this.loadProducts();
+    }
   }
 });
