@@ -22,7 +22,7 @@ def register_extensions(app):
 
 
 def register_blueprints(app):
-    for module_name in ('authentication', 'home', 'member'):
+    for module_name in ('authentication', 'home', 'member', 'product'):
         module = import_module('apps.{}.routes'.format(module_name))
         app.register_blueprint(module.blueprint)
 
@@ -49,26 +49,36 @@ def register_api(app):
     from apps.member.api import api as member_user_api, talent_ns
     api.add_namespace(member_user_api, path='/api/user')
     api.add_namespace(talent_ns, path='/api/user/talent')
+    
+    from apps.product.api import api as product_api, category_ns, cart_ns, order_ns
+    api.add_namespace(product_api, path='/api/product')
+    api.add_namespace(category_ns, path='/api/product/category')
+    api.add_namespace(cart_ns, path='/api/product/cart')
+    api.add_namespace(order_ns, path='/api/product/order')
 
 
 def configure_database(app):
-
-    @app.before_first_request
+    initialized = False
+    
+    @app.before_request
     def initialize_database():
-        try:
-            db.create_all()
-        except Exception as e:
-
-            print('> Error: DBMS Exception: ' + str(e) )
-
-            basedir = os.path.abspath(os.path.dirname(__file__))
-            app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
-
-            print('> Fallback to SQLite ')    
-            db.create_all()
-        
-        from apps.member.models import init_member_levels
-        init_member_levels()
+        nonlocal initialized
+        if not initialized:
+            try:
+                db.create_all()
+            except Exception as e:
+                print('> Warning: DBMS Exception: ' + str(e) )
+                print('> Tables may already exist, skipping auto-creation')
+            
+            from apps.member.models import init_member_levels
+            from apps.product.models import init_product_categories
+            try:
+                init_member_levels()
+                init_product_categories()
+            except Exception as e:
+                print('> Warning: Initialization failed: ' + str(e) )
+            
+            initialized = True
 
     @app.teardown_request
     def shutdown_session(exception=None):

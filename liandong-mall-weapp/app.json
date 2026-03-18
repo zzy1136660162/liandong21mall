@@ -15,8 +15,11 @@
     "pages/rank/rank",
     "pages/my/my",
     "pages/my-samples/my-samples",
-    "pages/logs/logs"
-    
+    "pages/logs/logs",
+    "pages/demo-tab/demo-tab",
+    "pages/selection/selection",
+    "pages/rd/rd",
+    "pages/Profile_page/Profile_page"
   ],
   "window": {
     "navigationBarTextStyle": "black",

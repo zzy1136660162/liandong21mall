@@ -1,4 +1,5 @@
 {
   "usingComponents": {
+    "custom-tab": "/components/custom-tab/custom-tab"
   }
 }

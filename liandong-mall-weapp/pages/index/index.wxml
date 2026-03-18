@@ -25,3 +25,5 @@
     </view>
   </view>
 </scroll-view>
+
+<custom-tab activeTab="{{0}}" bindtabchange="onTabChange" />

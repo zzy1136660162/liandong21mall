@@ -14,8 +14,13 @@ from apps import create_app, db
 # WARNING: Don't run with debug turned on in production!
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
 
+print(f'DEBUG environment variable: {os.getenv("DEBUG")}')
+print(f'DEBUG boolean value: {DEBUG}')
+
 # The configuration
 get_config_mode = 'Debug' if DEBUG else 'Production'
+
+print(f'Config mode: {get_config_mode}')
 
 try:
 

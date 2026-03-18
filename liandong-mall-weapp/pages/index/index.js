@@ -34,7 +34,7 @@ Page({
     })
   },
   getUserProfile(e) {
-    // 推荐使用wx.getUserProfile获取用户信息，开发者每次通过该接口获取用户个人信息均需用户确认，开发者妥善保管用户快速填写的头像昵称，避免重复弹窗
+    // 推荐使用wx.getUserProfile获取用户信息，开发者每次通过该接口获取用户个人信息均需用户确认，后续会展示在弹窗中，请谨慎填写
     wx.getUserProfile({
       desc: '展示用户信息', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
       success: (res) => {
@@ -46,4 +46,21 @@ Page({
       }
     })
   },
+
+  onTabChange(e) {
+    const { activeTab } = e.detail
+    const tabPaths = [
+      '/pages/index/index',
+      '/pages/Product_list_page/Product_list_page',
+      '/pages/selection/selection',
+      '/pages/rd/rd',
+      '/pages/Profile_page/Profile_page'
+    ]
+
+    if (activeTab !== 0) {
+      wx.switchTab({
+        url: tabPaths[activeTab]
+      })
+    }
+  }
 })

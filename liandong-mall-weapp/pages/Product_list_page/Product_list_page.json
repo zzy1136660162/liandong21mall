@@ -1,9 +1,12 @@
 {
   "navigationBarTitleText": "商品列表",
-  "navigationBarBackgroundColor": "#FFF9E6",
+  "navigationBarBackgroundColor": "#FFFFFF",
   "navigationBarTextStyle": "black",
-  "backgroundColor": "#FFF9E6",
+  "backgroundColor": "#FAFAFA",
   "backgroundTextStyle": "dark",
   "enablePullDownRefresh": true,
-  "onReachBottomDistance": 50
+  "onReachBottomDistance": 50,
+  "usingComponents": {
+    "custom-tab": "/components/custom-tab/custom-tab"
+  }
 }

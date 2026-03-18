@@ -1,121 +1,136 @@
 <view class="product-list-page">
+  <view class="page-background"></view>
+  
   <view class="page-header">
-    <view class="search-bar">
-      <view class="search-icon">🔍</view>
-      <input 
-        class="search-input" 
-        placeholder="搜索商品" 
-        placeholder-class="search-placeholder" 
-        bindinput="onSearch"
-        bindconfirm="onSearchConfirm"
-      />
-      <view class="search-btn" bindtap="onSearchConfirm">搜索</view>
+    <view class="header-content">
+      <view class="header-top">
+        <view class="brand-section">
+          <view class="brand-name">商城</view>
+          <view class="brand-line"></view>
+        </view>
+        
+        <view class="search-container">
+          <view class="search-wrapper">
+            <text class="search-icon">✦</text>
+            <input 
+              class="search-input" 
+              placeholder="探索好物" 
+              placeholder-class="search-placeholder" 
+              bindinput="onSearch"
+              bindconfirm="onSearchConfirm"
+            />
+          </view>
+        </view>
+        
+        <view class="header-actions">
+          <view class="action-btn" bindtap="goToCart">
+            <text class="action-icon">🛒</text>
+            <view class="badge" wx:if="{{cartCount > 0}}">{{cartCount}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <view class="header-desc">精选优质商品，满足您的需求</view>
     </view>
   </view>
 
-  <view class="content-container">
-    <scroll-view class="category-sidebar" scroll-y="{{true}}">
+  <view class="filter-section">
+    <view class="filter-tabs">
       <view 
-        wx:for="{{categories}}" 
+        wx:for="{{filterTabs}}" 
         wx:key="id"
-        class="category-item {{currentCategory === item.id ? 'active' : ''}}"
-        bindtap="switchCategory"
+        class="filter-tab {{currentFilter === item.id ? 'active' : ''}}"
+        bindtap="switchFilter"
         data-id="{{item.id}}"
       >
-        <text class="category-name">{{item.name}}</text>
-        <view class="category-indicator" wx:if="{{currentCategory === item.id}}"></view>
-        <view class="category-count" wx:if="{{item.count}}">{{item.count}}</view>
+        <text class="filter-text">{{item.name}}</text>
+        <view class="filter-indicator" wx:if="{{currentFilter === item.id}}"></view>
       </view>
-    </scroll-view>
+    </view>
+  </view>
+
+  <view class="main-container">
 
     <scroll-view 
-      class="product-content" 
+      class="product-scroll" 
       scroll-y="{{true}}"
+      scroll-top="{{productScrollTop}}"
       bindscrolltolower="loadMore"
-      bindscroll="onScroll"
-      scroll-top="{{scrollTop}}"
+      bindscroll="onProductScroll"
       enhanced="{{true}}"
       show-scrollbar="{{false}}"
+      refresher-enabled="{{true}}"
+      refresher-triggered="{{refreshing}}"
+      bindrefresherrefresh="onPullDownRefresh"
+      refresher-background="#FAFAFA"
     >
       <view class="product-grid">
         <view 
           wx:for="{{products}}" 
-          wx:key="id"
+          wx:key="productId"
           class="product-card"
           bindtap="goToDetail"
-          data-id="{{item.id}}"
+          data-id="{{item.productId}}"
         >
-          <view class="product-image-wrapper">
-            <image class="product-image" src="{{item.image}}" mode="aspectFill" lazy-load="{{true}}" />
-            <view class="product-badge-wrapper">
-              <view class="product-badge" wx:if="{{item.badge}}">{{item.badge}}</view>
-            </view>
-            <view class="product-favorite" bindtap="toggleFavorite" data-id="{{item.id}}" catchtap="true">
-              <text class="favorite-icon {{item.favorite ? 'active' : ''}}">{{item.favorite ? '♥' : '♡'}}</text>
+          <view class="card-visual">
+            <view class="image-container">
+              <image class="product-image" src="{{item.mainImage}}" mode="aspectFill" lazy-load="{{true}}" />
+              <view class="image-overlay">
+                <view class="overlay-badges">
+                  <view class="badge hot" wx:if="{{item.isHot}}">热门</view>
+                  <view class="badge new" wx:if="{{item.isNew}}">新品</view>
+                </view>
+                <view class="overlay-actions">
+                  <view class="action-favorite" bindtap="toggleFavorite" data-id="{{item.productId}}" catchtap="true">
+                    <text class="favorite-icon {{item.favorite ? 'active' : ''}}">{{item.favorite ? '♥' : '♡'}}</text>
+                  </view>
+                </view>
+              </view>
             </view>
           </view>
           
-          <view class="product-info">
-            <view class="product-header">
-              <view class="product-name">{{item.name}}</view>
-              <view class="product-sales" wx:if="{{item.sales}}">已售{{item.sales}}</view>
+          <view class="card-content">
+            <view class="product-name">{{item.productName}}</view>
+            <view class="product-meta">
+              <text class="meta-item" wx:if="{{item.sales}}">已售 {{item.sales}}</text>
+              <text class="meta-divider" wx:if="{{item.sales && item.stock < 50}}">·</text>
+              <text class="meta-item stock" wx:if="{{item.stock < 50}}">仅剩 {{item.stock}}</text>
             </view>
-            <view class="product-desc">{{item.desc}}</view>
             
-            <view class="product-price-row">
-              <view class="price-container">
-                <text class="price-symbol">¥</text>
-                <text class="price-value">{{item.price}}</text>
-                <text class="price-original" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+            <view class="card-footer">
+              <view class="price-section">
+                <text class="currency">¥</text>
+                <text class="price">{{item.price}}</text>
               </view>
-              <view class="add-cart-btn" bindtap="addToCart" data-id="{{item.id}}" catchtap="true">
-                <text class="add-icon">+</text>
-              </view>
-            </view>
-
-            <view class="product-tags" wx:if="{{item.tags && item.tags.length > 0}}">
-              <view 
-                wx:for="{{item.tags}}" 
-                wx:for-item="tag" 
-                wx:for-index="tagIndex"
-                wx:key="tagIndex"
-                class="product-tag"
-              >
-                {{tag}}
+              <view class="add-btn" bindtap="addToCart" data-id="{{item.productId}}" catchtap="true">
+                <text class="add-icon">＋</text>
               </view>
             </view>
           </view>
         </view>
       </view>
 
-      <view class="loading-more" wx:if="{{loading}}">
-        <view class="loading-spinner"></view>
-        <text class="loading-text">加载中...</text>
+      <view class="loading-state" wx:if="{{loading}}">
+        <view class="loading-dots">
+          <view class="dot"></view>
+          <view class="dot"></view>
+          <view class="dot"></view>
+        </view>
       </view>
 
-      <view class="no-more" wx:if="{{noMore && products.length > 0}}">
-        <text class="no-more-text">— 已经到底啦 —</text>
+      <view class="end-state" wx:if="{{noMore && products.length > 0}}">
+        <view class="end-line"></view>
+        <text class="end-text">已加载全部</text>
+        <view class="end-line"></view>
       </view>
 
       <view class="empty-state" wx:if="{{products.length === 0 && !loading}}">
-        <text class="empty-icon">📦</text>
-        <text class="empty-text">暂无商品</text>
-        <text class="empty-hint">换个分类试试吧</text>
+        <text class="empty-emoji">✨</text>
+        <text class="empty-title">暂无商品</text>
+        <text class="empty-desc">探索更多精彩好物</text>
       </view>
     </scroll-view>
   </view>
 
-  <view class="back-to-top" wx:if="{{showBackToTop}}" bindtap="scrollToTop">
-    <text class="back-icon">↑</text>
-  </view>
-
-  <view class="quick-actions" wx:if="{{showQuickActions}}">
-    <view class="quick-action-item" bindtap="goToCart">
-      <text class="action-icon">🛒</text>
-      <view class="action-badge" wx:if="{{cartCount > 0}}">{{cartCount}}</view>
-    </view>
-    <view class="quick-action-item" bindtap="goToHome">
-      <text class="action-icon">🏠</text>
-    </view>
-  </view>
+  <custom-tab activeTab="{{1}}" bindtabchange="onTabChange" />
 </view>
