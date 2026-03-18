@@ -1,6 +1,6 @@
 <view class="profile-page">
   <view class="page-background"></view>
-  
+
   <view class="page-header">
     <view class="header-content">
       <view class="header-top">
@@ -90,8 +90,8 @@
 
     <view class="menu-section">
       <view class="menu-container">
-        <view 
-          class="menu-item" 
+        <view
+          class="menu-item"
           bindtap="onSettingsTap"
           hover-class="menu-item-hover"
         >
@@ -103,8 +103,8 @@
           <view class="menu-divider"></view>
         </view>
 
-        <view 
-          class="menu-item" 
+        <view
+          class="menu-item"
           bindtap="onAddressTap"
           hover-class="menu-item-hover"
         >
@@ -116,8 +116,8 @@
           <view class="menu-divider"></view>
         </view>
 
-        <view 
-          class="menu-item" 
+        <view
+          class="menu-item"
           bindtap="onAboutTap"
           hover-class="menu-item-hover"
         >
@@ -129,8 +129,8 @@
           <view class="menu-divider"></view>
         </view>
 
-        <view 
-          class="menu-item" 
+        <view
+          class="menu-item"
           bindtap="onFeedbackTap"
           hover-class="menu-item-hover"
         >
@@ -143,6 +143,4 @@
       </view>
     </view>
   </view>
-
-  <custom-tab activeTab="{{4}}" bindtabchange="onTabChange" />
 </view>

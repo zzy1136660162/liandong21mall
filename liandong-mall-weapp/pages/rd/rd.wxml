@@ -1,6 +1,6 @@
 <view class="rd-page">
   <view class="page-background"></view>
-  
+
   <view class="page-header">
     <view class="header-content">
       <view class="header-top">
@@ -58,8 +58,8 @@
     </view>
 
     <view class="project-list">
-      <view 
-        wx:for="{{projects}}" 
+      <view
+        wx:for="{{projects}}"
         wx:key="id"
         class="project-card"
         bindtap="goToProjectDetail"
@@ -73,10 +73,10 @@
           </view>
           <view class="project-status {{item.statusClass}}">{{item.statusText}}</view>
         </view>
-        
+
         <view class="project-body">
           <view class="project-desc">{{item.description}}</view>
-          
+
           <view class="project-progress">
             <view class="progress-header">
               <text class="progress-label">项目进度</text>
@@ -128,6 +128,4 @@
       <text class="empty-desc">探索更多研发成果</text>
     </view>
   </view>
-
-  <custom-tab activeTab="{{3}}" bindtabchange="onTabChange" />
 </view>

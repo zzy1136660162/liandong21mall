@@ -1,6 +1,6 @@
 <view class="product-list-page">
   <view class="page-background"></view>
-  
+
   <view class="page-header">
     <view class="header-content">
       <view class="header-top">
@@ -8,20 +8,20 @@
           <view class="brand-name">商城</view>
           <view class="brand-line"></view>
         </view>
-        
+
         <view class="search-container">
           <view class="search-wrapper">
             <text class="search-icon">✦</text>
-            <input 
-              class="search-input" 
-              placeholder="探索好物" 
-              placeholder-class="search-placeholder" 
+            <input
+              class="search-input"
+              placeholder="探索好物"
+              placeholder-class="search-placeholder"
               bindinput="onSearch"
               bindconfirm="onSearchConfirm"
             />
           </view>
         </view>
-        
+
         <view class="header-actions">
           <view class="action-btn" bindtap="goToCart">
             <text class="action-icon">🛒</text>
@@ -29,15 +29,15 @@
           </view>
         </view>
       </view>
-      
+
       <view class="header-desc">精选优质商品，满足您的需求</view>
     </view>
   </view>
 
   <view class="filter-section">
     <view class="filter-tabs">
-      <view 
-        wx:for="{{filterTabs}}" 
+      <view
+        wx:for="{{filterTabs}}"
         wx:key="id"
         class="filter-tab {{currentFilter === item.id ? 'active' : ''}}"
         bindtap="switchFilter"
@@ -51,8 +51,8 @@
 
   <view class="main-container">
 
-    <scroll-view 
-      class="product-scroll" 
+    <scroll-view
+      class="product-scroll"
       scroll-y="{{true}}"
       scroll-top="{{productScrollTop}}"
       bindscrolltolower="loadMore"
@@ -65,8 +65,8 @@
       refresher-background="#FAFAFA"
     >
       <view class="product-grid">
-        <view 
-          wx:for="{{products}}" 
+        <view
+          wx:for="{{products}}"
           wx:key="productId"
           class="product-card"
           bindtap="goToDetail"
@@ -88,7 +88,7 @@
               </view>
             </view>
           </view>
-          
+
           <view class="card-content">
             <view class="product-name">{{item.productName}}</view>
             <view class="product-meta">
@@ -96,7 +96,7 @@
               <text class="meta-divider" wx:if="{{item.sales && item.stock < 50}}">·</text>
               <text class="meta-item stock" wx:if="{{item.stock < 50}}">仅剩 {{item.stock}}</text>
             </view>
-            
+
             <view class="card-footer">
               <view class="price-section">
                 <text class="currency">¥</text>
@@ -131,6 +131,4 @@
       </view>
     </scroll-view>
   </view>
-
-  <custom-tab activeTab="{{1}}" bindtabchange="onTabChange" />
 </view>

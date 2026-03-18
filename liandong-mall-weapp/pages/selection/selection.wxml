@@ -1,6 +1,6 @@
 <view class="selection-page">
   <view class="page-background"></view>
-  
+
   <view class="page-header">
     <view class="header-content">
       <view class="header-top">
@@ -24,8 +24,8 @@
   <view class="page-content">
     <view class="filter-section">
       <view class="filter-tabs">
-        <view 
-          wx:for="{{filterTabs}}" 
+        <view
+          wx:for="{{filterTabs}}"
           wx:key="id"
           class="filter-tab {{currentFilter === item.id ? 'active' : ''}}"
           bindtap="switchFilter"
@@ -49,8 +49,8 @@
     </view>
 
     <view class="product-grid">
-      <view 
-        wx:for="{{products}}" 
+      <view
+        wx:for="{{products}}"
         wx:key="id"
         class="product-card"
         bindtap="goToDetail"
@@ -72,7 +72,7 @@
             </view>
           </view>
         </view>
-        
+
         <view class="card-content">
           <view class="product-name">{{item.name}}</view>
           <view class="product-meta">
@@ -80,7 +80,7 @@
             <text class="meta-divider" wx:if="{{item.sales && item.stock < 50}}">·</text>
             <text class="meta-item stock" wx:if="{{item.stock < 50}}">仅剩 {{item.stock}}</text>
           </view>
-          
+
           <view class="card-footer">
             <view class="price-section">
               <text class="currency">¥</text>
@@ -114,6 +114,4 @@
       <text class="empty-desc">探索更多精彩好物</text>
     </view>
   </view>
-
-  <custom-tab activeTab="{{2}}" bindtabchange="onTabChange" />
 </view>

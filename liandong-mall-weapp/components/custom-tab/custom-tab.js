@@ -35,7 +35,7 @@ Component({
       {
         id: 3,
         name: '研发',
-        url: '/pages/rd/rd',
+        url: '/pages/rd_index/rd_index',
         normalIcon: '/images/tab/研发 (未选中).png',
         selectedIcon: '/images/tab/研发（选中）.png',
         badge: 0
