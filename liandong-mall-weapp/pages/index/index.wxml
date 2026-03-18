@@ -82,3 +82,8 @@
 
 <!-- 浮动提交按钮 -->
 <view class="fab" bindtap="goToSubmit">+</view>
+
+<!-- 客服入口 -->
+<view class="customer-service-btn" bindtap="goToChat">
+  <text class="service-icon">💬</text>
+</view>

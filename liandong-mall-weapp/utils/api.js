@@ -3,7 +3,7 @@
  * 封装微信小程序的 wx.request，提供统一的请求处理
  */
 
-// API 基础配置
+// API 基础配置 - Flask后端服务地址
 const API_BASE_URL = 'http://127.0.0.1:5000'; // Flask 后端地址
 
 // 请求方法

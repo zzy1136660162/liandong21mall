@@ -1,5 +1,5 @@
 // 登录页面
-const api = require('../../utils/api.js');
+const api = require('../../utils/api');
 
 Page({
   data: {

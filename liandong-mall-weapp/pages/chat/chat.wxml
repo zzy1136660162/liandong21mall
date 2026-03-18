@@ -1,0 +1,106 @@
+<view class="chat-container">
+  <!-- 顶部导航 -->
+  <view class="chat-header">
+    <view class="back-btn" bindtap="goBack">
+      <text class="icon">←</text>
+    </view>
+    <text class="title">智能客服</text>
+    <view class="human-btn" bindtap="contactHuman">
+      <text>人工</text>
+    </view>
+  </view>
+
+  <!-- 消息列表 -->
+  <scroll-view 
+    class="message-list" 
+    scroll-y 
+    scroll-into-view="{{scrollToMessage}}"
+    scroll-with-animation
+  >
+    <view class="message-item {{item.type}}" 
+          wx:for="{{messages}}" 
+          wx:key="id"
+          id="msg-{{item.id}}"
+          bindlongpress="onMessageLongPress"
+          data-content="{{item.content}}">
+      
+      <!-- 用户头像 -->
+      <image wx:if="{{item.type === 'user'}}" 
+             class="avatar" 
+             src="{{userInfo.avatarUrl || ''}}"
+             mode="aspectFill"/>
+      
+      <!-- 客服头像 -->
+      <image wx:if="{{item.type === 'agent' || item.type === 'system'}}" 
+             class="avatar avatar-service"
+             mode="aspectFill"/>
+      
+      <view class="message-content">
+        <!-- 消息气泡 -->
+        <view class="bubble {{item.type}}">
+          <!-- AI 消息使用 rich-text 解析 Markdown -->
+          <rich-text wx:if="{{item.type === 'agent' || item.type === 'system'}}" 
+                     class="message-text" 
+                     nodes="{{item.htmlContent || item.content}}"/>
+          <!-- 用户消息使用普通文本 -->
+          <text wx:else class="message-text">{{item.content}}</text>
+        </view>
+        
+        <!-- 建议选项 -->
+        <view class="suggestions" wx:if="{{item.suggestions && item.suggestions.length > 0}}">
+          <view class="suggestion-item" 
+                wx:for="{{item.suggestions}}" 
+                wx:for-item="suggestion"
+                wx:key="index"
+                bindtap="onSuggestionTap"
+                data-suggestion="{{suggestion}}">
+            {{suggestion}}
+          </view>
+        </view>
+        
+        <!-- 时间 -->
+        <text class="message-time">{{item.time}}</text>
+      </view>
+    </view>
+    
+    <!-- 加载状态 -->
+    <view class="loading-indicator" wx:if="{{isLoading}}">
+      <view class="loading-dots">
+        <view class="dot"></view>
+        <view class="dot"></view>
+        <view class="dot"></view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 快捷问题 -->
+  <view class="quick-questions" wx:if="{{messages.length <= 2}}">
+    <text class="quick-title">常见问题</text>
+    <scroll-view class="quick-scroll" scroll-x>
+      <view class="quick-item" 
+            wx:for="{{quickQuestions}}" 
+            wx:key="index"
+            bindtap="onQuickQuestionTap"
+            data-question="{{item}}">
+        {{item}}
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 底部输入框 -->
+  <view class="input-area">
+    <view class="input-wrapper">
+      <input 
+        class="message-input"
+        placeholder="请输入您的问题..."
+        value="{{inputValue}}"
+        bindinput="onInputChange"
+        confirm-type="send"
+        bindconfirm="sendMessage"
+      />
+    </view>
+    <button class="send-btn {{inputValue ? 'active' : ''}}" bindtap="sendMessage">
+      发送
+    </button>
+  </view>
+</view>
