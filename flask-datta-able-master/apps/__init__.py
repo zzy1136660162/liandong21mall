@@ -22,9 +22,10 @@ def register_extensions(app):
 
 
 def register_blueprints(app):
-    for module_name in ('authentication', 'home', 'member', 'product'):
+    for module_name in ('authentication', 'home', 'member', 'demand', 'demand_admin', 'product'):
         module = import_module('apps.{}.routes'.format(module_name))
-        app.register_blueprint(module.blueprint)
+        if hasattr(module, 'blueprint'):
+            app.register_blueprint(module.blueprint)
 
 
 def register_api(app):
@@ -49,7 +50,7 @@ def register_api(app):
     from apps.member.api import api as member_user_api, talent_ns
     api.add_namespace(member_user_api, path='/api/user')
     api.add_namespace(talent_ns, path='/api/user/talent')
-    
+
     from apps.product.api import api as product_api, category_ns, cart_ns, order_ns
     api.add_namespace(product_api, path='/api/product')
     api.add_namespace(category_ns, path='/api/product/category')
@@ -59,7 +60,7 @@ def register_api(app):
 
 def configure_database(app):
     initialized = False
-    
+
     @app.before_request
     def initialize_database():
         nonlocal initialized
@@ -69,7 +70,7 @@ def configure_database(app):
             except Exception as e:
                 print('> Warning: DBMS Exception: ' + str(e) )
                 print('> Tables may already exist, skipping auto-creation')
-            
+
             from apps.member.models import init_member_levels
             from apps.product.models import init_product_categories
             try:
@@ -77,7 +78,7 @@ def configure_database(app):
                 init_product_categories()
             except Exception as e:
                 print('> Warning: Initialization failed: ' + str(e) )
-            
+
             initialized = True
 
     @app.teardown_request

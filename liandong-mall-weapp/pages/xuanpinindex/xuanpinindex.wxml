@@ -2,41 +2,16 @@
   <!-- 顶部白色区域 -->
   <view class="header">
     <!-- 搜索栏 -->
-    <view class="search-bar">
-      <view class="search-input-box" bindtap="onSearchFocus">
-        <text class="search-icon">🔍</text>
+  <view class="search-bar">
+    <view class="search-input-box" bindtap="goToSearch">
+      <text class="search-icon">🔍</text>
+      <view class="search-input-wrapper">
         <input class="search-input" placeholder="搜索商品" placeholder-class="placeholder" 
-               bindinput="onSearchInput" value="{{searchKeyword}}" 
-               confirm-type="search" bindconfirm="onSearch"
-               bindfocus="onSearchFocus" bindblur="onSearchBlur"/>
-      </view>
-      <view class="search-btn" bindtap="onSearch">搜索</view>
-    </view>
-
-    <!-- 搜索面板 - 热门搜索和历史记录 -->
-    <view class="search-panel" wx:if="{{showSearchPanel}}">
-      <view class="panel-section" wx:if="{{searchHistory.length > 0}}">
-        <view class="panel-header">
-          <text class="panel-title">历史搜索</text>
-          <text class="clear-btn" bindtap="clearHistory">清除</text>
-        </view>
-        <view class="tag-list">
-          <view class="tag-item" wx:for="{{searchHistory}}" wx:key="index" bindtap="onHistoryTap" data-keyword="{{item}}">
-            {{item}}
-          </view>
-        </view>
-      </view>
-      <view class="panel-section">
-        <view class="panel-header">
-          <text class="panel-title">热门搜索</text>
-        </view>
-        <view class="tag-list">
-          <view class="tag-item hot" wx:for="{{hotSearches}}" wx:key="index" bindtap="onHotSearchTap" data-keyword="{{item}}">
-            {{item}}
-          </view>
-        </view>
+               confirm-type="search"/>
       </view>
     </view>
+    <view class="search-btn" bindtap="goToSearch">搜索</view>
+  </view>
 
     <!-- 分类标签 -->
     <scroll-view class="category-scroll" scroll-x enhanced show-scrollbar="{{false}}">

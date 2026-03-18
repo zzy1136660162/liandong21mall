@@ -1,0 +1,323 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}发货管理{% endblock %}
+
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="page-header">
+                            <div class="row align-items-end">
+                                <div class="col-lg-8">
+                                    <div class="page-header-title">
+                                        <div class="d-inline">
+                                            <h4>发货管理</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="page-body">
+                            <div class="card">
+                                <div class="card-block">
+                                    <div class="row mb-3">
+                                        <div class="col-lg-12">
+                                            <button class="btn btn-success" id="batchShipBtn" onclick="batchShip()">批量发货</button>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th><input type="checkbox" id="checkAll"></th>
+                                                    <th>申请单号</th>
+                                                    <th>申请人</th>
+                                                    <th>联系电话</th>
+                                                    <th>商品信息</th>
+                                                    <th>数量</th>
+                                                    <th>收货地址</th>
+                                                    <th>审核状态</th>
+                                                    <th>申请时间</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="shipTable">
+                                                <tr>
+                                                    <td colspan="10" class="text-center">加载中...</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <nav>
+                                        <ul class="pagination" id="pagination"></ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="shipModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">发货</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="shipId">
+                <div class="form-group">
+                    <label>物流公司</label>
+                    <select class="form-control" id="shipCompany">
+                        <option value="">请选择物流公司</option>
+                        <option value="顺丰">顺丰</option>
+                        <option value="中通">中通</option>
+                        <option value="圆通">圆通</option>
+                        <option value="申通">申通</option>
+                        <option value="韵达">韵达</option>
+                        <option value="百世">百世</option>
+                        <option value="邮政">邮政</option>
+                        <option value="京东">京东</option>
+                        <option value="德邦">德邦</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>物流单号</label>
+                    <input type="text" class="form-control" id="shipNo" placeholder="请输入物流单号">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="submitShip()">确认发货</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">申请详情</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="detailContent">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+let currentPage = 1;
+let pageSize = 10;
+
+function loadData(page = 1) {
+    currentPage = page;
+    
+    fetch(`/api/samples/ship?page=${page}&page_size=${pageSize}`)
+        .then(response => response.json())
+        .then(res => {
+            if (res.code === 200) {
+                renderTable(res.data.list);
+                renderPagination(res.data.total);
+            }
+        });
+}
+
+function renderTable(data) {
+    const tbody = document.getElementById('shipTable');
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center">暂无待发货申请</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = data.map(item => `
+        <tr>
+            <td><input type="checkbox" class="ship-check" value="${item.id}"></td>
+            <td>${item.apply_no}</td>
+            <td>${item.user_name || '-'}</td>
+            <td>${item.user_phone || '-'}</td>
+            <td>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="${item.product_image}" style="width: 40px; height: 40px; object-fit: cover;" onerror="this.src='/static/assets/images/no-image.png'">
+                    <span>${item.product_name || '-'}</span>
+                </div>
+            </td>
+            <td>${item.quantity}</td>
+            <td><div style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.address}">${item.address || '-'}</div></td>
+            <td><span class="badge badge-success">审核通过</span></td>
+            <td>${item.created_at || '-'}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="viewDetail(${item.id})">查看</button>
+                <button class="btn btn-sm btn-success" onclick="openShip(${item.id})">发货</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderPagination(total) {
+    const totalPages = Math.ceil(total / pageSize);
+    const ul = document.getElementById('pagination');
+    let html = '';
+
+    if (currentPage > 1) {
+        html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadData(${currentPage - 1})">上一页</a></li>`;
+    }
+
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === currentPage) {
+            html += `<li class="page-item active"><a class="page-link" href="javascript:void(0)">${i}</a></li>`;
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadData(${i})">${i}</a></li>`;
+        }
+    }
+
+    if (currentPage < totalPages) {
+        html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadData(${currentPage + 1})">下一页</a></li>`;
+    }
+
+    ul.innerHTML = html;
+}
+
+function openShip(id) {
+    document.getElementById('shipId').value = id;
+    document.getElementById('shipCompany').value = '';
+    document.getElementById('shipNo').value = '';
+    $('#shipModal').modal('show');
+}
+
+function submitShip() {
+    const id = document.getElementById('shipId').value;
+    const shipCompany = document.getElementById('shipCompany').value;
+    const shipNo = document.getElementById('shipNo').value;
+
+    if (!shipCompany) {
+        alert('请选择物流公司');
+        return;
+    }
+    if (!shipNo) {
+        alert('请输入物流单号');
+        return;
+    }
+
+    fetch('/api/samples/ship', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id: parseInt(id), ship_company: shipCompany, ship_no: shipNo})
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.code === 200) {
+            $('#shipModal').modal('hide');
+            loadData(currentPage);
+            alert('发货成功');
+        } else {
+            alert(res.message || '操作失败');
+        }
+    });
+}
+
+function batchShip() {
+    const checks = document.querySelectorAll('.ship-check:checked');
+    const ids = Array.from(checks).map(c => parseInt(c.value));
+
+    if (ids.length === 0) {
+        alert('请选择要发货的申请');
+        return;
+    }
+
+    const shipCompany = prompt('请输入物流公司');
+    if (!shipCompany) return;
+    
+    const shipNo = prompt('请输入物流单号（多个单号用逗号分隔）');
+    if (!shipNo) return;
+
+    const shipNos = shipNo.split(',').map(s => s.trim());
+
+    fetch('/api/samples/batch-ship', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ids: ids, ship_company: shipCompany, ship_no: shipNos[0] || ''})
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.code === 200) {
+            loadData(currentPage);
+            alert('批量发货成功');
+        } else {
+            alert(res.message || '操作失败');
+        }
+    });
+}
+
+function viewDetail(id) {
+    fetch(`/api/samples/apply/${id}`)
+        .then(response => response.json())
+        .then(res => {
+            if (res.code === 200) {
+                const item = res.data;
+                const statusMap = {
+                    0: '待审核',
+                    1: '审核通过',
+                    2: '审核拒绝',
+                    3: '已取消'
+                };
+                const shipStatusMap = {
+                    0: '待发货',
+                    1: '已发货',
+                    2: '已签收'
+                };
+                document.getElementById('detailContent').innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>申请单号：</strong>${item.apply_no}</p>
+                            <p><strong>申请人：</strong>${item.user_name || '-'}</p>
+                            <p><strong>联系电话：</strong>${item.user_phone || '-'}</p>
+                            <p><strong>收货地址：</strong>${item.address || '-'}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>商品名称：</strong>${item.product_name || '-'}</p>
+                            <p><strong>申请数量：</strong>${item.quantity}</p>
+                            <p><strong>审核状态：</strong>${statusMap[item.status]}</p>
+                            <p><strong>发货状态：</strong>${shipStatusMap[item.ship_status]}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <p><strong>物流公司：</strong>${item.ship_company || '-'}</p>
+                            <p><strong>物流单号：</strong>${item.ship_no || '-'}</p>
+                            <p><strong>发货时间：</strong>${item.ship_time || '-'}</p>
+                            <p><strong>申请时间：</strong>${item.created_at || '-'}</p>
+                        </div>
+                    </div>
+                `;
+                $('#detailModal').modal('show');
+            }
+        });
+}
+
+document.getElementById('checkAll').addEventListener('change', function() {
+    const checks = document.querySelectorAll('.ship-check');
+    checks.forEach(check => check.checked = this.checked);
+});
+
+loadData();
+</script>
+{% endblock %}

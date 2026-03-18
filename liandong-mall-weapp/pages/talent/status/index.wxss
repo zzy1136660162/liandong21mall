@@ -1,0 +1,157 @@
+/* 达人申请状态页样式 - 淡黄色风格 */
+.status-container {
+  min-height: 100vh;
+  background-color: #fafafa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 60rpx 60rpx;
+}
+
+/* 状态图标 */
+.status-icon-view {
+  margin-bottom: 40rpx;
+}
+
+.status-icon {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-icon.pending {
+  background: #fe944d;
+}
+
+.status-icon.approved {
+  background: #fe944d;
+}
+
+.status-icon.rejected {
+  background: #fe944d;
+}
+
+.status-icon.none {
+  background: #e0e0e0;
+}
+
+.status-icon .icon {
+  font-size: 80rpx;
+  color: #fff;
+}
+
+/* 状态标题 */
+.status-title {
+  font-size: 44rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24rpx;
+}
+
+/* 状态描述 */
+.status-desc {
+  font-size: 28rpx;
+  color: #666;
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 40rpx;
+  padding: 0 20rpx;
+}
+
+/* 拒绝原因 */
+.reject-reason {
+  width: 100%;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 40rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.reason-title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.reason-text {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 申请信息 */
+.apply-info {
+  width: 100%;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 40rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+}
+
+.info-item:not(:last-child) {
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.info-value {
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 操作按钮 */
+.action-section {
+  width: 100%;
+}
+
+.action-btn {
+  width: 100%;
+  height: 96rpx;
+  line-height: 96rpx;
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  border: none;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn.primary {
+  background: #fe944d;
+  color: #fff;
+  box-shadow: 0 8rpx 24rpx rgba(254, 148, 77, 0.3);
+}
+
+.action-btn.secondary {
+  background: #fff;
+  color: #fe944d;
+  border: 2rpx solid #fe944d;
+}
+
+.action-btn::after {
+  border: none;
+}
+
+.action-btn text {
+  display: block;
+  text-align: center;
+  width: 100%;
+}

@@ -1,0 +1,134 @@
+<view class="apply-container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="header-title">达人申请</text>
+    <text class="header-subtitle">成为我们的达人，分享你的才华</text>
+  </view>
+
+  <!-- 表单区域 -->
+  <view class="form-section">
+    <!-- 真实姓名 -->
+    <view class="form-item">
+      <view class="item-label">
+        <text class="label-text">真实姓名</text>
+        <text class="label-required">*</text>
+      </view>
+      <input 
+        class="item-input" 
+        placeholder="请输入真实姓名" 
+        placeholder-class="placeholder" 
+        value="{{formData.realName}}"
+        data-field="realName"
+        bindinput="onInputChange"
+      />
+    </view>
+
+    <!-- 手机号码 -->
+    <view class="form-item">
+      <view class="item-label">
+        <text class="label-text">手机号码</text>
+        <text class="label-required">*</text>
+      </view>
+      <input 
+        class="item-input" 
+        placeholder="请输入手机号码" 
+        placeholder-class="placeholder" 
+        value="{{formData.phone}}"
+        data-field="phone"
+        bindinput="onInputChange"
+        type="number"
+      />
+    </view>
+
+    <!-- 所在地区 -->
+    <view class="form-item">
+      <view class="item-label">
+        <text class="label-text">所在地区</text>
+      </view>
+      <view class="picker-value" bindtap="openRegionPicker">
+        <text wx:if="{{region.length > 0}}" class="picker-text">{{region[0]}} {{region[1]}} {{region[2]}}</text>
+        <text wx:else class="placeholder">请选择所在地区</text>
+        <text class="picker-arrow">></text>
+      </view>
+    </view>
+
+    <!-- 申请理由 -->
+    <view class="form-item form-item-textarea">
+      <view class="item-label">
+        <text class="label-text">申请理由</text>
+        <text class="label-required">*</text>
+      </view>
+      <textarea 
+        class="item-textarea" 
+        placeholder="请简要描述你的特长和申请理由（10-500字）" 
+        placeholder-class="placeholder" 
+        value="{{formData.applyReason}}"
+        data-field="applyReason"
+        bindinput="onInputChange"
+        maxlength="500"
+      />
+      <text class="textarea-count">{{formData.applyReason.length}}/500</text>
+    </view>
+
+    <!-- 个人简介 -->
+    <view class="form-item form-item-textarea">
+      <view class="item-label">
+        <text class="label-text">个人简介</text>
+      </view>
+      <textarea 
+        class="item-textarea" 
+        placeholder="请简要介绍自己（选填）" 
+        placeholder-class="placeholder" 
+        value="{{formData.intro}}"
+        data-field="intro"
+        bindinput="onInputChange"
+        maxlength="500"
+      />
+      <text class="textarea-count">{{formData.intro.length}}/500</text>
+    </view>
+  </view>
+
+  <!-- 权益说明 -->
+  <view class="benefits-section">
+    <text class="benefits-title">成为达人你将获得</text>
+    <view class="benefits-list">
+      <view class="benefit-item">
+        <view class="benefit-dot"></view>
+        <text class="benefit-text">专属达人标识</text>
+      </view>
+      <view class="benefit-item">
+        <view class="benefit-dot"></view>
+        <text class="benefit-text">高曝光推荐位</text>
+      </view>
+      <view class="benefit-item">
+        <view class="benefit-dot"></view>
+        <text class="benefit-text">专属活动邀请</text>
+      </view>
+      <view class="benefit-item">
+        <view class="benefit-dot"></view>
+        <text class="benefit-text">优先审核通道</text>
+      </view>
+      <view class="benefit-item">
+        <view class="benefit-dot"></view>
+        <text class="benefit-text">内容创作指导</text>
+      </view>
+      <view class="benefit-item">
+        <view class="benefit-dot"></view>
+        <text class="benefit-text">专属客服支持</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提交区域 -->
+  <view class="submit-section">
+    <button 
+      class="submit-btn"
+      bindtap="submitApply"
+      disabled="{{isSubmitting}}"
+    >
+      <text wx:if="{{!isSubmitting}}">提交申请</text>
+      <text wx:else>提交中...</text>
+    </button>
+    <text class="submit-tip">提交后我们将在1-3个工作日内审核</text>
+  </view>
+</view>

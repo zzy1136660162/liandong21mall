@@ -1,5 +1,324 @@
-/**app.wxss**/
-.container {
+/* 全局样式 */
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
 
+/* 容器 */
+.container {
+  padding: 20rpx;
+}
+
+/* 卡片样式 */
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 表单样式 */
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 12rpx;
+  font-weight: 500;
+}
+
+.form-label .required {
+  color: #ff4d4f;
+  margin-right: 8rpx;
+}
+
+.form-input,
+.form-textarea,
+.form-picker {
+  width: 100%;
+  min-height: 80rpx;
+  padding: 20rpx;
+  border: 2rpx solid #e8e8e8;
+  border-radius: 8rpx;
+  font-size: 28rpx;
   box-sizing: border-box;
-} 
+  background: #fff;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: #1890ff;
+}
+
+.form-textarea {
+  min-height: 160rpx;
+}
+
+.form-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.picker-placeholder {
+  color: #999;
+}
+
+/* 按钮样式 */
+.btn {
+  width: 100% !important;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  border: none;
+  padding: 0;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-primary {
+  background: #1890ff;
+  color: #fff;
+}
+
+.btn-primary:active {
+  background: #096dd9;
+}
+
+.btn-default {
+  background: #fff;
+  color: #333;
+  border: 2rpx solid #d9d9d9;
+}
+
+.btn-default:active {
+  background: #f5f5f5;
+}
+
+/* 状态标签 */
+.status-tag {
+  display: inline-block;
+  padding: 8rpx 20rpx;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+}
+
+.status-pending {
+  background: #f5f5f5;
+  color: #999;
+}
+
+.status-confirming {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.status-developing {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.status-sampling {
+  background: #f9f0ff;
+  color: #722ed1;
+}
+
+.status-completed {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.status-cancelled {
+  background: #fff1f0;
+  color: #ff4d4f;
+}
+
+/* 列表样式 */
+.list-item {
+  background: #fff;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  border-radius: 16rpx;
+}
+
+.list-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.list-item-title {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list-item-info {
+  font-size: 26rpx;
+  color: #666;
+  margin-top: 12rpx;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 40rpx;
+}
+
+.empty-icon {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 30rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 详情样式 */
+.detail-section {
+  margin-bottom: 30rpx;
+}
+
+.detail-label {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.detail-value {
+  font-size: 30rpx;
+  color: #333;
+  line-height: 1.8;
+}
+
+/* 时间线样式 */
+.timeline {
+  position: relative;
+  padding-left: 40rpx;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 12rpx;
+  top: 0;
+  bottom: 0;
+  width: 2rpx;
+  background: #e8e8e8;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 40rpx;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -34rpx;
+  top: 8rpx;
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  background: #1890ff;
+  border: 4rpx solid #fff;
+  box-shadow: 0 0 0 2rpx #1890ff;
+}
+
+.timeline-content {
+  background: #fff;
+  padding: 20rpx;
+  border-radius: 12rpx;
+}
+
+.timeline-time {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.timeline-text {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
+}
+
+.timeline-operator {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 8rpx;
+}
+
+/* 网格布局 */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.grid-item {
+  flex: 1;
+  min-width: 33.33%;
+  text-align: center;
+  padding: 30rpx 20rpx;
+}
+
+.grid-number {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.grid-label {
+  font-size: 26rpx;
+  color: #666;
+  margin-top: 8rpx;
+}
+
+/* 分割线 */
+.divider {
+  height: 2rpx;
+  background: #e8e8e8;
+  margin: 30rpx 0;
+}
+
+/* 浮动按钮 */
+.fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 120rpx;
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: #1890ff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60rpx;
+  box-shadow: 0 8rpx 24rpx rgba(24, 144, 255, 0.4);
+}
+
+.fab:active {
+  background: #096dd9;
+}

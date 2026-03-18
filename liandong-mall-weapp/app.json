@@ -20,6 +20,16 @@
     "pages/selection/selection",
     "pages/rd/rd",
     "pages/Profile_page/Profile_page"
+    "pages/mine/index",
+    "pages/member/center/index",
+    "pages/talent/apply/index",
+    "pages/talent/center/index",
+    "pages/talent/status/index",
+    "pages/demandSubmit/demandSubmit",
+    "pages/demandList/demandList",
+    "pages/demandDetail/demandDetail",
+    "pages/demandProgress/demandProgress",
+    "pages/chat/chat"
   ],
   "window": {
     "navigationBarTextStyle": "black",

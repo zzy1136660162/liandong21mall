@@ -1,0 +1,138 @@
+CREATE TABLE `users` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+  `openid` varchar(100) NOT NULL COMMENT '微信openid',
+  `unionid` varchar(100) DEFAULT NULL COMMENT '微信unionid',
+  `nickname` varchar(100) DEFAULT NULL COMMENT '昵称',
+  `avatar` varchar(500) DEFAULT NULL COMMENT '头像URL',
+  `phone` varchar(20) DEFAULT NULL COMMENT '手机号',
+  `level` tinyint DEFAULT '1' COMMENT '达人等级：1-普通达人，2-优质达人，3-头部达人',
+  `status` tinyint DEFAULT '1' COMMENT '状态：0-禁用，1-正常',
+  `fans_count` int DEFAULT '0' COMMENT '粉丝数',
+  `order_count` int DEFAULT '0' COMMENT '带货订单数',
+  `positive_rate` decimal(4,2) DEFAULT '100.00' COMMENT '好评率',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_openid` (`openid`),
+  KEY `idx_level` (`level`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+CREATE TABLE `products` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '商品ID',
+  `product_no` varchar(50) NOT NULL COMMENT '商品编号',
+  `name` varchar(200) NOT NULL COMMENT '商品名称',
+  `subtitle` varchar(500) DEFAULT NULL COMMENT '副标题',
+  `category_id` bigint unsigned NOT NULL COMMENT '分类ID',
+  `main_image` varchar(500) NOT NULL COMMENT '主图',
+  `images` json DEFAULT NULL COMMENT '商品图片列表',
+  `price` decimal(10,2) NOT NULL COMMENT '售价',
+  `original_price` decimal(10,2) DEFAULT NULL COMMENT '原价',
+  `supply_price` decimal(10,2) NOT NULL COMMENT '供货价',
+  `stock` int DEFAULT '0' COMMENT '库存',
+  `sales` int DEFAULT '0' COMMENT '销量',
+  `unit` varchar(20) DEFAULT '件' COMMENT '单位',
+  `weight` decimal(8,2) DEFAULT NULL COMMENT '重量(kg)',
+  `description` text COMMENT '商品详情',
+  `specifications` json DEFAULT NULL COMMENT '规格参数',
+  `shop_id` bigint unsigned NOT NULL COMMENT '店铺ID',
+  `is_brand` tinyint DEFAULT '0' COMMENT '是否品牌：0-否，1-是',
+  `is_cashback` tinyint DEFAULT '0' COMMENT '是否返现：0-否，1-是',
+  `is_trust` tinyint DEFAULT '0' COMMENT '是否信任购：0-否，1-是',
+  `status` tinyint DEFAULT '1' COMMENT '状态：0-下架，1-上架',
+  `sort` int DEFAULT '0' COMMENT '排序',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_product_no` (`product_no`),
+  KEY `idx_category_id` (`category_id`),
+  KEY `idx_shop_id` (`shop_id`),
+  KEY `idx_status` (`status`),
+  KEY `idx_sort` (`sort`),
+  FULLTEXT KEY `ft_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品表';
+CREATE TABLE `product_commission` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `product_id` bigint unsigned NOT NULL COMMENT '商品ID',
+  `base_rate` decimal(4,2) NOT NULL COMMENT '基础佣金比例',
+  `normal_rate` decimal(4,2) NOT NULL COMMENT '普通达人佣金比例',
+  `premium_rate` decimal(4,2) NOT NULL COMMENT '优质达人佣金比例',
+  `top_rate` decimal(4,2) NOT NULL COMMENT '头部达人佣金比例',
+  `settlement_type` tinyint DEFAULT '1' COMMENT '结算类型：1-月结，2-周结，3-实时',
+  `settlement_desc` varchar(500) DEFAULT NULL COMMENT '结算说明',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_product_id` (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品佣金表';
+CREATE TABLE `sample_applications` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '申请ID',
+  `application_no` varchar(50) NOT NULL COMMENT '申请编号',
+  `user_id` bigint unsigned NOT NULL COMMENT '申请人ID',
+  `recipient_name` varchar(100) NOT NULL COMMENT '收件人姓名',
+  `recipient_phone` varchar(20) NOT NULL COMMENT '收件人电话',
+  `province` varchar(50) NOT NULL COMMENT '省份',
+  `city` varchar(50) NOT NULL COMMENT '城市',
+  `district` varchar(50) NOT NULL COMMENT '区县',
+  `address` varchar(200) NOT NULL COMMENT '详细地址',
+  `remark` varchar(500) DEFAULT NULL COMMENT '申请备注',
+  `status` tinyint DEFAULT '0' COMMENT '审核状态：0-待审核，1-审核通过，2-审核拒绝',
+  `review_remark` varchar(500) DEFAULT NULL COMMENT '审核备注',
+  `review_time` timestamp NULL DEFAULT NULL COMMENT '审核时间',
+  `reviewer_id` bigint unsigned DEFAULT NULL COMMENT '审核人ID',
+  `ship_status` tinyint DEFAULT '0' COMMENT '寄出状态：0-未寄出，1-已寄出，2-已签收',
+  `logistics_company` varchar(50) DEFAULT NULL COMMENT '物流公司',
+  `tracking_no` varchar(100) DEFAULT NULL COMMENT '物流单号',
+  `ship_time` timestamp NULL DEFAULT NULL COMMENT '发货时间',
+  `receive_time` timestamp NULL DEFAULT NULL COMMENT '签收时间',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '申请时间',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_application_no` (`application_no`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_status` (`status`),
+  KEY `idx_ship_status` (`ship_status`),
+  KEY `idx_created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='样品申请表';
+CREATE TABLE `sample_application_products` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `application_id` bigint unsigned NOT NULL COMMENT '申请ID',
+  `product_id` bigint unsigned NOT NULL COMMENT '商品ID',
+  `product_name` varchar(200) NOT NULL COMMENT '商品名称（快照）',
+  `product_image` varchar(500) NOT NULL COMMENT '商品图片（快照）',
+  `product_price` decimal(10,2) NOT NULL COMMENT '商品价格（快照）',
+  `commission_rate` decimal(4,2) DEFAULT NULL COMMENT '佣金比例（快照）',
+  `quantity` int DEFAULT '1' COMMENT '申请数量',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_application_product` (`application_id`,`product_id`),
+  KEY `idx_application_id` (`application_id`),
+  KEY `idx_product_id` (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='样品申请商品关联表';
+sql
+CREATE TABLE `search_history` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `user_id` bigint unsigned DEFAULT NULL COMMENT '用户ID，null表示热门搜索',
+  `keyword` varchar(100) NOT NULL COMMENT '搜索关键词',
+  `search_count` int DEFAULT '1' COMMENT '搜索次数',
+  `last_search_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后搜索时间',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_keyword` (`user_id`,`keyword`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_keyword` (`keyword`),
+  KEY `idx_search_count` (`search_count`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='搜索历史表';
+-- 一级分类
+INSERT INTO `categories` (`name`, `parent_id`, `level`, `sort`) VALUES
+('零食饮料', 0, 1, 1),
+('家居百货', 0, 1, 2),
+('女装女鞋', 0, 1, 3),
+('美妆护肤', 0, 1, 4),
+('个护清洁', 0, 1, 5);
+
+-- 二级分类（零食饮料）
+INSERT INTO `categories` (`name`, `parent_id`, `level`, `sort`) VALUES
+('休闲零食', 1, 2, 1),
+('饮料冲调', 1, 2, 2),
+('方便速食', 1, 2, 3),
+('粮油调味', 1, 2, 4);

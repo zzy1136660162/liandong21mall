@@ -1,0 +1,750 @@
+# 选品小程序 API 接口文档
+
+## 基础信息
+
+- **Base URL**: `https://api.example.com/v1`
+- **请求格式**: JSON
+- **响应格式**: JSON
+- **字符编码**: UTF-8
+
+## 通用响应格式
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {}
+}
+```
+
+### 状态码说明
+
+| 状态码 | 说明 |
+|--------|------|
+| 200 | 请求成功 |
+| 400 | 请求参数错误 |
+| 401 | 未授权，需要登录 |
+| 403 | 禁止访问 |
+| 404 | 资源不存在 |
+| 500 | 服务器内部错误 |
+
+---
+
+## 一、用户模块
+
+### 1.1 用户登录
+
+**接口地址**: `POST /user/login`
+
+**请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| code | string | 是 | 微信登录临时凭证 |
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "登录成功",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIs...",
+    "expiresIn": 7200,
+    "userInfo": {
+      "id": "U123456",
+      "nickname": "达人用户",
+      "avatar": "https://example.com/avatar.jpg",
+      "level": "premium",
+      "levelText": "优质达人"
+    }
+  }
+}
+```
+
+### 1.2 获取用户信息
+
+**接口地址**: `GET /user/info`
+
+**请求头**:
+
+```
+Authorization: Bearer {token}
+```
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "id": "U123456",
+    "nickname": "达人用户",
+    "avatar": "https://example.com/avatar.jpg",
+    "level": "premium",
+    "levelText": "优质达人",
+    "fansCount": 12000,
+    "orderCount": 856,
+    "positiveRate": "98%"
+  }
+}
+```
+
+---
+
+## 二、商品模块
+
+### 2.1 获取商品列表
+
+**接口地址**: `GET /products`
+
+**请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| page | int | 否 | 页码，默认1 |
+| pageSize | int | 否 | 每页数量，默认10 |
+| category | string | 否 | 分类编码 |
+| keyword | string | 否 | 搜索关键词 |
+| sortBy | string | 否 | 排序方式：commission-佣金、sales-销量、price-价格 |
+| sortOrder | string | 否 | 排序顺序：asc-升序、desc-降序 |
+| minCommission | decimal | 否 | 最低佣金比例 |
+| maxPrice | decimal | 否 | 最高价格 |
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "total": 2580,
+    "page": 1,
+    "pageSize": 10,
+    "list": [
+      {
+        "id": "P123456",
+        "name": "立白大师香氛洗衣液持久留香护色护衣",
+        "image": "https://example.com/product.jpg",
+        "price": 39.90,
+        "supplyPrice": 25.00,
+        "commissionRate": 20,
+        "commissionAmount": 7.98,
+        "sales": 120000,
+        "monthlySales": "月销12万件",
+        "category": "家居日用",
+        "tags": ["品牌", "信任购", "单单返现"],
+        "isBrand": true,
+        "hasCashback": true
+      }
+    ]
+  }
+}
+```
+
+### 2.2 获取商品详情
+
+**接口地址**: `GET /products/{id}`
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "id": "P123456",
+    "name": "立白大师香氛洗衣液持久留香护色护衣",
+    "images": [
+      "https://example.com/product1.jpg",
+      "https://example.com/product2.jpg"
+    ],
+    "price": 39.90,
+    "originalPrice": 59.90,
+    "supplyPrice": 25.00,
+    "commissionRate": 20,
+    "commissionAmount": 7.98,
+    "commissionLevel": {
+      "normal": 15,
+      "premium": 20,
+      "top": 25
+    },
+    "sales": 120000,
+    "positiveRate": "98%",
+    "description": "商品详细描述...",
+    "specifications": [
+      {"name": "品牌", "value": "立白"},
+      {"name": "规格", "value": "2kg/瓶"}
+    ],
+    "shop": {
+      "id": "S123",
+      "name": "立白官方旗舰店",
+      "logo": "https://example.com/shop.jpg",
+      "score": 4.9
+    },
+    "samplePolicy": {
+      "canApply": true,
+      "maxCount": 3,
+      "description": "每位达人限申请3件"
+    }
+  }
+}
+```
+
+### 2.3 获取商品佣金信息
+
+**接口地址**: `GET /products/{id}/commission`
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "productId": "P123456",
+    "baseRate": 20,
+    "levelRates": {
+      "normal": {
+        "rate": 15,
+        "description": "普通达人"
+      },
+      "premium": {
+        "rate": 20,
+        "description": "优质达人"
+      },
+      "top": {
+        "rate": 25,
+        "description": "头部达人"
+      }
+    },
+    "currentRate": 20,
+    "estimatedCommission": 7.98,
+    "settlementType": "月结",
+    "settlementDesc": "订单确认收货后结算，每月15日打款"
+  }
+}
+```
+
+---
+
+## 三、分类模块
+
+### 3.1 获取分类列表
+
+**接口地址**: `GET /categories`
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "id": "C001",
+      "name": "零食饮料",
+      "icon": "https://example.com/icon1.png",
+      "subCategories": [
+        {"id": "C001-1", "name": "休闲零食"},
+        {"id": "C001-2", "name": "饮料冲调"}
+      ]
+    },
+    {
+      "id": "C002",
+      "name": "家居百货",
+      "icon": "https://example.com/icon2.png",
+      "subCategories": [
+        {"id": "C002-1", "name": "纸品清洁"},
+        {"id": "C002-2", "name": "日用百货"}
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## 四、样品申请模块
+
+### 4.1 提交样品申请
+
+**接口地址**: `POST /samples/apply`
+
+**请求头**:
+
+```
+Authorization: Bearer {token}
+```
+
+**请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| productIds | array | 是 | 申请商品ID列表 |
+| recipientName | string | 是 | 收件人姓名 |
+| phone | string | 是 | 联系电话 |
+| province | string | 是 | 省份 |
+| city | string | 是 | 城市 |
+| district | string | 是 | 区县 |
+| address | string | 是 | 详细地址 |
+| remark | string | 否 | 备注 |
+
+**请求示例**:
+
+```json
+{
+  "productIds": ["P123456", "P123457"],
+  "recipientName": "张三",
+  "phone": "13800138000",
+  "province": "广东省",
+  "city": "深圳市",
+  "district": "南山区",
+  "address": "科技园路1号",
+  "remark": "希望尽快审核"
+}
+```
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "申请提交成功",
+  "data": {
+    "applicationId": "SA1773469050335",
+    "status": "pending",
+    "applyTime": "2026-03-14 06:17:00"
+  }
+}
+```
+
+### 4.2 获取样品申请列表
+
+**接口地址**: `GET /samples`
+
+**请求头**:
+
+```
+Authorization: Bearer {token}
+```
+
+**请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| page | int | 否 | 页码，默认1 |
+| pageSize | int | 否 | 每页数量，默认10 |
+| status | string | 否 | 筛选状态：all-全部、pending-待审核、approved-审核通过、shipped-已寄出、rejected-已拒绝 |
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "total": 15,
+    "page": 1,
+    "pageSize": 10,
+    "list": [
+      {
+        "id": "SA1773469050335",
+        "applyTime": "2026-03-14 06:17:00",
+        "status": "pending",
+        "statusText": "待审核",
+        "shipStatus": "not_shipped",
+        "shipStatusText": "未寄出",
+        "products": [
+          {
+            "id": "P123456",
+            "name": "立白大师香氛洗衣液",
+            "image": "https://example.com/product.jpg",
+            "price": "39.9",
+            "commission": "20%"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### 4.3 获取样品申请详情
+
+**接口地址**: `GET /samples/{id}`
+
+**请求头**:
+
+```
+Authorization: Bearer {token}
+```
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "id": "SA1773469050335",
+    "applyTime": "2026-03-14 06:17:00",
+    "status": "approved",
+    "statusText": "审核通过",
+    "reviewTime": "2026-03-14 08:30:00",
+    "reviewRemark": "审核通过，请耐心等待发货",
+    "shipStatus": "shipped",
+    "shipStatusText": "已寄出",
+    "logisticsCompany": "顺丰速运",
+    "trackingNo": "SF1234567890",
+    "shipTime": "2026-03-14 10:00:00",
+    "receiveTime": null,
+    "recipient": {
+      "name": "张三",
+      "phone": "13800138000",
+      "address": "广东省深圳市南山区科技园路1号"
+    },
+    "products": [
+      {
+        "id": "P123456",
+        "name": "立白大师香氛洗衣液",
+        "image": "https://example.com/product.jpg",
+        "price": "39.9",
+        "commission": "20%"
+      }
+    ]
+  }
+}
+```
+
+### 4.4 确认收货
+
+**接口地址**: `POST /samples/{id}/receive`
+
+**请求头**:
+
+```
+Authorization: Bearer {token}
+```
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "确认收货成功",
+  "data": {
+    "id": "SA1773469050335",
+    "shipStatus": "received",
+    "receiveTime": "2026-03-16 14:30:00"
+  }
+}
+```
+
+---
+
+## 五、活动模块
+
+### 5.1 获取活动列表
+
+**接口地址**: `GET /activities`
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "id": "ACT001",
+      "type": "hot",
+      "name": "超级爆品",
+      "title": "超级爆品",
+      "subtitle": "精选全网热销爆款，佣金高转化好",
+      "banner": "https://example.com/banner1.jpg",
+      "stats": {
+        "productCount": 2580,
+        "avgCommission": 25,
+        "totalSales": "1.2亿"
+      }
+    },
+    {
+      "id": "ACT002",
+      "type": "follow",
+      "name": "同行跟选",
+      "title": "同行跟选",
+      "subtitle": "看看同行都在卖什么，紧跟市场趋势",
+      "banner": "https://example.com/banner2.jpg",
+      "stats": {
+        "followerCount": 12580,
+        "successRate": 85,
+        "avgIncome": "¥3,200"
+      }
+    }
+  ]
+}
+```
+
+### 5.2 获取活动商品列表
+
+**接口地址**: `GET /activities/{type}/products`
+
+**请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| page | int | 否 | 页码，默认1 |
+| pageSize | int | 否 | 每页数量，默认10 |
+| filter | string | 否 | 筛选条件 |
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "activityType": "hot",
+    "products": [
+      {
+        "id": "P123456",
+        "rank": 1,
+        "name": "立白大师香氛洗衣液",
+        "image": "https://example.com/product.jpg",
+        "price": 39.90,
+        "commission": 7.98,
+        "commissionRate": 20,
+        "sales": "月销12万件",
+        "dailySales": "1.2万",
+        "tag": "爆款",
+        "rankTag": "入选洗衣液爆款榜第1名"
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 六、物流模块
+
+### 6.1 查询物流信息
+
+**接口地址**: `GET /logistics/query`
+
+**请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| company | string | 是 | 物流公司编码 |
+| trackingNo | string | 是 | 物流单号 |
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "company": "顺丰速运",
+    "trackingNo": "SF1234567890",
+    "status": "shipped",
+    "statusText": "运输中",
+    "traces": [
+      {
+        "time": "2026-03-14 10:00:00",
+        "desc": "【深圳市】快件已发货",
+        "location": "深圳市"
+      },
+      {
+        "time": "2026-03-14 14:30:00",
+        "desc": "【深圳市】快件到达深圳转运中心",
+        "location": "深圳市"
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 七、搜索模块
+
+### 7.1 搜索商品
+
+**接口地址**: `GET /search`
+
+**请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| keyword | string | 是 | 搜索关键词 |
+| page | int | 否 | 页码，默认1 |
+| pageSize | int | 否 | 每页数量，默认10 |
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "keyword": "洗衣液",
+    "total": 156,
+    "page": 1,
+    "pageSize": 10,
+    "list": [
+      {
+        "id": "P123456",
+        "name": "立白大师香氛洗衣液",
+        "image": "https://example.com/product.jpg",
+        "price": 39.90,
+        "commissionRate": 20,
+        "sales": 120000
+      }
+    ]
+  }
+}
+```
+
+### 7.2 获取热门搜索词
+
+**接口地址**: `GET /search/hot`
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "keywords": ["洗衣液", "抽纸", "零食", "饮料", "面膜"]
+  }
+}
+```
+
+### 7.3 获取搜索历史
+
+**接口地址**: `GET /search/history`
+
+**请求头**:
+
+```
+Authorization: Bearer {token}
+```
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "history": ["洗衣液", "抽纸", "面膜"]
+  }
+}
+```
+
+### 7.4 清空搜索历史
+
+**接口地址**: `DELETE /search/history`
+
+**请求头**:
+
+```
+Authorization: Bearer {token}
+```
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "清空成功",
+  "data": null
+}
+```
+
+---
+
+## 八、榜单模块
+
+### 8.1 获取榜单列表
+
+**接口地址**: `GET /rankings`
+
+**请求参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| type | string | 是 | 榜单类型：hot-热销榜、commission-高佣榜、new-新品榜、rising-飙升榜 |
+| category | string | 否 | 分类编码 |
+| page | int | 否 | 页码，默认1 |
+| pageSize | int | 否 | 每页数量，默认10 |
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "type": "hot",
+    "title": "热销榜单",
+    "updateTime": "2026-03-14 10:00:00",
+    "list": [
+      {
+        "id": "P123456",
+        "rank": 1,
+        "name": "立白大师香氛洗衣液",
+        "image": "https://example.com/product.jpg",
+        "price": 39.90,
+        "commission": 7.98,
+        "commissionRate": 20,
+        "sales": "月销12万件",
+        "trend": "up"
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 错误处理
+
+### 通用错误响应格式
+
+```json
+{
+  "code": 400,
+  "message": "请求参数错误",
+  "data": {
+    "field": "phone",
+    "error": "手机号格式不正确"
+  }
+}
+```
+
+### 常见错误码
+
+| 错误码 | 说明 | 处理方式 |
+|--------|------|----------|
+| 400001 | 参数缺失 | 检查请求参数是否完整 |
+| 400002 | 参数格式错误 | 检查参数格式是否符合要求 |
+| 401001 | Token过期 | 重新登录获取新Token |
+| 401002 | Token无效 | 检查Token是否正确 |
+| 403001 | 权限不足 | 检查用户权限 |
+| 404001 | 商品不存在 | 检查商品ID是否正确 |
+| 404002 | 订单不存在 | 检查订单ID是否正确 |
+| 500001 | 服务器内部错误 | 稍后重试或联系管理员 |
+
+---
+
+## 版本历史
+
+| 版本 | 日期 | 更新内容 |
+|------|------|----------|
+| v1.0.0 | 2026-03-14 | 初始版本，包含用户、商品、样品申请等基础接口 |

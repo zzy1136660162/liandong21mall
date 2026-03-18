@@ -25,7 +25,22 @@
                     <a href="/profile.html" class="nav-link">
                         <span class="pcoded-micon"><i class="feather icon-user"></i></span>
                             <span class="pcoded-mtext">Profile Page</span></a>
-                </li>                
+                </li>
+                <li class="nav-item pcoded-menu-caption">
+                    <label>研发需求</label>
+                </li>
+                <li data-username="需求统计" 
+                    class="nav-item {% if 'demand_statistics' in segment %} active {% endif %}">
+                    <a href="{{ url_for('demand_admin.statistics') }}" class="nav-link">
+                        <span class="pcoded-micon"><i class="feather icon-bar-chart"></i></span>
+                        <span class="pcoded-mtext">需求统计</span></a>
+                </li>
+                <li data-username="需求管理" 
+                    class="nav-item {% if 'demand_list' in segment %} active {% endif %}">
+                    <a href="{{ url_for('demand_admin.list_demands') }}" class="nav-link">
+                        <span class="pcoded-micon"><i class="feather icon-list"></i></span>
+                        <span class="pcoded-mtext">需求管理</span></a>
+                </li>
                 <li class="nav-item pcoded-menu-caption">
                     <label>UI Element</label>
                 </li>
@@ -63,13 +78,6 @@
                 <li class="nav-item pcoded-menu-caption">
                     <label>会员管理</label>
                 </li>
-                <li data-username="会员管理首页" 
-                    class="nav-item {% if segment == 'member' %} active {% endif %}">
-                    <a href="/admin/member/" class="nav-link">
-                        <span class="pcoded-micon"><i class="feather icon-grid"></i></span>
-                        <span class="pcoded-mtext">会员管理首页</span>
-                    </a>
-                </li>
                 <li data-username="会员管理 会员列表 会员等级 达人申请 达人管理" 
                     class="nav-item pcoded-hasmenu {% if 'member' in segment %} active {% endif %}">
                     <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-users"></i></span><span
@@ -86,6 +94,47 @@
                         </li>
                         <li class="{% if 'member/talent_list' in segment %}active{% endif %}">
                             <a href="/admin/member/talent/list" class="">达人管理</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item pcoded-menu-caption">
+                    <label>选品管理</label>
+                </li>
+                <li data-username="选品管理 商品管理 分类管理 店铺管理 佣金管理" 
+                    class="nav-item pcoded-hasmenu {% if 'product' in segment %} active {% endif %}">
+                    <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-shopping-cart"></i></span><span
+                            class="pcoded-mtext">商品管理</span></a>
+                    <ul class="pcoded-submenu">
+                        <li class="{% if 'product/list' in segment %}active{% endif %}">
+                            <a href="/admin/product/list" class="">商品列表</a>
+                        </li>
+                        <li class="{% if 'product/category' in segment %}active{% endif %}">
+                            <a href="/admin/product/category" class="">商品分类</a>
+                        </li>
+                        <li class="{% if 'product/commission' in segment %}active{% endif %}">
+                            <a href="/admin/product/commission" class="">佣金管理</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item pcoded-menu-caption">
+                    <label>样品申请管理</label>
+                </li>
+                <li data-username="样品申请 审核管理 发货管理 状态维护" 
+                    class="nav-item pcoded-hasmenu {% if 'sample' in segment %} active {% endif %}">
+                    <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-package"></i></span><span
+                            class="pcoded-mtext">样品申请管理</span></a>
+                    <ul class="pcoded-submenu">
+                        <li class="{% if 'sample/apply_list' in segment %}active{% endif %}">
+                            <a href="/admin/sample/apply/list" class="">申请列表</a>
+                        </li>
+                        <li class="{% if 'sample/review' in segment %}active{% endif %}">
+                            <a href="/admin/sample/review" class="">审核管理</a>
+                        </li>
+                        <li class="{% if 'sample/ship' in segment %}active{% endif %}">
+                            <a href="/admin/sample/ship" class="">发货管理</a>
+                        </li>
+                        <li class="{% if 'sample/status' in segment %}active{% endif %}">
+                            <a href="/admin/sample/status" class="">状态维护</a>
                         </li>
                     </ul>
                 </li>

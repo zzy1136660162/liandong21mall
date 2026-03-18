@@ -1,0 +1,79 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}商品管理{% endblock %}
+
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="page-header">
+                            <div class="row align-items-end">
+                                <div class="col-lg-8">
+                                    <div class="page-header-title">
+                                        <div class="d-inline">
+                                            <h4>商品管理</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="page-body">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <h5>商品总数</h5>
+                                            <h3 class="text-c-blue">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <h5>在售商品</h5>
+                                            <h3 class="text-c-green">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <h5>待审核</h5>
+                                            <h3 class="text-c-yellow">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <h5>今日新增</h5>
+                                            <h3 class="text-c-red">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <p>欢迎使用商品管理模块</p>
+                                            <ul>
+                                                <li><a href="/admin/product/list">商品列表</a></li>
+                                                <li><a href="/admin/product/category">商品分类</a></li>
+                                                <li><a href="/admin/product/commission">佣金管理</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -32,6 +32,13 @@ class Config(object):
          SOCIAL_AUTH_GITHUB  = True        
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+    # SQLAlchemy 连接参数 - 确保使用 utf8mb4
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'connect_args': {
+            'charset': 'utf8mb4'
+        }
+    }
 
     # Redis Configuration
     REDIS_HOST     = os.getenv('REDIS_HOST'    , 'localhost')
@@ -59,7 +66,7 @@ class Config(object):
             if engine == 'mysql':
                 engine = 'mysql+pymysql'
             
-            SQLALCHEMY_DATABASE_URI = '{}://{}:{}@{}:{}/{}'.format(
+            SQLALCHEMY_DATABASE_URI = '{}://{}:{}@{}:{}/{}?charset=utf8mb4&use_unicode=1'.format(
                 engine,
                 DB_USERNAME,
                 DB_PASS,
