@@ -78,22 +78,23 @@ Page({
   // 添加消息到列表
   addMessage(message) {
     log('添加消息', message);
-    const messages = this.data.messages;
+    // 创建新数组，避免直接修改原数组
+    const messages = [...this.data.messages];
     message.id = Date.now();
     message.time = this.formatTime(new Date());
-    
+
     // 如果是 AI 消息，解析 Markdown
     if ((message.type === 'agent' || message.type === 'system') && message.content) {
       message.htmlContent = markdownParser.parseMarkdown(message.content);
       log('Markdown 解析后', message.htmlContent);
     }
-    
+
     messages.push(message);
-    
+
     log('当前消息列表长度', messages.length);
-    
+
     this.setData({
-      messages,
+      messages: messages,
       scrollToMessage: `msg-${message.id}`
     });
   },
@@ -152,10 +153,12 @@ Page({
 
       // 添加客服回复
       if (res.reply) {
-        log('添加客服回复', res.reply);
+        // 去除重复内容
+        let reply = this.removeDuplicateContent(res.reply);
+        log('添加客服回复', reply);
         this.addMessage({
           type: 'agent',
-          content: res.reply,
+          content: reply,
           suggestions: res.suggestions || []
         });
       } else {
@@ -229,5 +232,25 @@ Page({
       content: '人工客服工作时间：9:00-18:00\n客服电话：400-xxx-xxxx',
       showCancel: false
     });
+  },
+
+  // 去除重复内容
+  removeDuplicateContent(content) {
+    if (!content || typeof content !== 'string') {
+      return content;
+    }
+    // 按换行符分割
+    const lines = content.split('\n');
+    // 去重
+    const uniqueLines = [];
+    const seen = new Set();
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed && !seen.has(trimmed)) {
+        seen.add(trimmed);
+        uniqueLines.push(line);
+      }
+    }
+    return uniqueLines.join('\n');
   }
 });
