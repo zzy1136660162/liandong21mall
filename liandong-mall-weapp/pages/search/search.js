@@ -64,6 +64,12 @@ Page({
     });
   },
 
+  goToCamera() {
+    wx.navigateTo({
+      url: '/pages/camera/camera'
+    });
+  },
+
   onSuggestionTap(e) {
     const keyword = e.currentTarget.dataset.keyword;
     this.setData({

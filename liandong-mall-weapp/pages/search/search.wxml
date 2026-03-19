@@ -7,6 +7,7 @@
              bindinput="onSearchInput" value="{{searchKeyword}}" 
              confirm-type="search" bindconfirm="onSearch"
              auto-focus/>
+      <image class="camera-btn" src="https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260319090524623_666695127685.png" mode="aspectFit" bindtap="goToCamera"></image>
       <view class="search-clear" wx:if="{{searchKeyword}}" bindtap="clearInput">
         <text>×</text>
       </view>

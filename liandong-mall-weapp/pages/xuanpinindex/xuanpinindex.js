@@ -419,6 +419,38 @@ Page({
     });
   },
 
+  // 跳转到相机页面
+  goToCamera() {
+    wx.showActionSheet({
+      itemList: ['拍照识别', '扫码识别'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          wx.chooseMedia({
+            count: 1,
+            mediaType: ['image'],
+            sourceType: ['camera'],
+            success: (photoRes) => {
+              const tempFilePath = photoRes.tempFiles[0].tempFilePath;
+              wx.navigateTo({
+                url: '/pages/search/search?image=' + encodeURIComponent(tempFilePath)
+              });
+            }
+          });
+        } else {
+          wx.scanCode({
+            success: (scanRes) => {
+              if (scanRes.result) {
+                wx.navigateTo({
+                  url: '/pages/search/search?keyword=' + encodeURIComponent(scanRes.result)
+                });
+              }
+            }
+          });
+        }
+      }
+    });
+  },
+
   // 切换筛选
   switchFilter(e) {
     const filter = e.currentTarget.dataset.filter;

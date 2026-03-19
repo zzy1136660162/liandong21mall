@@ -145,7 +145,7 @@ Page({
   switchMainCategory(e) {
     const category = e.currentTarget.dataset.category;
     if (category === 'home') {
-      wx.navigateTo({
+      wx.switchTab({
         url: '/pages/xuanpinindex/xuanpinindex'
       });
       return;
@@ -201,7 +201,47 @@ Page({
   // 去搜索
   goToSearch() {
     wx.navigateTo({
-      url: '/pages/index/index'
+      url: '/pages/search/search'
+    });
+  },
+
+  // 拍照搜索和扫码
+  onCameraTap() {
+    wx.showActionSheet({
+      itemList: ['拍照搜索', '扫码识别'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          this.takePhoto();
+        } else if (res.tapIndex === 1) {
+          this.scanCode();
+        }
+      }
+    });
+  },
+
+  // 拍照搜索 - 跳转到相机页面
+  takePhoto() {
+    wx.navigateTo({
+      url: '/pages/camera/camera'
+    });
+  },
+
+  // 扫码
+  scanCode() {
+    wx.scanCode({
+      success: (res) => {
+        console.log('扫码结果:', res);
+        if (res.result) {
+          wx.showModal({
+            title: '扫码结果',
+            content: res.result,
+            showCancel: false
+          });
+        }
+      },
+      fail: (err) => {
+        console.log('扫码失败:', err);
+      }
     });
   },
 

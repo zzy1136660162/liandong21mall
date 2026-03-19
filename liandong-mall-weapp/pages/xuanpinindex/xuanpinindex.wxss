@@ -43,6 +43,12 @@ page {
   align-items: center;
 }
 
+.camera-btn {
+  width: 56rpx;
+  height: 56rpx;
+  margin-left: 16rpx;
+}
+
 .search-input {
   flex: 1;
   font-size: 28rpx;

@@ -1,19 +1,14 @@
 <view class="page">
   <!-- 状态栏占位 -->
   <view class="status-bar" style="height: {{statusBarHeight}}rpx;"></view>
-  
-  <!-- 顶部导航栏 -->
-  <view class="nav-bar">
-    <view class="nav-back" bindtap="goBack">
-      <text class="nav-icon">←</text>
-    </view>
+
+  <!-- 顶部搜索栏 -->
+  <view class="search-bar">
     <view class="search-box" bindtap="goToSearch">
       <text class="search-icon">🔍</text>
       <text class="search-text">搜索商品</text>
     </view>
-    <view class="nav-invite">
-      <text class="invite-icon">📷</text>
-    </view>
+    <image class="camera-btn" src="https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260319090524623_666695127685.png" mode="aspectFit" bindtap="takePhoto"></image>
   </view>
 
   <!-- 主分类标签 -->
