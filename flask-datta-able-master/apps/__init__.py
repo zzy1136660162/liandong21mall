@@ -22,7 +22,7 @@ def register_extensions(app):
 
 
 def register_blueprints(app):
-    for module_name in ('authentication', 'home', 'member', 'demand', 'demand_admin'):
+    for module_name in ('authentication', 'home', 'member', 'demand', 'demand_admin', 'product'):
         module = import_module('apps.{}.routes'.format(module_name))
         if hasattr(module, 'blueprint'):
             app.register_blueprint(module.blueprint)
@@ -51,25 +51,35 @@ def register_api(app):
     api.add_namespace(member_user_api, path='/api/user')
     api.add_namespace(talent_ns, path='/api/user/talent')
 
+    from apps.product.api import api as product_api, category_ns, cart_ns, order_ns
+    api.add_namespace(product_api, path='/api/product')
+    api.add_namespace(category_ns, path='/api/product/category')
+    api.add_namespace(cart_ns, path='/api/product/cart')
+    api.add_namespace(order_ns, path='/api/product/order')
+
 
 def configure_database(app):
+    initialized = False
 
-    @app.before_first_request
+    @app.before_request
     def initialize_database():
-        try:
-            db.create_all()
-        except Exception as e:
+        nonlocal initialized
+        if not initialized:
+            try:
+                db.create_all()
+            except Exception as e:
+                print('> Warning: DBMS Exception: ' + str(e) )
+                print('> Tables may already exist, skipping auto-creation')
 
-            print('> Error: DBMS Exception: ' + str(e) )
+            from apps.member.models import init_member_levels
+            from apps.product.models import init_product_categories
+            try:
+                init_member_levels()
+                init_product_categories()
+            except Exception as e:
+                print('> Warning: Initialization failed: ' + str(e) )
 
-            basedir = os.path.abspath(os.path.dirname(__file__))
-            app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
-
-            print('> Fallback to SQLite ')    
-            db.create_all()
-        
-        from apps.member.models import init_member_levels
-        init_member_levels()
+            initialized = True
 
     @app.teardown_request
     def shutdown_session(exception=None):

@@ -1,0 +1,131 @@
+<view class="rd-page">
+  <view class="page-background"></view>
+
+  <view class="page-header">
+    <view class="header-content">
+      <view class="header-top">
+        <view class="brand-section">
+          <view class="brand-name">研发中心</view>
+          <view class="brand-line"></view>
+        </view>
+        <view class="header-actions">
+          <view class="action-btn">
+            <text class="action-icon">🔍</text>
+          </view>
+          <view class="action-btn">
+            <text class="action-icon">⚙️</text>
+          </view>
+        </view>
+      </view>
+      <view class="header-desc">创新驱动，品质保障</view>
+    </view>
+  </view>
+
+  <view class="page-content">
+    <view class="stats-section">
+      <view class="stat-card">
+        <view class="stat-icon">🔬</view>
+        <view class="stat-content">
+          <view class="stat-value">12</view>
+          <view class="stat-label">进行中</view>
+        </view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-icon">✅</view>
+        <view class="stat-content">
+          <view class="stat-value">28</view>
+          <view class="stat-label">已完成</view>
+        </view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-icon">📊</view>
+        <view class="stat-content">
+          <view class="stat-value">156</view>
+          <view class="stat-label">总项目</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section-header">
+      <view class="section-title">
+        <text class="title-text">研发项目</text>
+        <view class="title-decoration"></view>
+      </view>
+      <view class="section-more" bindtap="viewAllProjects">
+        <text class="more-text">全部项目</text>
+        <text class="more-arrow">→</text>
+      </view>
+    </view>
+
+    <view class="project-list">
+      <view
+        wx:for="{{projects}}"
+        wx:key="id"
+        class="project-card"
+        bindtap="goToProjectDetail"
+        data-id="{{item.id}}"
+      >
+        <view class="project-header">
+          <view class="project-icon">{{item.icon}}</view>
+          <view class="project-info">
+            <view class="project-name">{{item.name}}</view>
+            <view class="project-category">{{item.category}}</view>
+          </view>
+          <view class="project-status {{item.statusClass}}">{{item.statusText}}</view>
+        </view>
+
+        <view class="project-body">
+          <view class="project-desc">{{item.description}}</view>
+
+          <view class="project-progress">
+            <view class="progress-header">
+              <text class="progress-label">项目进度</text>
+              <text class="progress-value">{{item.progress}}%</text>
+            </view>
+            <view class="progress-bar">
+              <view class="progress-fill" style="width: {{item.progress}}%"></view>
+            </view>
+          </view>
+        </view>
+
+        <view class="project-footer">
+          <view class="project-meta">
+            <view class="meta-item">
+              <text class="meta-label">负责人</text>
+              <text class="meta-value">{{item.leader}}</text>
+            </view>
+            <view class="meta-item">
+              <text class="meta-label">截止日期</text>
+              <text class="meta-value">{{item.deadline}}</text>
+            </view>
+          </view>
+          <view class="project-actions">
+            <view class="action-btn-small" bindtap="viewProject" data-id="{{item.id}}" catchtap="true">
+              <text class="action-text">查看</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="loading-state" wx:if="{{loading}}">
+      <view class="loading-dots">
+        <view class="dot"></view>
+        <view class="dot"></view>
+        <view class="dot"></view>
+      </view>
+    </view>
+
+    <view class="end-state" wx:if="{{noMore && projects.length > 0}}">
+      <view class="end-line"></view>
+      <text class="end-text">已加载全部</text>
+      <view class="end-line"></view>
+    </view>
+
+    <view class="empty-state" wx:if="{{projects.length === 0 && !loading}}">
+      <text class="empty-emoji">🔬</text>
+      <text class="empty-title">暂无项目</text>
+      <text class="empty-desc">探索更多研发成果</text>
+    </view>
+  </view>
+</view>

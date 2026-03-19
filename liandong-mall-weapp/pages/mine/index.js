@@ -288,7 +288,7 @@ Page({
 
   goToCustomerService() {
     wx.navigateTo({
-      url: '/pages/customer/service/index'
+      url: '/pages/chat/chat'
     });
   }
 });
