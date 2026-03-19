@@ -397,10 +397,11 @@ Page({
   // 切换分类
   switchCategory(e) {
     const category = e.currentTarget.dataset.category;
+    console.log('切换分类:', category);
     this.setData({
-      currentCategory: category
+      currentCategory: category,
+      products: this.data.allProducts
     });
-    this.applyFilters();
   },
 
   // 跳转到分类页面

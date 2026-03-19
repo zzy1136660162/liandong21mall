@@ -145,8 +145,8 @@ Page({
   switchMainCategory(e) {
     const category = e.currentTarget.dataset.category;
     if (category === 'home') {
-      wx.switchTab({
-        url: '/pages/index/index'
+      wx.navigateTo({
+        url: '/pages/xuanpinindex/xuanpinindex'
       });
       return;
     }
