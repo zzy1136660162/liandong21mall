@@ -7,7 +7,6 @@
     "pages/rd/rd",
     "pages/Profile_page/Profile_page",
     "pages/category/category",
-    "pages/camera/camera",
     "pages/activity/hot",
     "pages/activity/follow",
     "pages/activity/video",
@@ -35,7 +34,7 @@
   ],
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "选品中心",
+    "navigationBarTitleText": "链动商城",
     "navigationBarBackgroundColor": "#ffffff"
   },
   "tabBar": {

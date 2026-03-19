@@ -431,24 +431,46 @@ Page({
             sourceType: ['camera'],
             success: (photoRes) => {
               const tempFilePath = photoRes.tempFiles[0].tempFilePath;
-              wx.navigateTo({
-                url: '/pages/search/search?image=' + encodeURIComponent(tempFilePath)
-              });
+              this.processImage(tempFilePath);
             }
           });
         } else {
           wx.scanCode({
             success: (scanRes) => {
               if (scanRes.result) {
-                wx.navigateTo({
-                  url: '/pages/search/search?keyword=' + encodeURIComponent(scanRes.result)
-                });
+                this.processScanResult(scanRes.result);
               }
             }
           });
         }
       }
     });
+  },
+
+  // 处理拍照识别结果
+  processImage(imagePath) {
+    wx.showLoading({ title: '识别中...' });
+    // TODO: 调用图像识别API
+    setTimeout(() => {
+      wx.hideLoading();
+      wx.showToast({
+        title: '图片已选择',
+        icon: 'none'
+      });
+    }, 1000);
+  },
+
+  // 处理扫码结果
+  processScanResult(result) {
+    wx.showLoading({ title: '识别中...' });
+    // TODO: 调用扫码结果处理API
+    setTimeout(() => {
+      wx.hideLoading();
+      wx.showToast({
+        title: '扫码成功',
+        icon: 'none'
+      });
+    }, 1000);
   },
 
   // 切换筛选

@@ -219,30 +219,54 @@ Page({
     });
   },
 
-  // 拍照搜索 - 跳转到相机页面
+  // 拍照搜索
   takePhoto() {
-    wx.navigateTo({
-      url: '/pages/camera/camera'
+    wx.showActionSheet({
+      itemList: ['拍照识别', '扫码识别'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          wx.chooseMedia({
+            count: 1,
+            mediaType: ['image'],
+            sourceType: ['camera'],
+            success: (photoRes) => {
+              const tempFilePath = photoRes.tempFiles[0].tempFilePath;
+              this.processImage(tempFilePath);
+            }
+          });
+        } else {
+          wx.scanCode({
+            success: (scanRes) => {
+              if (scanRes.result) {
+                this.processScanResult(scanRes.result);
+              }
+            }
+          });
+        }
+      }
     });
   },
 
-  // 扫码
-  scanCode() {
-    wx.scanCode({
-      success: (res) => {
-        console.log('扫码结果:', res);
-        if (res.result) {
-          wx.showModal({
-            title: '扫码结果',
-            content: res.result,
-            showCancel: false
-          });
-        }
-      },
-      fail: (err) => {
-        console.log('扫码失败:', err);
-      }
-    });
+  processImage(imagePath) {
+    wx.showLoading({ title: '识别中...' });
+    setTimeout(() => {
+      wx.hideLoading();
+      wx.showToast({
+        title: '图片已选择',
+        icon: 'none'
+      });
+    }, 1000);
+  },
+
+  processScanResult(result) {
+    wx.showLoading({ title: '识别中...' });
+    setTimeout(() => {
+      wx.hideLoading();
+      wx.showToast({
+        title: '扫码成功',
+        icon: 'none'
+      });
+    }, 1000);
   },
 
   // 切换Tab

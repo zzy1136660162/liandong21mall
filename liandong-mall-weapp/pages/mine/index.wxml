@@ -83,7 +83,7 @@
         <text class="func-name">样品申请</text>
         <text class="func-subtitle">测试体验</text>
       </view>
-      <view class="func-item" bindtap="checkLoginAndGo" data-url="rnd">
+      <view class="func-item" bindtap="goToRNDemandDirect" data-url="rnd">
         <text class="func-icon">🔬</text>
         <text class="func-name">研发需求</text>
         <text class="func-subtitle">定制研发</text>
