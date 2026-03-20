@@ -73,7 +73,7 @@
   <view class="common-functions">
     <text class="function-title">常用功能</text>
     <view class="function-grid">
-      <view class="func-item" bindtap="checkLoginAndGo" data-url="talent">
+      <view class="func-item" bindtap="goToTalentCenterDirect" data-url="talent">
         <text class="func-icon">👤</text>
         <text class="func-name">达人中心</text>
         <text class="func-subtitle">申请成为达人</text>

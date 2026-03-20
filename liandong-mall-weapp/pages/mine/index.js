@@ -271,6 +271,12 @@ Page({
     });
   },
 
+  goToTalentCenterDirect() {
+    wx.navigateTo({
+      url: '/pages/talent/center/index'
+    });
+  },
+
   goToSampleApplication() {
     wx.navigateTo({
       url: '/pages/sample/application/index'
