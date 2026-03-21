@@ -76,8 +76,7 @@ page {
   justify-content: center;
 }
 
-.avatar-service::after {
-  content: '客';
+.avatar-text {
   color: #fff;
   font-size: 32rpx;
   font-weight: bold;

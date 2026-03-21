@@ -96,11 +96,17 @@
   flex: 1;
   font-size: 30rpx;
   color: #333;
+  min-width: 0;
 }
 
 .code-input {
   flex: 1;
   margin-right: 20rpx;
+  min-width: 200rpx;
+}
+
+.placeholder {
+  color: #999;
 }
 
 .code-btn {

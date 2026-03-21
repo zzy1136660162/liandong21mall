@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/login/index",
     "pages/rd_index/rd_index",
     "pages/Product_list_page/Product_list_page",
     "pages/xuanpinindex/xuanpinindex",

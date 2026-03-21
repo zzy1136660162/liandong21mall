@@ -22,7 +22,7 @@
         <view class="user-detail">
           <text class="nickname">未登录</text>
           <text class="login-tip">点击登录，享受更多服务</text>
-          <view class="login-btn-small">
+          <view class="login-btn-small" bindtap="goToLogin">
             <text class="login-btn-text">立即登录</text>
             <text class="login-btn-arrow">></text>
           </view>

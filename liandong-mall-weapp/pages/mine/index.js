@@ -1,5 +1,5 @@
 // 个人中心页
-const api = require('../../utils/api.js');
+const { api } = require('../../utils/api.js');
 const user = require('../../utils/user.js');
 
 Page({
