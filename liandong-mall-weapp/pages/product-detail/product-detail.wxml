@@ -223,5 +223,91 @@
       <text class="promo-desc">履约全额返现</text>
     </view>
     <view class="action-btn btn-add" bindtap="addToShelf">加入货架</view>
+    <view class="action-btn btn-buy" bindtap="buyNow">立即购买</view>
+  </view>
+</view>
+
+<!-- 商品规格选择弹窗 -->
+<view class="spec-modal" wx:if="{{specModalVisible}}">
+  <view class="spec-modal-overlay" bindtap="closeSpecModal"></view>
+  <view class="spec-modal-content">
+    <!-- 弹窗头部 -->
+    <view class="spec-modal-header">
+      <text class="close-btn" bindtap="closeSpecModal">×</text>
+    </view>
+    
+    <!-- 商品基本信息 -->
+    <view class="spec-product-info">
+      <image class="spec-product-image" src="{{product.images[0]}}" mode="aspectFill" />
+      <view class="spec-product-detail">
+        <text class="spec-product-title">{{product.title}}</text>
+        <view class="spec-product-price">
+          <text class="spec-price-symbol">¥</text>
+          <text class="spec-price-value">{{selectedSpecs.weight ? selectedSpecs.weight.price : product.price}}</text>
+          <text class="spec-original-price">¥{{selectedSpecs.weight ? selectedSpecs.weight.originalPrice || product.originalPrice : product.originalPrice}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 规格选择区域 -->
+    <view class="spec-selection">
+      <view class="spec-item">
+        <text class="spec-label">容量选择</text>
+        <view class="spec-options">
+          <view 
+            wx:for="{{product.specs.weight}}" 
+            wx:key="id"
+            class="spec-option {{selectedSpecs.weight && selectedSpecs.weight.id === item.id ? 'selected' : ''}}"
+            bindtap="selectSpec"
+            data-type="weight"
+            data-spec="{{item}}"
+          >
+            <text class="spec-option-text">{{item.name}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <view class="spec-item">
+        <text class="spec-label">香型选择</text>
+        <view class="spec-options">
+          <view 
+            wx:for="{{product.specs.scent}}" 
+            wx:key="id"
+            class="spec-option {{selectedSpecs.scent && selectedSpecs.scent.id === item.id ? 'selected' : ''}}"
+            bindtap="selectSpec"
+            data-type="scent"
+            data-spec="{{item}}"
+          >
+            <text class="spec-option-text">{{item.name}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 数量选择区域 -->
+    <view class="spec-quantity">
+      <text class="spec-label">购买数量</text>
+      <view class="quantity-control">
+        <view class="quantity-btn minus" bindtap="changeQuantity" data-type="minus" disabled="{{selectedCount <= 1}}">
+          <text class="btn-text">-</text>
+        </view>
+        <view class="quantity-value">{{selectedCount}}</view>
+        <view class="quantity-btn plus" bindtap="changeQuantity" data-type="plus">
+          <text class="btn-text">+</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 底部操作区域 -->
+    <view class="spec-bottom">
+      <view class="spec-total">
+        <text class="total-label">合计：</text>
+        <text class="total-price-symbol">¥</text>
+        <text class="total-price-value">{{totalPrice}}</text>
+      </view>
+      <view class="spec-confirm-btn" bindtap="confirmSpec">
+        <text class="confirm-btn-text">确定</text>
+      </view>
+    </view>
   </view>
 </view>

@@ -270,6 +270,34 @@ class OrderItem(db.Model):
         }
 
 
+class ProductFavorite(db.Model):
+    """商品收藏表"""
+    __tablename__ = 'product_favorite'
+    
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True, comment='收藏ID')
+    user_id = db.Column(db.BigInteger, db.ForeignKey('user.id'), nullable=False, comment='用户ID')
+    product_id = db.Column(db.BigInteger, db.ForeignKey('product.id'), nullable=False, comment='商品ID')
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now, comment='创建时间')
+    
+    product = db.relationship('Product', backref='favorites')
+    
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'product_id', name='uk_user_product'),
+    )
+    
+    def __repr__(self):
+        return f'<ProductFavorite {self.user_id}:{self.product_id}>'
+    
+    def to_dict(self):
+        return {
+            'favoriteId': self.id,
+            'userId': self.user_id,
+            'productId': self.product_id,
+            'product': self.product.to_dict() if self.product else None,
+            'createdAt': self.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        }
+
+
 def init_product_categories():
     """初始化商品分类数据"""
     categories = [

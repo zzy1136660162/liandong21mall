@@ -23,13 +23,16 @@ Component({
     const pages = getCurrentPages();
     if (pages && pages.length > 0) {
       const currentPage = pages[pages.length - 1];
-      const route = currentPage.route || currentPage.__route__;
-      const index = this.data.list.findIndex(item => {
-        const itemPath = item.pagePath.replace(/^\//, '');
-        return route === itemPath;
-      });
-      if (index !== -1 && index !== this.data.selected) {
-        this.setData({ selected: index });
+      // 只使用 route 属性，__route__ 已废弃
+      const route = currentPage.route;
+      if (route) {
+        const index = this.data.list.findIndex(item => {
+          const itemPath = item.pagePath.replace(/^\//, '');
+          return route === itemPath;
+        });
+        if (index !== -1 && index !== this.data.selected) {
+          this.setData({ selected: index });
+        }
       }
     }
   },

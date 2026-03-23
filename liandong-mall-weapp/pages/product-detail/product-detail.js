@@ -32,8 +32,28 @@ Page({
       tuanzhangName: '飞鸽传媒团长精选',
       tuanzhangAvatar: 'https://picsum.photos/80/80?random=20',
       tuanzhangDesc: '聊高佣·帮申样·响应快',
-      tags: ['官方正品', '大牌大补', '品质保障']
-    }
+      tags: ['官方正品', '大牌大补', '品质保障'],
+      // 商品规格信息
+      specs: {
+        weight: [
+          { id: 1, name: '500g', price: '29.9', stock: 100 },
+          { id: 2, name: '1.5kg', price: '39.9', stock: 100 },
+          { id: 3, name: '3kg', price: '59.9', stock: 100 },
+          { id: 4, name: '9kg', price: '99.9', stock: 100 }
+        ],
+        scent: [
+          { id: 1, name: '樱花香', stock: 100 },
+          { id: 2, name: '薰衣草', stock: 100 },
+          { id: 3, name: '茉莉香', stock: 100 },
+          { id: 4, name: '柠檬香', stock: 100 }
+        ]
+      }
+    },
+    // 规格选择弹窗相关数据
+    specModalVisible: false,
+    selectedSpecs: {},
+    selectedCount: 1,
+    totalPrice: 0
   },
 
   onLoad(options) {
@@ -177,5 +197,113 @@ Page({
       path: '/pages/product-detail/product-detail?id=' + this.data.product.id,
       imageUrl: this.data.product.images[0]
     };
+  },
+
+  // 立即购买按钮点击事件
+  buyNow() {
+    // 显示规格选择弹窗
+    this.setData({
+      specModalVisible: true,
+      // 重置选择状态
+      selectedSpecs: {},
+      selectedCount: 1,
+      totalPrice: parseFloat(this.data.product.price)
+    });
+  },
+
+  // 更新总价
+  updateTotalPrice() {
+    const { selectedSpecs, selectedCount, product } = this.data;
+    const price = selectedSpecs.weight ? parseFloat(selectedSpecs.weight.price) : parseFloat(product.price);
+    const totalPrice = price * selectedCount;
+    this.setData({
+      totalPrice: parseFloat(totalPrice.toFixed(2))
+    });
+  },
+
+  // 关闭规格选择弹窗
+  closeSpecModal() {
+    this.setData({
+      specModalVisible: false
+    });
+  },
+
+  // 选择规格
+  selectSpec(e) {
+    const { type, spec } = e.currentTarget.dataset;
+    const selectedSpecs = { ...this.data.selectedSpecs };
+    selectedSpecs[type] = spec;
+    this.setData({
+      selectedSpecs
+    });
+    // 更新总价
+    this.updateTotalPrice();
+  },
+
+  // 调整购买数量
+  changeQuantity(e) {
+    const { type } = e.currentTarget.dataset;
+    let { selectedCount } = this.data;
+    
+    if (type === 'minus' && selectedCount > 1) {
+      selectedCount--;
+    } else if (type === 'plus') {
+      // 检查库存限制
+      const maxStock = this.data.selectedSpecs.weight ? this.data.selectedSpecs.weight.stock : this.data.product.stock;
+      if (selectedCount < maxStock) {
+        selectedCount++;
+      } else {
+        wx.showToast({
+          title: '已达到最大库存',
+          icon: 'none'
+        });
+        return;
+      }
+    }
+    
+    this.setData({
+      selectedCount
+    });
+    // 更新总价
+    this.updateTotalPrice();
+  },
+
+  // 确认规格选择
+  confirmSpec() {
+    const { selectedSpecs, selectedCount, product } = this.data;
+    
+    // 检查是否选择了所有必要的规格
+    if (!selectedSpecs.weight || !selectedSpecs.scent) {
+      wx.showToast({
+        title: '请选择完整的商品规格',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    // 准备订单商品数据
+    const orderItem = {
+      productId: product.id,
+      productName: product.title,
+      mainImage: product.images[0],
+      price: selectedSpecs.weight.price,
+      quantity: selectedCount,
+      specs: `${selectedSpecs.weight.name} - ${selectedSpecs.scent.name}`
+    };
+    
+    // 关闭弹窗
+    this.closeSpecModal();
+    
+    // 跳转到订单确认页面
+    wx.navigateTo({
+      url: `/pages/sp_Order_confirm_page/sp_Order_confirm_page`,
+      success: (res) => {
+        // 通过eventChannel传递数据到下一个页面
+        res.eventChannel.emit('orderDataFromProduct', {
+          orderItems: [orderItem],
+          from: 'buyNow' // 标识是从立即购买过来的
+        });
+      }
+    });
   }
 });

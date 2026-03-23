@@ -81,7 +81,7 @@ Page({
   goToDetail(e) {
     const productId = e.currentTarget.dataset.id
     wx.navigateTo({
-      url: `/pages/Product_detail_page/Product_detail_page?id=${productId}`,
+      url: `/pages/sp_Details/sp_Details?id=${productId}`,
       fail: () => {
         wx.showToast({
           title: '页面跳转失败',

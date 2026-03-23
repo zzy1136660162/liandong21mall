@@ -30,7 +30,14 @@
     "pages/demandList/demandList",
     "pages/demandDetail/demandDetail",
     "pages/demandProgress/demandProgress",
-    "pages/chat/chat"
+    "pages/chat/chat",
+    "pages/sp_Details/sp_Details",
+    "pages/sp_Cart_page/sp_Cart_page",
+    "pages/sp_Order_confirm_page/sp_Order_confirm_page",
+    "pages/sp_My_orders_page/sp_My_orders_page",
+    "pages/sp_Order_detail_page/sp_Order_detail_page",
+    "pages/sp_Address_page/sp_Address_page",
+    "pages/sp_Address_edit_page/sp_Address_edit_page"
   ],
   "window": {
     "navigationBarTextStyle": "black",
