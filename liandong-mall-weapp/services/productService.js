@@ -3,7 +3,8 @@
  */
 const { get, post } = require('../utils/api');
 
-const API_BASE = '/api/products';
+const API_BASE = '/api/product';
+const API_LIST_BASE = '/api/product/list';
 
 module.exports = {
   /**
@@ -17,7 +18,7 @@ module.exports = {
    * @param {string} params.sortOrder - 排序顺序
    */
   getProducts(params = {}) {
-    return get(API_BASE, params);
+    return get(API_LIST_BASE, params);
   },
 
   /**

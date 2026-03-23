@@ -143,31 +143,28 @@ Page({
       
       const res = await productService.getProducts(params);
       
-      if (res.code === 200) {
-        const products = res.data.list.map(item => ({
-          id: item.id,
-          image: item.image,
-          title: item.name,
-          price: item.price.toString(),
-          commissionRate: item.commissionRate,
-          commissionAmount: item.commissionAmount.toString(),
-          sales: item.sales,
-          salesText: item.monthlySales.replace('月销', '').replace('件', ''),
-          tags: item.tags,
-          isBrand: item.isBrand,
-          hasCashback: item.hasCashback
-        }));
-        
-        this.setData({
-          products: refresh ? products : [...this.data.products, ...products],
-          allProducts: refresh ? products : [...this.data.allProducts, ...products],
-          page: page + 1,
-          hasMore: products.length === this.data.pageSize,
-          loading: false
-        });
-      } else {
-        throw new Error(res.message || '获取商品失败');
-      }
+      const products = res.list.map(item => ({
+        id: item.id,
+        image: item.image,
+        title: item.name || item.title,
+        price: item.price.toString(),
+        originalPrice: item.originalPrice ? item.originalPrice.toString() : '',
+        commissionRate: item.commissionRate || 0,
+        commissionAmount: item.commissionAmount ? item.commissionAmount.toString() : '0',
+        sales: item.sales || 0,
+        salesText: item.monthlySales ? item.monthlySales.replace('月销', '').replace('件', '') : '0',
+        tags: item.tags || [],
+        isBrand: item.isBrand || false,
+        hasCashback: item.hasCashback || false
+      }));
+
+      this.setData({
+        products: refresh ? products : [...this.data.products, ...products],
+        allProducts: refresh ? products : [...this.data.allProducts, ...products],
+        page: page + 1,
+        hasMore: products.length === this.data.pageSize,
+        loading: false
+      });
     } catch (error) {
       console.error('加载商品失败:', error);
       this.setData({ loading: false });
