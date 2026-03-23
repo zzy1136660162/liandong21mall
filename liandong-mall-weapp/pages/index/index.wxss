@@ -7,10 +7,10 @@
 
 /* Banner区域 */
 .banner {
-  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
+  background: linear-gradient(135deg, #f5d547 0%, #ffec8b 100%);
   padding: 80rpx 40rpx 100rpx;
   text-align: center;
-  color: #fff;
+  color: #333;
   position: relative;
   overflow: hidden;
 }

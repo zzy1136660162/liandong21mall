@@ -38,12 +38,7 @@
       <view class="message-content">
         <!-- 消息气泡 -->
         <view class="bubble {{item.type}}">
-          <!-- AI 消息使用 rich-text 解析 Markdown -->
-          <rich-text wx:if="{{item.type === 'agent' || item.type === 'system'}}" 
-                     class="message-text" 
-                     nodes="{{item.htmlContent || item.content}}"/>
-          <!-- 用户消息使用普通文本 -->
-          <text wx:else class="message-text">{{item.content}}</text>
+          <text class="message-text">{{item.content}}</text>
         </view>
         
         <!-- 建议选项 -->

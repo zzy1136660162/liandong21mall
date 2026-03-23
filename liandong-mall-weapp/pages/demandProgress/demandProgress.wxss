@@ -1,6 +1,6 @@
 .header-card {
-  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
-  color: #fff;
+  background: linear-gradient(135deg, #f5d547 0%, #ffec8b 100%);
+  color: #333;
 }
 
 .header-title {
@@ -31,7 +31,7 @@
   color: #333;
   margin-bottom: 40rpx;
   padding-left: 20rpx;
-  border-left: 8rpx solid #1890ff;
+  border-left: 8rpx solid #f5d547;
 }
 
 .timeline {
@@ -65,9 +65,9 @@
   width: 24rpx;
   height: 24rpx;
   border-radius: 50%;
-  background: #1890ff;
+  background: #f5d547;
   border: 4rpx solid #fff;
-  box-shadow: 0 0 0 2rpx #1890ff;
+  box-shadow: 0 0 0 2rpx #f5d547;
 }
 
 .timeline-item:first-child .timeline-dot {
@@ -96,8 +96,8 @@
 
 .timeline-operator {
   font-size: 24rpx;
-  color: #1890ff;
-  background: #e6f7ff;
+  color: #d4a017;
+  background: #fffbe6;
   padding: 4rpx 16rpx;
   border-radius: 8rpx;
 }

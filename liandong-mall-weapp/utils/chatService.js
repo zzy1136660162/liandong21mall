@@ -80,7 +80,9 @@ const sendMessage = (message, sessionId = '', userInfo = {}) => {
         
         if (res.statusCode === 200 && res.data.choices && res.data.choices[0]) {
           // OpenAI 格式响应
-          const reply = res.data.choices[0].message.content;
+          let reply = res.data.choices[0].message.content;
+          // 清理可能重复的回复
+          reply = cleanDuplicateReply(reply);
           log('API返回成功，使用真实回复', reply);
           resolve({
             reply: reply,
@@ -110,6 +112,32 @@ const sendMessage = (message, sessionId = '', userInfo = {}) => {
       }
     });
   });
+};
+
+/**
+ * 清理重复的回复内容
+ * @param {string} reply - 原始回复
+ * @returns {string} - 清理后的回复
+ */
+const cleanDuplicateReply = (reply) => {
+  if (!reply) return reply;
+  
+  // 按换行符分割
+  const lines = reply.split('\n');
+  const seen = new Set();
+  const uniqueLines = [];
+  
+  for (const line of lines) {
+    const trimmed = line.trim();
+    // 跳过空行
+    if (!trimmed) continue;
+    // 如果这行已经出现过，跳过
+    if (seen.has(trimmed)) continue;
+    seen.add(trimmed);
+    uniqueLines.push(line);
+  }
+  
+  return uniqueLines.join('\n');
 };
 
 /**

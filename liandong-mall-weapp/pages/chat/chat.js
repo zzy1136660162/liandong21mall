@@ -1,5 +1,4 @@
 const chatService = require('../../utils/chatService');
-const markdownParser = require('../../utils/markdownParser');
 const app = getApp();
 
 // 调试日志
@@ -79,15 +78,19 @@ Page({
   addMessage(message) {
     log('添加消息', message);
     const messages = this.data.messages;
-    message.id = Date.now();
-    message.time = this.formatTime(new Date());
     
-    // 如果是 AI 消息，解析 Markdown
-    if ((message.type === 'agent' || message.type === 'system') && message.content) {
-      message.htmlContent = markdownParser.parseMarkdown(message.content);
-      log('Markdown 解析后', message.htmlContent);
+    // 检查是否是重复消息（防止重复添加）
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage && 
+        lastMessage.type === message.type && 
+        lastMessage.content === message.content &&
+        Date.now() - lastMessage.id < 1000) {
+      log('检测到重复消息，跳过添加');
+      return;
     }
     
+    message.id = Date.now();
+    message.time = this.formatTime(new Date());
     messages.push(message);
     
     log('当前消息列表长度', messages.length);
