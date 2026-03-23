@@ -9,7 +9,7 @@
   <!-- Logo 区域 -->
   <view class="logo-section">
     <image class="logo" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" mode="aspectFit"></image>
-    <text class="app-name">联东商城</text>
+    <text class="app-name">链动商城</text>
     <text class="app-slogan">品质生活，从这里开始</text>
   </view>
 
@@ -33,6 +33,7 @@
         class="input-field code-input" 
         type="number" 
         placeholder="请输入验证码" 
+        placeholder-class="placeholder"
         maxlength="6"
         value="{{code}}"
         bindinput="onCodeInput"

@@ -1,7 +1,7 @@
 {
   "navigationBarTitleText": "智能客服",
-  "navigationBarBackgroundColor": "#1890ff",
-  "navigationBarTextStyle": "white",
+  "navigationBarBackgroundColor": "#f5d547",
+  "navigationBarTextStyle": "black",
   "backgroundColor": "#f5f5f5",
   "enablePullDownRefresh": false
 }

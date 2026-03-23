@@ -1,5 +1,5 @@
 // 达人中心页
-const api = require('../../../utils/api.js');
+const { talentApi } = require('../../../utils/api.js');
 
 Page({
   data: {
@@ -28,7 +28,7 @@ Page({
   loadTalentInfo() {
     wx.showLoading({ title: '加载中' });
     
-    api.get('/api/user/talent/info')
+    talentApi.getTalentInfo()
       .then(res => {
         wx.hideLoading();
         if (res.code === 200) {
@@ -46,8 +46,8 @@ Page({
 
   // 跳转到选品池
   goToSelectionPool() {
-    wx.navigateTo({
-      url: '/pages/selection/pool/index'
+    wx.switchTab({
+      url: '/pages/xuanpinindex/xuanpinindex'
     });
   },
 
@@ -60,8 +60,8 @@ Page({
 
   // 跳转到研发需求
   goToRdDemand() {
-    wx.navigateTo({
-      url: '/pages/rd/demand/index'
+    wx.switchTab({
+      url: '/pages/rd_index/rd_index'
     });
   }
 });

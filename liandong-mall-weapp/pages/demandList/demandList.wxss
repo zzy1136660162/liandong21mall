@@ -31,9 +31,9 @@
 }
 
 .filter-item.active {
-  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
-  color: #fff;
-  box-shadow: 0 4rpx 16rpx rgba(24,144,255,0.3);
+  background: linear-gradient(135deg, #f5d547 0%, #ffec8b 100%);
+  color: #333;
+  box-shadow: 0 4rpx 16rpx rgba(245,213,71,0.3);
 }
 
 /* 需求列表 */
@@ -54,7 +54,7 @@
 .demand-card:active {
   transform: translateY(-4rpx);
   box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
-  border-color: #e6f7ff;
+  border-color: #fff7e6;
 }
 
 .card-header {
@@ -89,8 +89,8 @@
 }
 
 .status-confirming {
-  background: #e6f7ff;
-  color: #1890ff;
+  background: #fffbe6;
+  color: #d4a017;
 }
 
 .status-developing {
@@ -238,10 +238,10 @@
 }
 
 .load-more text {
-  color: #1890ff;
+  color: #d4a017;
   font-weight: 500;
   padding: 16rpx 40rpx;
-  background: #e6f7ff;
+  background: #fffbe6;
   border-radius: 32rpx;
 }
 
@@ -269,12 +269,12 @@
 
 .empty-btn {
   width: 320rpx;
-  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
-  color: #fff;
+  background: linear-gradient(135deg, #f5d547 0%, #ffec8b 100%);
+  color: #333;
   border-radius: 44rpx;
   font-size: 30rpx;
   font-weight: 500;
-  box-shadow: 0 8rpx 24rpx rgba(24,144,255,0.3);
+  box-shadow: 0 8rpx 24rpx rgba(245,213,71,0.3);
 }
 
 .empty-btn::after {

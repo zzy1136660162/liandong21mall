@@ -48,8 +48,10 @@ def register_api(app):
     )
     
     from apps.member.api import api as member_user_api, talent_ns
+    from apps.member.auth import auth_ns
     api.add_namespace(member_user_api, path='/api/user')
     api.add_namespace(talent_ns, path='/api/user/talent')
+    api.add_namespace(auth_ns, path='/api/auth')
 
     from apps.product.api import api as product_api, category_ns, cart_ns, order_ns, favorite_ns
     api.add_namespace(product_api, path='/api/product')

@@ -1,5 +1,4 @@
 const chatService = require('../../utils/chatService');
-const markdownParser = require('../../utils/markdownParser');
 const app = getApp();
 
 // 调试日志
@@ -78,6 +77,18 @@ Page({
   // 添加消息到列表
   addMessage(message) {
     log('添加消息', message);
+    const messages = this.data.messages;
+    
+    // 检查是否是重复消息（防止重复添加）
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage && 
+        lastMessage.type === message.type && 
+        lastMessage.content === message.content &&
+        Date.now() - lastMessage.id < 1000) {
+      log('检测到重复消息，跳过添加');
+      return;
+    }
+    
     // 创建新数组，避免直接修改原数组
     const messages = [...this.data.messages];
     message.id = Date.now();

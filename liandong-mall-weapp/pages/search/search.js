@@ -64,6 +64,53 @@ Page({
     });
   },
 
+  goToCamera() {
+    wx.showActionSheet({
+      itemList: ['拍照识别', '扫码识别'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          wx.chooseMedia({
+            count: 1,
+            mediaType: ['image'],
+            sourceType: ['camera'],
+            success: (photoRes) => {
+              const tempFilePath = photoRes.tempFiles[0].tempFilePath;
+              this.processImage(tempFilePath);
+            }
+          });
+        } else {
+          wx.scanCode({
+            success: (scanRes) => {
+              if (scanRes.result) {
+                this.processScanResult(scanRes.result);
+              }
+            }
+          });
+        }
+      }
+    });
+  },
+
+  processImage(imagePath) {
+    wx.showLoading({ title: '识别中...' });
+    setTimeout(() => {
+      wx.hideLoading();
+      wx.showToast({
+        title: '图片已选择',
+        icon: 'none'
+      });
+    }, 1000);
+  },
+
+  processScanResult(result) {
+    wx.showLoading({ title: '识别中...' });
+    setTimeout(() => {
+      wx.hideLoading();
+      this.setData({ searchKeyword: result });
+      this.doSearch(result);
+    }, 1000);
+  },
+
   onSuggestionTap(e) {
     const keyword = e.currentTarget.dataset.keyword;
     this.setData({

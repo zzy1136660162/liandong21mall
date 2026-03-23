@@ -16,8 +16,8 @@ page {
   align-items: center;
   justify-content: space-between;
   padding: 20rpx 30rpx;
-  background: linear-gradient(135deg, #1890ff, #36cfc9);
-  color: #fff;
+  background: linear-gradient(135deg, #f5d547, #ffec8b);
+  color: #333;
 }
 
 .back-btn {
@@ -70,17 +70,22 @@ page {
 }
 
 .avatar-service {
-  background: linear-gradient(135deg, #1890ff, #36cfc9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: linear-gradient(135deg, #f5d547, #ffec8b);
+  position: relative;
 }
 
+.avatar-text {
+  color: #fff;
 .avatar-service::after {
   content: '客';
-  color: #fff;
+  color: #333;
   font-size: 32rpx;
   font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  line-height: 1;
 }
 
 .message-content {
@@ -100,8 +105,8 @@ page {
 }
 
 .bubble.user {
-  background: #1890ff;
-  color: #fff;
+  background: #f5d547;
+  color: #333;
   border-bottom-right-radius: 4rpx;
 }
 
@@ -139,11 +144,11 @@ page {
 
 .suggestion-item {
   padding: 10rpx 20rpx;
-  background: #e6f7ff;
-  color: #1890ff;
+  background: #fffbe6;
+  color: #d4a017;
   border-radius: 30rpx;
   font-size: 26rpx;
-  border: 1rpx solid #91d5ff;
+  border: 1rpx solid #ffe58f;
 }
 
 /* 加载动画 */
@@ -213,9 +218,9 @@ page {
 }
 
 .quick-item:active {
-  background: #e6f7ff;
-  color: #1890ff;
-  border-color: #91d5ff;
+  background: #fffbe6;
+  color: #d4a017;
+  border-color: #ffe58f;
 }
 
 /* 输入区域 */
@@ -268,6 +273,7 @@ page {
 
 .send-btn.active {
   background: #1890ff !important;
+  background: #f5d547;
 }
 
 .send-btn:active {

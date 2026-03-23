@@ -136,11 +136,11 @@ const userApi = {
 }
 
 const talentApi = {
-    submitApply: (data) => api.post('/user/talent/apply', data),
+    submitApply: (data) => api.post('/api/user/talent/apply', data),
 
-    getTalentStatus: () => api.get('/user/talent/status'),
+    getTalentStatus: () => api.get('/api/user/talent/status'),
 
-    getTalentInfo: () => api.get('/user/talent/info')
+    getTalentInfo: () => api.get('/api/user/talent/info')
 }
 
 const addressApi = {

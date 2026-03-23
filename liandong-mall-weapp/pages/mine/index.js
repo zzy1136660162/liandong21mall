@@ -1,5 +1,5 @@
 // 个人中心页
-const api = require('../../utils/api.js');
+const { api } = require('../../utils/api.js');
 const user = require('../../utils/user.js');
 
 Page({
@@ -114,6 +114,12 @@ Page({
   checkLoginAndGo(e) {
     const { url, status } = e.currentTarget.dataset;
 
+    // rnd 不需要登录验证
+    if (url === 'rnd') {
+      this.goToRNDemand();
+      return;
+    }
+
     if (!this.data.isLogin) {
       wx.navigateTo({
         url: '/pages/login/index'
@@ -130,9 +136,6 @@ Page({
         break;
       case 'sample':
         this.goToSampleApplication();
-        break;
-      case 'rnd':
-        this.goToRNDemand();
         break;
       case 'address':
         this.goToAddress();
@@ -268,6 +271,12 @@ Page({
     });
   },
 
+  goToTalentCenterDirect() {
+    wx.navigateTo({
+      url: '/pages/talent/center/index'
+    });
+  },
+
   goToSampleApplication() {
     wx.navigateTo({
       url: '/pages/sample/application/index'
@@ -275,8 +284,14 @@ Page({
   },
 
   goToRNDemand() {
-    wx.navigateTo({
-      url: '/pages/rnd/demand/index'
+    wx.switchTab({
+      url: '/pages/rd_index/rd_index'
+    });
+  },
+
+  goToRNDemandDirect() {
+    wx.switchTab({
+      url: '/pages/rd_index/rd_index'
     });
   },
 

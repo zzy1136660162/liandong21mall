@@ -8,9 +8,9 @@
       <view class="search-input-wrapper">
         <input class="search-input" placeholder="搜索商品" placeholder-class="placeholder" 
                confirm-type="search"/>
+        <image class="camera-btn" src="https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260319090524623_666695127685.png" mode="aspectFit" bindtap="goToCamera"></image>
       </view>
     </view>
-    <view class="search-btn" bindtap="goToSearch">搜索</view>
   </view>
 
     <!-- 分类标签 -->

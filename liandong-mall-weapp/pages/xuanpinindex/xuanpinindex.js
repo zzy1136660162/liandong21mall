@@ -397,10 +397,11 @@ Page({
   // 切换分类
   switchCategory(e) {
     const category = e.currentTarget.dataset.category;
+    console.log('切换分类:', category);
     this.setData({
-      currentCategory: category
+      currentCategory: category,
+      products: this.data.allProducts
     });
-    this.applyFilters();
   },
 
   // 跳转到分类页面
@@ -416,6 +417,60 @@ Page({
     wx.navigateTo({
       url: '/pages/search/search'
     });
+  },
+
+  // 跳转到相机页面
+  goToCamera() {
+    wx.showActionSheet({
+      itemList: ['拍照识别', '扫码识别'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          wx.chooseMedia({
+            count: 1,
+            mediaType: ['image'],
+            sourceType: ['camera'],
+            success: (photoRes) => {
+              const tempFilePath = photoRes.tempFiles[0].tempFilePath;
+              this.processImage(tempFilePath);
+            }
+          });
+        } else {
+          wx.scanCode({
+            success: (scanRes) => {
+              if (scanRes.result) {
+                this.processScanResult(scanRes.result);
+              }
+            }
+          });
+        }
+      }
+    });
+  },
+
+  // 处理拍照识别结果
+  processImage(imagePath) {
+    wx.showLoading({ title: '识别中...' });
+    // TODO: 调用图像识别API
+    setTimeout(() => {
+      wx.hideLoading();
+      wx.showToast({
+        title: '图片已选择',
+        icon: 'none'
+      });
+    }, 1000);
+  },
+
+  // 处理扫码结果
+  processScanResult(result) {
+    wx.showLoading({ title: '识别中...' });
+    // TODO: 调用扫码结果处理API
+    setTimeout(() => {
+      wx.hideLoading();
+      wx.showToast({
+        title: '扫码成功',
+        icon: 'none'
+      });
+    }, 1000);
   },
 
   // 切换筛选

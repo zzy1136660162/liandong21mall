@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/login/index",
     "pages/rd_index/rd_index",
     "pages/Product_list_page/Product_list_page",
     "pages/xuanpinindex/xuanpinindex",
@@ -41,7 +42,7 @@
   ],
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "选品中心",
+    "navigationBarTitleText": "链动商城",
     "navigationBarBackgroundColor": "#ffffff"
   },
   "tabBar": {
