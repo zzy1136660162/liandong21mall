@@ -81,16 +81,14 @@ Page({
     
     // 检查是否是重复消息（防止重复添加）
     const lastMessage = messages[messages.length - 1];
-    if (lastMessage && 
-        lastMessage.type === message.type && 
+    if (lastMessage &&
+        lastMessage.type === message.type &&
         lastMessage.content === message.content &&
         Date.now() - lastMessage.id < 1000) {
       log('检测到重复消息，跳过添加');
       return;
     }
-    
-    // 创建新数组，避免直接修改原数组
-    const messages = [...this.data.messages];
+
     message.id = Date.now();
     message.time = this.formatTime(new Date());
 

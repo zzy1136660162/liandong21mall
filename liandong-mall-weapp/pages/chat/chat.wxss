@@ -74,8 +74,6 @@ page {
   position: relative;
 }
 
-.avatar-text {
-  color: #fff;
 .avatar-service::after {
   content: '客';
   color: #333;
@@ -86,6 +84,10 @@ page {
   left: 50%;
   transform: translate(-50%, -50%);
   line-height: 1;
+}
+
+.avatar-text {
+  color: #fff;
 }
 
 .message-content {
