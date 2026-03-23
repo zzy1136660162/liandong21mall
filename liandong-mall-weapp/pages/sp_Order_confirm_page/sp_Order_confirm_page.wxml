@@ -1,0 +1,117 @@
+<view class="order-confirm-page">
+  <view class="page-background"></view>
+
+  <scroll-view class="confirm-scroll" scroll-y enhanced="{{true}}" show-scrollbar="{{false}}">
+    <view class="confirm-content">
+      <view class="address-section">
+        <view class="section-header">
+          <text class="section-title">收货地址</text>
+          <view class="edit-btn" bindtap="editAddress">
+            <text class="edit-text">编辑</text>
+          </view>
+        </view>
+
+        <view class="address-card" bindtap="selectAddress">
+          <view class="address-icon">
+            <text class="icon">📍</text>
+          </view>
+          <view class="address-info">
+            <view class="address-user">
+              <text class="user-name">{{address.name}}</text>
+              <text class="user-phone">{{address.phone}}</text>
+            </view>
+            <view class="address-detail">{{address.province}}{{address.city}}{{address.district}}{{address.detail}}</view>
+          </view>
+          <view class="address-arrow">
+            <text class="arrow">›</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="products-section">
+        <view class="section-header">
+          <text class="section-title">商品信息</text>
+          <text class="product-count">共{{orderItems.length}}件</text>
+        </view>
+
+        <view class="products-list">
+          <view
+            wx:for="{{orderItems}}"
+            wx:key="productId"
+            class="product-item"
+          >
+            <view class="product-image-wrapper">
+              <image class="product-image" src="{{item.mainImage}}" mode="aspectFill" lazy-load="{{true}}" />
+            </view>
+
+            <view class="product-info">
+              <view class="product-name">{{item.productName}}</view>
+              <view class="product-specs" wx:if="{{item.specs}}">{{item.specs}}</view>
+              <view class="product-bottom">
+                <view class="product-price">
+                  <text class="currency">¥</text>
+                  <text class="price">{{item.price}}</text>
+                </view>
+                <view class="product-quantity">×{{item.quantity}}</view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="price-section">
+        <view class="price-row">
+          <text class="price-label">商品金额</text>
+          <text class="price-value">¥{{totalAmount}}</text>
+        </view>
+        <view class="price-row">
+          <text class="price-label">运费</text>
+          <text class="price-value">{{shippingFee > 0 ? '¥' + shippingFee : '免运费'}}</text>
+        </view>
+        <view class="price-row" wx:if="{{discountAmount > 0}}">
+          <text class="price-label">优惠金额</text>
+          <text class="price-value discount">-¥{{discountAmount}}</text>
+        </view>
+        <view class="price-row total-row">
+          <text class="price-label total-label">实付金额</text>
+          <view class="total-value">
+            <text class="currency">¥</text>
+            <text class="total-price">{{finalAmount}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="remark-section">
+        <view class="section-header">
+          <text class="section-title">订单备注</text>
+        </view>
+        <view class="remark-input-wrapper">
+          <input
+            class="remark-input"
+            type="text"
+            placeholder="选填，请输入备注信息"
+            value="{{remark}}"
+            bindinput="onRemarkInput"
+            maxlength="100"
+          />
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="confirm-footer">
+    <view class="footer-content">
+      <view class="total-info">
+        <text class="total-label">合计：</text>
+        <view class="total-amount">
+          <text class="currency">¥</text>
+          <text class="amount">{{finalAmount}}</text>
+        </view>
+      </view>
+
+      <view class="submit-btn" bindtap="submitOrder">
+        <text class="submit-text">提交订单</text>
+      </view>
+    </view>
+  </view>
+</view>

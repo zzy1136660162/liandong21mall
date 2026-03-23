@@ -1,0 +1,66 @@
+<view class="address-page">
+  <view class="page-background"></view>
+
+  <scroll-view class="address-scroll" scroll-y enhanced="{{true}}" show-scrollbar="{{false}}">
+    <view class="address-content">
+      <view wx:if="{{addressList.length === 0}}" class="empty-state">
+        <text class="empty-emoji">📍</text>
+        <text class="empty-title">暂无收货地址</text>
+        <text class="empty-desc">添加收货地址，方便快速下单</text>
+        <view class="empty-action">
+          <view class="add-address-btn" bindtap="addAddress">
+            <text class="add-address-text">添加地址</text>
+          </view>
+        </view>
+      </view>
+
+      <view wx:else class="address-list">
+        <view
+          wx:for="{{addressList}}"
+          wx:key="addressId"
+          class="address-item {{item.isDefault ? 'default' : ''}} {{item.selected ? 'selected' : ''}}"
+          bindtap="selectAddress"
+          data-id="{{item.addressId}}"
+        >
+          <view class="address-header">
+            <view class="address-info">
+              <text class="address-name">{{item.name}}</text>
+              <text class="address-phone">{{item.phone}}</text>
+              <view class="default-tag" wx:if="{{item.isDefault}}">默认</view>
+            </view>
+            <view class="address-actions">
+              <view class="action-btn" bindtap="editAddress" data-id="{{item.addressId}}" catchtap="stopPropagation">
+                <text class="action-icon">✏️</text>
+              </view>
+              <view class="action-btn" bindtap="deleteAddress" data-id="{{item.addressId}}" catchtap="stopPropagation">
+                <text class="action-icon">🗑️</text>
+              </view>
+            </view>
+          </view>
+
+          <view class="address-detail">
+            <text class="address-text">{{item.province}}{{item.city}}{{item.district}}{{item.detail}}</text>
+          </view>
+
+          <view class="address-footer">
+            <view class="default-switch" bindtap="setDefault" data-id="{{item.addressId}}" catchtap="stopPropagation">
+              <view class="switch-icon {{item.isDefault ? 'active' : ''}}">
+                <text class="switch-text">{{item.isDefault ? '✓' : ''}}</text>
+              </view>
+              <text class="switch-label">设为默认地址</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="address-footer" wx:if="{{addressList.length > 0}}">
+    <view class="footer-content">
+      <view class="add-new-btn" bindtap="addAddress">
+        <text class="add-icon">+</text>
+        <text class="add-text">添加新地址</text>
+      </view>
+    </view>
+  </view>
+</view>

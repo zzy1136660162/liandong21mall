@@ -1,0 +1,174 @@
+<view class="sp-details-page">
+  <view class="page-background"></view>
+
+  <view class="page-header">
+    <view class="header-content">
+      <view class="header-top">
+        <view class="back-btn" bindtap="goBack">
+          <text class="back-icon">←</text>
+        </view>
+        <view class="header-actions">
+          <view class="action-btn" bindtap="toggleFavorite">
+            <text class="action-icon">{{isFavorite ? '♥' : '♡'}}</text>
+          </view>
+          <view class="action-btn" bindtap="shareProduct">
+            <text class="action-icon">📤</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <scroll-view class="page-content" scroll-y="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
+    <view class="product-gallery">
+      <swiper class="gallery-swiper" indicator-dots autoplay circular interval="4000" duration="500" indicator-color="rgba(255, 193, 7, 0.3)" indicator-active-color="#FFC107">
+        <swiper-item wx:for="{{product.images}}" wx:key="index">
+          <image class="gallery-image" src="{{item}}" mode="aspectFill" bindtap="previewImage" data-url="{{item}}" lazy-load="{{true}}" />
+        </swiper-item>
+      </swiper>
+      <view class="gallery-dots">
+        <view class="dot" wx:for="{{product.images}}" wx:key="index" wx:if="{{index === currentIndex}}"></view>
+      </view>
+    </view>
+
+    <view class="product-info">
+      <view class="product-title">{{product.name}}</view>
+      <view class="product-subtitle">{{product.subtitle}}</view>
+
+      <view class="price-section">
+        <view class="price-main">
+          <text class="currency">¥</text>
+          <text class="price">{{product.price}}</text>
+        </view>
+        <view class="price-original" wx:if="{{product.originalPrice}}">
+          <text class="original-price">¥{{product.originalPrice}}</text>
+          <text class="discount-tag">{{product.discount}}折</text>
+        </view>
+      </view>
+
+      <view class="member-price" wx:if="{{product.memberPrice}}">
+        <text class="member-label">会员价</text>
+        <text class="member-price-value">¥{{product.memberPrice}}</text>
+        <text class="member-save">省¥{{product.saveAmount}}</text>
+      </view>
+
+      <view class="product-meta">
+        <view class="meta-item">
+          <text class="meta-label">库存</text>
+          <text class="meta-value stock">{{product.stock}}</text>
+        </view>
+        <view class="meta-divider">·</view>
+        <view class="meta-item">
+          <text class="meta-label">销量</text>
+          <text class="meta-value">{{product.sales}}</text>
+        </view>
+        <view class="meta-divider">·</view>
+        <view class="meta-item">
+          <text class="meta-label">评价</text>
+          <text class="meta-value">{{product.reviews}}</text>
+        </view>
+      </view>
+
+      <view class="product-tags">
+        <view class="tag" wx:for="{{product.tags}}" wx:key="index">{{item}}</view>
+      </view>
+    </view>
+
+    <view class="product-specs">
+      <view class="section-header">
+        <text class="section-title">商品规格</text>
+      </view>
+      <view class="specs-list">
+        <view 
+          wx:for="{{product.specs}}" 
+          wx:key="name"
+          class="spec-item"
+        >
+          <view class="spec-name">{{item.name}}</view>
+          <view class="spec-values">
+            <view 
+              wx:for="{{item.values}}" 
+              wx:for-item="value"
+              wx:key="value"
+              class="spec-value {{selectedSpecs[item.name] === value ? 'active' : ''}}"
+              bindtap="selectSpec"
+              data-name="{{item.name}}"
+              data-value="{{value}}"
+            >
+              {{value}}
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="product-description">
+      <view class="section-header">
+        <text class="section-title">商品详情</text>
+      </view>
+      <view class="description-content">
+        <rich-text nodes="{{product.description}}"></rich-text>
+      </view>
+    </view>
+
+    <view class="product-reviews" wx:if="{{product.reviews > 0}}">
+      <view class="section-header">
+        <text class="section-title">用户评价</text>
+        <text class="section-more" bindtap="viewAllReviews">查看全部</text>
+      </view>
+      <view class="reviews-list">
+        <view class="review-item" wx:for="{{product.reviewList}}" wx:key="id">
+          <view class="review-header">
+            <image class="review-avatar" src="{{item.avatar}}" mode="aspectFill" />
+            <view class="review-info">
+              <text class="review-name">{{item.name}}</text>
+              <view class="review-rating">
+                <text class="star" wx:for="{{item.rating}}" wx:key="index">★</text>
+              </view>
+            </view>
+          </view>
+          <text class="review-date">{{item.date}}</text>
+          <view class="review-content">{{item.content}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="product-recommendations">
+      <view class="section-header">
+        <text class="section-title">相关推荐</text>
+      </view>
+      <view class="recommendation-grid">
+        <view 
+          wx:for="{{product.recommendations}}" 
+          wx:key="id"
+          class="recommendation-card"
+          bindtap="goToRecommendation"
+          data-id="{{item.id}}"
+        >
+          <image class="recommendation-image" src="{{item.image}}" mode="aspectFill" lazy-load="{{true}}" />
+          <view class="recommendation-info">
+            <text class="recommendation-name">{{item.name}}</text>
+            <view class="recommendation-price">¥{{item.price}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="bottom-bar">
+    <view class="bar-content">
+      <view class="cart-info" bindtap="goToCart">
+        <text class="cart-icon">🛒</text>
+        <view class="cart-badge" wx:if="{{cartCount > 0}}">{{cartCount}}</view>
+      </view>
+      <view class="action-buttons">
+        <view class="btn-secondary {{isInCart ? 'in-cart' : ''}}" bindtap="addToCart">
+          <text class="btn-text">{{isInCart ? '已加入购物车' : '加入购物车'}}</text>
+        </view>
+        <view class="btn-primary" bindtap="buyNow">
+          <text class="btn-text">立即购买</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
