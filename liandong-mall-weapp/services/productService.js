@@ -69,6 +69,13 @@ module.exports = {
   },
 
   /**
+   * 获取搜索联想
+   */
+  getSearchSuggestions(keyword) {
+    return get(`${API_BASE}/search/suggestions`, { keyword });
+  },
+
+  /**
    * 获取热门搜索词
    */
   getHotSearches() {

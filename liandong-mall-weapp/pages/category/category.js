@@ -146,7 +146,7 @@ Page({
     const category = e.currentTarget.dataset.category;
     if (category === 'home') {
       wx.switchTab({
-        url: '/pages/index/index'
+        url: '/pages/xuanpinindex/xuanpinindex'
       });
       return;
     }
@@ -201,8 +201,72 @@ Page({
   // 去搜索
   goToSearch() {
     wx.navigateTo({
-      url: '/pages/index/index'
+      url: '/pages/search/search'
     });
+  },
+
+  // 拍照搜索和扫码
+  onCameraTap() {
+    wx.showActionSheet({
+      itemList: ['拍照搜索', '扫码识别'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          this.takePhoto();
+        } else if (res.tapIndex === 1) {
+          this.scanCode();
+        }
+      }
+    });
+  },
+
+  // 拍照搜索
+  takePhoto() {
+    wx.showActionSheet({
+      itemList: ['拍照识别', '扫码识别'],
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          wx.chooseMedia({
+            count: 1,
+            mediaType: ['image'],
+            sourceType: ['camera'],
+            success: (photoRes) => {
+              const tempFilePath = photoRes.tempFiles[0].tempFilePath;
+              this.processImage(tempFilePath);
+            }
+          });
+        } else {
+          wx.scanCode({
+            success: (scanRes) => {
+              if (scanRes.result) {
+                this.processScanResult(scanRes.result);
+              }
+            }
+          });
+        }
+      }
+    });
+  },
+
+  processImage(imagePath) {
+    wx.showLoading({ title: '识别中...' });
+    setTimeout(() => {
+      wx.hideLoading();
+      wx.showToast({
+        title: '图片已选择',
+        icon: 'none'
+      });
+    }, 1000);
+  },
+
+  processScanResult(result) {
+    wx.showLoading({ title: '识别中...' });
+    setTimeout(() => {
+      wx.hideLoading();
+      wx.showToast({
+        title: '扫码成功',
+        icon: 'none'
+      });
+    }, 1000);
   },
 
   // 切换Tab

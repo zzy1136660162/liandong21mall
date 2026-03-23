@@ -1,0 +1,85 @@
+.custom-tab-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100rpx;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 20rpx;
+  border-top: 1rpx solid rgba(0, 0, 0, 0.06);
+  z-index: 1000;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: content-box;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+  padding: 12rpx 0;
+  position: relative;
+}
+
+.tab-icon-wrapper {
+  position: relative;
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-icon {
+  width: 48rpx;
+  height: 48rpx;
+  object-fit: contain;
+}
+
+.tab-badge {
+  position: absolute;
+  top: -8rpx;
+  right: -12rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  background: #FF6B6B;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8rpx;
+  border: 2rpx solid #FFFFFF;
+}
+
+.badge-text {
+  font-size: 18rpx;
+  color: #FFFFFF;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.tab-label {
+  font-size: 20rpx;
+  color: #999999;
+  font-weight: 400;
+  letter-spacing: 0.5rpx;
+  transition: color 0.2s ease;
+}
+
+.tab-item.active .tab-label {
+  color: #1A1A1A;
+  font-weight: 600;
+}
+
+.tab-item:active .tab-icon-wrapper {
+  transform: scale(0.92);
+}
+
+.tab-item:active .tab-icon {
+  opacity: 0.7;
+}

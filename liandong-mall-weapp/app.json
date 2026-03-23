@@ -1,9 +1,12 @@
 {
   "pages": [
-    "pages/Product_list_page/Product_list_page",
-    "pages/login/index",
-    "pages/xuanpinindex/xuanpinindex",
     "pages/index/index",
+    "pages/login/index",
+    "pages/rd_index/rd_index",
+    "pages/Product_list_page/Product_list_page",
+    "pages/xuanpinindex/xuanpinindex",
+    "pages/rd/rd",
+    "pages/Profile_page/Profile_page",
     "pages/category/category",
     "pages/activity/hot",
     "pages/activity/follow",
@@ -16,6 +19,9 @@
     "pages/rank/rank",
     "pages/my/my",
     "pages/my-samples/my-samples",
+    "pages/logs/logs",
+    "pages/demo-tab/demo-tab",
+    "pages/search/search",
     "pages/mine/index",
     "pages/member/center/index",
     "pages/talent/apply/index",
@@ -29,9 +35,49 @@
   ],
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "选品中心",
+    "navigationBarTitleText": "链动商城",
     "navigationBarBackgroundColor": "#ffffff"
   },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#1890ff",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/tab/首页（未选中）.png",
+        "selectedIconPath": "images/tab/首页 (选中).png"
+      },
+      {
+        "pagePath": "pages/Product_list_page/Product_list_page",
+        "text": "商城",
+        "iconPath": "images/tab/商城 (未选中).png",
+        "selectedIconPath": "images/tab/商城（选中）.png"
+      },
+      {
+        "pagePath": "pages/xuanpinindex/xuanpinindex",
+        "text": "选品",
+        "iconPath": "images/tab/选品 (未选中).png",
+        "selectedIconPath": "images/tab/选品（选中）.png"
+      },
+      {
+        "pagePath": "pages/rd_index/rd_index",
+        "text": "研发",
+        "iconPath": "images/tab/研发 (未选中).png",
+        "selectedIconPath": "images/tab/研发（选中）.png"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的",
+        "iconPath": "images/tab/我的 (未选中).png",
+        "selectedIconPath": "images/tab/我的 (选中).png"
+      }
+    ]
+  },
   "style": "v2",
-  "sitemapLocation": "sitemap.json"
+  "componentFramework": "glass-easel",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
 }

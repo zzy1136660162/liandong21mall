@@ -4,10 +4,14 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 import os, random, string
+from dotenv import load_dotenv
+
+# Load .env file from the parent directory of the apps folder
+basedir = os.path.abspath(os.path.dirname(__file__))
+env_path = os.path.join(os.path.dirname(basedir), '.env')
+load_dotenv(env_path)
 
 class Config(object):
-
-    basedir = os.path.abspath(os.path.dirname(__file__))
 
     # Assets Management
     ASSETS_ROOT = os.getenv('ASSETS_ROOT', '/static/assets')  
@@ -72,16 +76,19 @@ class Config(object):
             ) 
 
             USE_SQLITE  = False
+            print(f'> Using MySQL database: {SQLALCHEMY_DATABASE_URI}')
 
         except Exception as e:
 
-            print('> Error: DBMS Exception: ' + str(e) )
+            print(f'> Error: DBMS Exception: {str(e)} ')
+            print(f'> Exception type: {type(e).__name__}')
             print('> Fallback to SQLite ')    
 
     if USE_SQLITE:
 
         # This will create a file in <app> FOLDER
         SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
+        print(f'> Using SQLite database: {SQLALCHEMY_DATABASE_URI}')
     
 class ProductionConfig(Config):
     DEBUG = False

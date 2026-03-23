@@ -1,0 +1,89 @@
+<view class="page">
+  <!-- 搜索头部 -->
+  <view class="search-header">
+    <view class="search-input-wrap">
+      <text class="search-icon">🔍</text>
+      <input class="search-input" placeholder="搜索商品" placeholder-class="placeholder" 
+             bindinput="onSearchInput" value="{{searchKeyword}}" 
+             confirm-type="search" bindconfirm="onSearch"
+             auto-focus/>
+      <image class="camera-btn" src="https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260319090524623_666695127685.png" mode="aspectFit" bindtap="goToCamera"></image>
+      <view class="search-clear" wx:if="{{searchKeyword}}" bindtap="clearInput">
+        <text>×</text>
+      </view>
+    </view>
+    <view class="search-btn" bindtap="onSearch">搜索</view>
+  </view>
+
+  <!-- 搜索联想 -->
+  <view class="suggestions-panel" wx:if="{{showSuggestions && searchSuggestions.length > 0}}">
+    <view class="suggestion-item" wx:for="{{searchSuggestions}}" wx:key="index" bindtap="onSuggestionTap" data-keyword="{{item}}">
+      <text class="suggestion-text">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 搜索历史 -->
+  <view class="search-content" wx:if="{{!searchKeyword && searchHistory.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">最近搜索</text>
+      <view class="clear-btn" bindtap="clearHistory">
+        <text>删除</text>
+      </view>
+    </view>
+    <view class="history-list">
+      <view class="history-item" wx:for="{{searchHistory}}" wx:key="index" bindtap="onHistoryTap" data-keyword="{{item}}">
+        <text>{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 热门搜索 -->
+  <view class="search-content" wx:if="{{!searchKeyword}}">
+    <view class="section-header">
+      <text class="section-title">热门推荐</text>
+    </view>
+    <view class="hot-grid">
+      <view class="hot-item {{index < 3 ? 'highlight' : ''}}" wx:for="{{hotSearches}}" wx:key="index" bindtap="onHotSearchTap" data-keyword="{{item}}">
+        <text class="hot-rank" wx:if="{{index < 3}}">{{index + 1}}</text>
+        <text class="hot-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 搜索结果 -->
+  <view class="search-result" wx:if="{{searchStatus === 'result'}}">
+    <view class="result-tabs">
+      <view class="result-tab {{currentSort === 'default' ? 'active' : ''}}" bindtap="onSortChange" data-value="default">精选</view>
+      <view class="result-tab {{currentSort === 'sales' ? 'active' : ''}}" bindtap="onSortChange" data-value="sales">销量</view>
+      <view class="result-tab {{currentSort === 'commission' ? 'active' : ''}}" bindtap="onSortChange" data-value="commission">佣金</view>
+      <view class="result-tab {{currentSort === 'price' ? 'active' : ''}}" bindtap="onSortChange" data-value="price">价格</view>
+    </view>
+    
+    <scroll-view class="result-list" scroll-y bindscrolltolower="loadMore">
+      <view class="product-item" wx:for="{{products}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+        <image class="product-img" src="{{item.image}}" mode="aspectFill"/>
+        <view class="product-info">
+          <view class="product-title">{{item.title}}</view>
+          <view class="product-price">
+            <text class="price">¥{{item.price}}</text>
+            <text class="original" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+          </view>
+          <view class="product-bottom">
+            <text class="sales">销量 {{item.sales}}</text>
+            <text class="commission">赚 ¥{{item.commissionAmount}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <view class="loading-more" wx:if="{{loading}}">
+        <text>加载中...</text>
+      </view>
+      <view class="no-more" wx:if="{{!hasMore && products.length > 0}}">
+        <text>没有更多了</text>
+      </view>
+      <view class="no-result" wx:if="{{products.length === 0 && !loading}}">
+        <text>未找到相关商品</text>
+      </view>
+    </scroll-view>
+  </view>
+</view>

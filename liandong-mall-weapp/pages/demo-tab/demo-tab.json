@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "Tab 组件示例",
+  "usingComponents": {
+    "custom-tab": "/components/custom-tab/custom-tab"
+  }
+}

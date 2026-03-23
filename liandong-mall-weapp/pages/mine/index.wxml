@@ -22,7 +22,7 @@
         <view class="user-detail">
           <text class="nickname">未登录</text>
           <text class="login-tip">点击登录，享受更多服务</text>
-          <view class="login-btn-small">
+          <view class="login-btn-small" bindtap="goToLogin">
             <text class="login-btn-text">立即登录</text>
             <text class="login-btn-arrow">></text>
           </view>
@@ -73,7 +73,7 @@
   <view class="common-functions">
     <text class="function-title">常用功能</text>
     <view class="function-grid">
-      <view class="func-item" bindtap="checkLoginAndGo" data-url="talent">
+      <view class="func-item" bindtap="goToTalentCenterDirect" data-url="talent">
         <text class="func-icon">👤</text>
         <text class="func-name">达人中心</text>
         <text class="func-subtitle">申请成为达人</text>
@@ -83,7 +83,7 @@
         <text class="func-name">样品申请</text>
         <text class="func-subtitle">测试体验</text>
       </view>
-      <view class="func-item" bindtap="checkLoginAndGo" data-url="rnd">
+      <view class="func-item" bindtap="goToRNDemandDirect" data-url="rnd">
         <text class="func-icon">🔬</text>
         <text class="func-name">研发需求</text>
         <text class="func-subtitle">定制研发</text>

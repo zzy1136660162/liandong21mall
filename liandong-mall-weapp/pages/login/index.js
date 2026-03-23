@@ -1,5 +1,5 @@
 // 登录页面
-const api = require('../../utils/api');
+const { api } = require('../../utils/api');
 
 Page({
   data: {
@@ -63,18 +63,11 @@ Page({
 
     api.post('/api/auth/send-code', { phone }, { showLoading: true })
       .then(res => {
-        if (res.code === 200) {
-          wx.showToast({
-            title: '验证码已发送',
-            icon: 'success'
-          });
-          this.startCountdown();
-        } else {
-          wx.showToast({
-            title: res.message || '发送失败',
-            icon: 'none'
-          });
-        }
+        wx.showToast({
+          title: '验证码已发送',
+          icon: 'success'
+        });
+        this.startCountdown();
       })
       .catch(err => {
         console.error('发送验证码失败:', err);
@@ -150,34 +143,22 @@ Page({
 
     api.post('/api/auth/login', { phone, code }, { showLoading: true })
       .then(res => {
-        if (res.code === 200) {
-          const { token, userInfo } = res.data;
+        const token = res.token;
+        const userInfo = res.userInfo;
 
-          wx.setStorageSync('token', token);
-          wx.setStorageSync('userInfo', userInfo);
+        wx.setStorageSync('token', token);
+        wx.setStorageSync('userInfo', userInfo);
 
-          wx.showToast({
-            title: '登录成功',
-            icon: 'success'
+        wx.showToast({
+          title: '登录成功',
+          icon: 'success'
+        });
+
+        setTimeout(() => {
+          wx.switchTab({
+            url: '/pages/mine/index'
           });
-
-          setTimeout(() => {
-            if (redirect) {
-              wx.redirectTo({
-                url: decodeURIComponent(redirect)
-              });
-            } else {
-              wx.switchTab({
-                url: '/pages/index/index'
-              });
-            }
-          }, 1500);
-        } else {
-          wx.showToast({
-            title: res.message || '登录失败',
-            icon: 'none'
-          });
-        }
+        }, 1500);
       })
       .catch(err => {
         console.error('登录失败:', err);
@@ -265,34 +246,22 @@ Page({
     }, { showLoading: false })
       .then(res => {
         wx.hideLoading();
-        if (res.code === 200) {
-          const { token, userInfo: serverUserInfo } = res.data;
 
-          wx.setStorageSync('token', token);
-          wx.setStorageSync('userInfo', serverUserInfo);
+        const { token, userInfo: serverUserInfo } = res;
 
-          wx.showToast({
-            title: '登录成功',
-            icon: 'success'
+        wx.setStorageSync('token', token);
+        wx.setStorageSync('userInfo', serverUserInfo);
+
+        wx.showToast({
+          title: '登录成功',
+          icon: 'success'
+        });
+
+        setTimeout(() => {
+          wx.switchTab({
+            url: '/pages/mine/index'
           });
-
-          setTimeout(() => {
-            if (redirect) {
-              wx.redirectTo({
-                url: decodeURIComponent(redirect)
-              });
-            } else {
-              wx.switchTab({
-                url: '/pages/index/index'
-              });
-            }
-          }, 1500);
-        } else {
-          wx.showToast({
-            title: res.message || '登录失败',
-            icon: 'none'
-          });
-        }
+        }, 1500);
       })
       .catch(err => {
         wx.hideLoading();

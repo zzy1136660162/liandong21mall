@@ -1,15 +1,4 @@
 <view class="page">
-  <!-- 顶部导航栏 -->
-  <view class="nav-bar">
-    <view class="nav-back" bindtap="goBack">
-      <text class="nav-icon">←</text>
-    </view>
-    <view class="nav-title">商品详情</view>
-    <view class="nav-share" bindtap="shareProduct">
-      <text class="nav-icon">↗</text>
-    </view>
-  </view>
-
   <!-- 商品图片轮播 -->
   <view class="gallery-section">
     <swiper class="gallery-swiper" indicator-dots autoplay circular interval="4000" duration="500" indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#ff4757">
@@ -111,35 +100,16 @@
     </view>
   </view>
 
-  <!-- 团长信息 -->
-  <view class="tuanzhang-section">
-    <view class="tz-header">
-      <view class="tz-info">
-        <image class="tz-avatar" src="{{product.tuanzhangAvatar}}"/>
-        <view class="tz-detail">
-          <text class="tz-name">{{product.tuanzhangName}}</text>
-          <text class="tz-desc">{{product.tuanzhangDesc}}</text>
-        </view>
-      </view>
-      <view class="tz-contact" bindtap="contactTuanzhang">
-        <text>联系团长</text>
-      </view>
-    </view>
-  </view>
-
   <!-- 店铺信息 -->
   <view class="shop-section">
     <view class="shop-header">
       <image class="shop-logo" src="{{product.shopLogo}}"/>
       <view class="shop-info">
         <view class="shop-name-row">
-          <view class="shop-badge">快手旗舰</view>
+          <view class="shop-badge">旗舰店</view>
           <text class="shop-name">{{product.shopName}}</text>
         </view>
         <text class="shop-sales">近半年分销销量 {{product.shopSales}}</text>
-      </view>
-      <view class="shop-action" bindtap="goToShop">
-        <text>进店选品</text>
       </view>
     </view>
     <view class="shop-scores">
