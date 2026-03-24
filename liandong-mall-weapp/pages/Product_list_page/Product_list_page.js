@@ -1,4 +1,4 @@
-const { productApi, cartApi } = require('../../utils/api.js')
+const { productApi, cartApi, favoriteApi } = require('../../utils/sp_api.js')
 
 Page({
   data: {
@@ -19,15 +19,31 @@ Page({
     cartCount: 0,
     searchKeyword: '',
     productScrollTop: 0,
-    refreshing: false
+    refreshing: false,
+    banners: [],
+    cartProductIds: []
   },
 
   lastScrollTime: 0,
   scrollThrottle: 50,
 
   async onLoad(options) {
+    this.loadBanners()
     this.loadProducts()
-    this.loadCartCount()
+    this.loadCartInfo()
+  },
+
+  onShow() {
+    this.loadCartInfo()
+  },
+
+  async loadBanners() {
+    try {
+      const banners = await productApi.getRecommendProducts(5)
+      this.setData({ banners })
+    } catch (error) {
+      console.error('加载轮播图失败:', error)
+    }
   },
 
   async loadProducts() {
@@ -92,7 +108,7 @@ Page({
   goToDetail(e) {
     const productId = e.currentTarget.dataset.id
     wx.navigateTo({
-      url: `/pages/Product_detail_page/Product_detail_page?id=${productId}`,
+      url: `/pages/sp_Details/sp_Details?id=${productId}`,
       success: () => {
         console.log('跳转到商品详情页成功')
       },
@@ -107,23 +123,41 @@ Page({
     })
   },
 
-  toggleFavorite(e) {
+  async toggleFavorite(e) {
     const productId = e.currentTarget.dataset.id
-    const products = this.data.products.map(p => {
-      if (p.productId === productId) {
-        return { ...p, favorite: !p.favorite }
+    
+    try {
+      const product = this.data.products.find(p => p.productId === productId)
+      
+      if (product.favorite) {
+        await favoriteApi.removeFavorite(productId)
+      } else {
+        await favoriteApi.addFavorite(productId)
       }
-      return p
-    })
-    
-    this.setData({ products })
-    
-    const product = products.find(p => p.productId === productId)
-    wx.showToast({
-      title: product.favorite ? '已收藏' : '已取消收藏',
-      icon: product.favorite ? 'success' : 'none',
-      duration: 1500
-    })
+      
+      const products = this.data.products.map(p => {
+        if (p.productId === productId) {
+          return { ...p, favorite: !p.favorite }
+        }
+        return p
+      })
+      
+      this.setData({ products })
+      
+      const updatedProduct = products.find(p => p.productId === productId)
+      wx.showToast({
+        title: updatedProduct.favorite ? '已收藏' : '已取消收藏',
+        icon: updatedProduct.favorite ? 'success' : 'none',
+        duration: 1500
+      })
+    } catch (error) {
+      console.error('收藏操作失败:', error)
+      wx.showToast({
+        title: '操作失败',
+        icon: 'none',
+        duration: 1500
+      })
+    }
   },
 
   async addToCart(e) {
@@ -137,33 +171,61 @@ Page({
         duration: 1500
       })
       
-      this.setData({
-        cartCount: this.data.cartCount + 1
-      })
+      this.loadCartCount()
     } catch (error) {
       console.error('加入购物车失败:', error)
     }
   },
 
-  async loadCartCount() {
+  async loadCartInfo() {
     try {
-      const total = await cartApi.getCartTotal()
-      this.setData({
-        cartCount: Math.floor(total.total || 0)
-      })
+      const cartList = await cartApi.getCartList()
+      const cartCount = cartList ? cartList.length : 0
+      const cartProductIds = cartList ? cartList.map(item => item.productId) : []
+      this.setData({ cartCount, cartProductIds })
     } catch (error) {
-      console.error('获取购物车数量失败:', error)
+      console.error('获取购物车信息失败:', error)
+    }
+  },
+
+  async addToCart(e) {
+    const productId = e.currentTarget.dataset.id
+    
+    if (this.data.cartProductIds.includes(productId)) {
+      wx.showToast({
+        title: '已在购物车中',
+        icon: 'none',
+        duration: 1500
+      })
+      return
+    }
+    
+    try {
+      await cartApi.addToCart(productId, null, 1)
+      
+      const cartProductIds = [...this.data.cartProductIds, productId]
+      this.setData({ cartProductIds })
+      
+      wx.showToast({
+        title: '已加入购物车',
+        icon: 'success',
+        duration: 1500
+      })
+      
+      this.loadCartInfo()
+    } catch (error) {
+      console.error('加入购物车失败:', error)
+      wx.showToast({
+        title: '加入失败',
+        icon: 'none',
+        duration: 2000
+      })
     }
   },
 
   goToCart() {
-    wx.switchTab({
-      url: '/pages/Cart_page/Cart_page',
-      fail: () => {
-        wx.navigateTo({
-          url: '/pages/Cart_page/Cart_page'
-        })
-      }
+    wx.navigateTo({
+      url: '/pages/sp_Cart_page/sp_Cart_page'
     })
   },
 

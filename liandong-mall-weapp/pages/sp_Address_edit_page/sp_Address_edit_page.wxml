@@ -1,0 +1,110 @@
+<view class="address-edit-page">
+  <view class="page-background"></view>
+
+  <scroll-view class="edit-scroll" scroll-y enhanced="{{true}}" show-scrollbar="{{false}}">
+    <view class="edit-content">
+      <view class="form-section">
+        <view class="form-item">
+          <view class="form-label">
+            <text class="label-text">收货人</text>
+            <text class="required">*</text>
+          </view>
+          <input
+            class="form-input"
+            type="text"
+            placeholder="请输入收货人姓名"
+            value="{{formData.name}}"
+            bindinput="onNameInput"
+            maxlength="20"
+          />
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">
+            <text class="label-text">手机号码</text>
+            <text class="required">*</text>
+          </view>
+          <input
+            class="form-input"
+            type="number"
+            placeholder="请输入手机号码"
+            value="{{formData.phone}}"
+            bindinput="onPhoneInput"
+            maxlength="11"
+          />
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">
+            <text class="label-text">所在地区</text>
+            <text class="required">*</text>
+          </view>
+          <view class="form-input region-input" bindtap="chooseRegion">
+            <text class="region-text {{!formData.province ? 'placeholder' : ''}}">
+              {{formData.province ? formData.province + formData.city + formData.district : '请选择省/市/区'}}
+            </text>
+            <text class="region-arrow">›</text>
+          </view>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">
+            <text class="label-text">详细地址</text>
+            <text class="required">*</text>
+          </view>
+          <textarea
+            class="form-textarea"
+            placeholder="请输入详细地址，如街道、楼牌号等"
+            value="{{formData.detail}}"
+            bindinput="onDetailInput"
+            maxlength="100"
+            auto-height
+          />
+          <view class="char-count">{{formData.detail.length}}/100</view>
+        </view>
+
+        <view class="form-item">
+          <view class="form-label">
+            <text class="label-text">邮政编码</text>
+          </view>
+          <input
+            class="form-input"
+            type="number"
+            placeholder="请输入邮政编码（选填）"
+            value="{{formData.postcode}}"
+            bindinput="onPostcodeInput"
+            maxlength="6"
+          />
+        </view>
+
+        <view class="form-item switch-item">
+          <view class="form-label">
+            <text class="label-text">设为默认地址</text>
+          </view>
+          <view class="switch-wrapper" bindtap="toggleDefault">
+            <view class="switch {{formData.isDefault ? 'active' : ''}}">
+              <view class="switch-dot"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="tips-section">
+        <view class="tips-title">温馨提示</view>
+        <view class="tips-content">
+          <text class="tips-item">• 请填写真实的收货信息，确保商品能够准确送达</text>
+          <text class="tips-item">• 手机号码将用于接收物流信息，请务必填写正确</text>
+          <text class="tips-item">• 详细地址建议填写到门牌号，避免配送困难</text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="edit-footer">
+    <view class="footer-content">
+      <view class="save-btn" bindtap="saveAddress">
+        <text class="save-text">保存地址</text>
+      </view>
+    </view>
+  </view>
+</view>

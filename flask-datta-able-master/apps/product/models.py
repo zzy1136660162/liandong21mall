@@ -68,7 +68,44 @@ class Product(db.Model):
         return f'<Product {self.product_code}:{self.product_name}>'
     
     def to_dict(self, include_detail=False):
+        price = float(self.price)
+        original_price = float(self.original_price) if self.original_price else None
+        commission_rate = 15.0
+        commission_amount = round(price * commission_rate / 100, 2)
+        tags = []
+        if self.is_hot == 1:
+            tags.append('热销')
+        if self.is_new == 1:
+            tags.append('新品')
+        if self.is_recommend == 1:
+            tags.append('推荐')
+
+        discount = None
+        if original_price and original_price > price:
+            discount = round((1 - price / original_price) * 10, 1)
+
+        save_amount = None
+        if original_price and original_price > price:
+            save_amount = round(original_price - price, 2)
+
         data = {
+            'id': self.id,
+            'name': self.product_name,
+            'subtitle': self.brief or '',
+            'image': self.main_image,
+            'title': self.product_name,
+            'price': price,
+            'originalPrice': original_price,
+            'discount': discount,
+            'saveAmount': save_amount,
+            'memberPrice': float(self.member_price) if self.member_price else None,
+            'commissionRate': commission_rate,
+            'commissionAmount': commission_amount,
+            'sales': self.sales,
+            'monthlySales': f'月销{self.sales}件' if self.sales else '月销0件',
+            'tags': tags,
+            'isBrand': False,
+            'hasCashback': False,
             'productId': self.id,
             'categoryId': self.category_id,
             'categoryName': self.category.category_name if self.category else '',
@@ -76,11 +113,8 @@ class Product(db.Model):
             'productCode': self.product_code,
             'mainImage': self.main_image,
             'images': self.images or [],
-            'price': float(self.price),
-            'originalPrice': float(self.original_price) if self.original_price else None,
-            'memberPrice': float(self.member_price) if self.member_price else None,
+            'specs': [],
             'stock': self.stock,
-            'sales': self.sales,
             'brief': self.brief,
             'status': self.status,
             'isHot': self.is_hot == 1,
@@ -88,11 +122,14 @@ class Product(db.Model):
             'isRecommend': self.is_recommend == 1,
             'createdAt': self.created_at.strftime('%Y-%m-%d %H:%M:%S')
         }
-        
+
         if include_detail:
             data['description'] = self.description
             data['skus'] = [sku.to_dict() for sku in self.skus.filter_by(status=1).all()]
-        
+            data['reviews'] = 0
+            data['reviewList'] = []
+            data['recommendations'] = []
+
         return data
 
 
@@ -267,6 +304,34 @@ class OrderItem(db.Model):
             'memberPrice': float(self.member_price) if self.member_price else None,
             'quantity': self.quantity,
             'totalAmount': float(self.total_amount)
+        }
+
+
+class ProductFavorite(db.Model):
+    """商品收藏表"""
+    __tablename__ = 'product_favorite'
+    
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True, comment='收藏ID')
+    user_id = db.Column(db.BigInteger, db.ForeignKey('user.id'), nullable=False, comment='用户ID')
+    product_id = db.Column(db.BigInteger, db.ForeignKey('product.id'), nullable=False, comment='商品ID')
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now, comment='创建时间')
+    
+    product = db.relationship('Product', backref='favorites')
+    
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'product_id', name='uk_user_product'),
+    )
+    
+    def __repr__(self):
+        return f'<ProductFavorite {self.user_id}:{self.product_id}>'
+    
+    def to_dict(self):
+        return {
+            'favoriteId': self.id,
+            'userId': self.user_id,
+            'productId': self.product_id,
+            'product': self.product.to_dict() if self.product else None,
+            'createdAt': self.created_at.strftime('%Y-%m-%d %H:%M:%S')
         }
 
 

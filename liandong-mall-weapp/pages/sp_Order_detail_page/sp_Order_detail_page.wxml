@@ -1,0 +1,168 @@
+<view class="order-detail-page">
+  <view class="page-background"></view>
+
+  <scroll-view class="detail-scroll" scroll-y enhanced="{{true}}" show-scrollbar="{{false}}">
+    <view class="detail-content">
+      <view class="status-section">
+        <view class="status-icon">
+          <text class="icon">{{statusIcon}}</text>
+        </view>
+        <view class="status-info">
+          <text class="status-title">{{orderDetail.statusText}}</text>
+          <text class="status-desc">{{orderDetail.statusDesc}}</text>
+        </view>
+      </view>
+
+      <view class="address-section">
+        <view class="section-header">
+          <text class="section-title">收货信息</text>
+        </view>
+
+        <view class="address-card">
+          <view class="address-icon">
+            <text class="icon">📍</text>
+          </view>
+          <view class="address-info">
+            <view class="address-user">
+              <text class="user-name">{{orderDetail.address.name}}</text>
+              <text class="user-phone">{{orderDetail.address.phone}}</text>
+            </view>
+            <view class="address-detail">{{orderDetail.address.detail}}</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="products-section">
+        <view class="section-header">
+          <text class="section-title">商品信息</text>
+          <text class="product-count">共{{orderDetail.products.length}}件</text>
+        </view>
+
+        <view class="products-list">
+          <view
+            wx:for="{{orderDetail.products}}"
+            wx:key="productId"
+            class="product-item"
+            bindtap="goToProductDetail"
+            data-id="{{item.productId}}"
+          >
+            <view class="product-image-wrapper">
+              <image class="product-image" src="{{item.mainImage}}" mode="aspectFill" lazy-load="{{true}}" />
+            </view>
+
+            <view class="product-info">
+              <view class="product-name">{{item.productName}}</view>
+              <view class="product-specs" wx:if="{{item.specs}}">{{item.specs}}</view>
+              <view class="product-bottom">
+                <view class="product-price">
+                  <text class="currency">¥</text>
+                  <text class="price">{{item.price}}</text>
+                </view>
+                <view class="product-quantity">×{{item.quantity}}</view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="price-section">
+        <view class="section-header">
+          <text class="section-title">费用明细</text>
+        </view>
+
+        <view class="price-list">
+          <view class="price-row">
+            <text class="price-label">商品金额</text>
+            <text class="price-value">¥{{orderDetail.totalAmount}}</text>
+          </view>
+          <view class="price-row">
+            <text class="price-label">运费</text>
+            <text class="price-value">{{orderDetail.shippingFee > 0 ? '¥' + orderDetail.shippingFee : '免运费'}}</text>
+          </view>
+          <view class="price-row" wx:if="{{orderDetail.discountAmount > 0}}">
+            <text class="price-label">优惠金额</text>
+            <text class="price-value discount">-¥{{orderDetail.discountAmount}}</text>
+          </view>
+          <view class="price-row total-row">
+            <text class="price-label total-label">实付金额</text>
+            <view class="total-value">
+              <text class="currency">¥</text>
+              <text class="total-price">{{orderDetail.finalAmount}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="info-section">
+        <view class="section-header">
+          <text class="section-title">订单信息</text>
+        </view>
+
+        <view class="info-list">
+          <view class="info-row">
+            <text class="info-label">订单编号</text>
+            <view class="info-value-wrapper">
+              <text class="info-value">{{orderDetail.orderId}}</text>
+              <view class="copy-btn" bindtap="copyOrderId">
+                <text class="copy-text">复制</text>
+              </view>
+            </view>
+          </view>
+          <view class="info-row">
+            <text class="info-label">下单时间</text>
+            <text class="info-value">{{orderDetail.createTime}}</text>
+          </view>
+          <view class="info-row" wx:if="{{orderDetail.payTime}}">
+            <text class="info-label">支付时间</text>
+            <text class="info-value">{{orderDetail.payTime}}</text>
+          </view>
+          <view class="info-row" wx:if="{{orderDetail.shipTime}}">
+            <text class="info-label">发货时间</text>
+            <text class="info-value">{{orderDetail.shipTime}}</text>
+          </view>
+          <view class="info-row" wx:if="{{orderDetail.finishTime}}">
+            <text class="info-label">完成时间</text>
+            <text class="info-value">{{orderDetail.finishTime}}</text>
+          </view>
+          <view class="info-row" wx:if="{{orderDetail.remark}}">
+            <text class="info-label">订单备注</text>
+            <text class="info-value">{{orderDetail.remark}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="detail-footer" wx:if="{{orderDetail.status === 'PENDING_PAY' || orderDetail.status === 'SHIPPED'}}">
+    <view class="footer-content">
+      <view
+        wx:if="{{orderDetail.status === 'PENDING_PAY'}}"
+        class="action-btn"
+        bindtap="cancelOrder"
+      >
+        <text class="action-text">取消订单</text>
+      </view>
+      <view
+        wx:if="{{orderDetail.status === 'PENDING_PAY'}}"
+        class="action-btn primary"
+        bindtap="payOrder"
+      >
+        <text class="action-text">立即支付</text>
+      </view>
+      <view
+        wx:if="{{orderDetail.status === 'SHIPPED'}}"
+        class="action-btn"
+        bindtap="contactService"
+      >
+        <text class="action-text">联系客服</text>
+      </view>
+      <view
+        wx:if="{{orderDetail.status === 'SHIPPED'}}"
+        class="action-btn primary"
+        bindtap="confirmReceipt"
+      >
+        <text class="action-text">确认收货</text>
+      </view>
+    </view>
+  </view>
+</view>

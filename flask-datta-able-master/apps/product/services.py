@@ -6,7 +6,7 @@
 from apps import db
 from apps.product.models import (
     ProductCategory, Product, ProductSku, 
-    Cart, Order, OrderItem
+    Cart, Order, OrderItem, ProductFavorite
 )
 from datetime import datetime
 import random
@@ -29,7 +29,7 @@ class ProductService:
         return category.to_dict() if category else None
     
     @staticmethod
-    def get_products(category_id=None, page=1, page_size=10, keyword=None):
+    def get_products(category_id=None, page=1, page_size=10, keyword=None, user_id=None):
         """获取商品列表"""
         query = Product.query.filter_by(status=1)
         
@@ -43,8 +43,20 @@ class ProductService:
             page=page, per_page=page_size, error_out=False
         )
         
+        product_list = []
+        for product in pagination.items:
+            product_dict = product.to_dict()
+            
+            if user_id:
+                is_favorite = ProductFavorite.query.filter_by(user_id=user_id, product_id=product.id).first() is not None
+                product_dict['favorite'] = is_favorite
+            else:
+                product_dict['favorite'] = False
+            
+            product_list.append(product_dict)
+        
         return {
-            'list': [product.to_dict() for product in pagination.items],
+            'list': product_list,
             'total': pagination.total,
             'page': page,
             'pageSize': page_size,
@@ -192,6 +204,13 @@ class CartService:
                 total += float(price) * item.quantity
         
         return total
+    
+    @staticmethod
+    def get_cart_count(user_id):
+        """获取购物车商品总数量"""
+        cart_items = Cart.query.filter_by(user_id=user_id).all()
+        total_count = sum(item.quantity for item in cart_items)
+        return total_count
 
 
 class OrderService:
@@ -359,3 +378,66 @@ class OrderService:
         db.session.commit()
         
         return order.to_dict(include_items=True), '订单状态已更新'
+
+
+class ProductFavoriteService:
+    """商品收藏服务"""
+    
+    @staticmethod
+    def get_favorite_list(user_id, page=1, page_size=10):
+        """获取用户收藏列表"""
+        query = ProductFavorite.query.filter_by(user_id=user_id)
+        
+        pagination = query.order_by(ProductFavorite.created_at.desc()).paginate(
+            page=page, per_page=page_size, error_out=False
+        )
+        
+        return {
+            'list': [item.to_dict() for item in pagination.items],
+            'total': pagination.total,
+            'page': page,
+            'pageSize': page_size,
+            'totalPages': (pagination.total + page_size - 1) // page_size
+        }
+    
+    @staticmethod
+    def add_favorite(user_id, product_id):
+        """添加商品收藏"""
+        favorite = ProductFavorite.query.filter_by(user_id=user_id, product_id=product_id).first()
+        
+        if favorite:
+            return favorite.to_dict()
+        
+        favorite = ProductFavorite(
+            user_id=user_id,
+            product_id=product_id
+        )
+        db.session.add(favorite)
+        db.session.commit()
+        
+        return favorite.to_dict()
+    
+    @staticmethod
+    def remove_favorite(user_id, product_id):
+        """取消商品收藏"""
+        favorite = ProductFavorite.query.filter_by(user_id=user_id, product_id=product_id).first()
+        
+        if not favorite:
+            return False
+        
+        db.session.delete(favorite)
+        db.session.commit()
+        
+        return True
+    
+    @staticmethod
+    def check_favorite(user_id, product_id):
+        """检查商品是否已收藏"""
+        favorite = ProductFavorite.query.filter_by(user_id=user_id, product_id=product_id).first()
+        return favorite is not None
+    
+    @staticmethod
+    def get_favorite_count(user_id):
+        """获取用户收藏数量"""
+        count = ProductFavorite.query.filter_by(user_id=user_id).count()
+        return count

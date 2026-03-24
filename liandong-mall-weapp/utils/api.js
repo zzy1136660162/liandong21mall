@@ -52,52 +52,77 @@ const api = {
 }
 
 const productApi = {
-    getCategories: () => api.get('/product/category/list'),
+    getCategories: () => api.get('/api/product/category/list'),
 
-    getProducts: (params) => api.get('/product/list', params),
+    getProducts: (params) => api.get('/api/product/list', params),
 
-    getProductDetail: (productId) => api.get(`/product/${productId}`),
+    getProductDetail: (productId) => api.get(`/api/product/${productId}`),
 
-    getHotProducts: (limit = 10) => api.get('/product/hot', { limit }),
+    getHotProducts: (limit = 10) => api.get('/api/product/hot', { limit }),
 
-    getNewProducts: (limit = 10) => api.get('/product/new', { limit }),
+    getNewProducts: (limit = 10) => api.get('/api/product/new', { limit }),
 
-    getRecommendProducts: (limit = 10) => api.get('/product/recommend', { limit }),
+    getRecommendProducts: (limit = 10) => api.get('/api/product/recommend', { limit }),
 
     searchProducts: (keyword, page = 1, pageSize = 10) =>
-        api.get('/product/search', { keyword, page, pageSize })
+        api.get('/api/product/search', { keyword, page, pageSize })
 }
 
 const cartApi = {
-    getCartList: () => api.get('/product/cart/list'),
+    getCartList: () => api.get('/api/product/cart/list'),
+
+    getCartCount: () => api.get('/api/product/cart/count'),
 
     addToCart: (productId, skuId = null, quantity = 1) =>
-        api.post('/product/cart/add', { productId, skuId, quantity }),
+        api.post('/api/product/cart/add', { productId, skuId, quantity }),
 
     updateCartQuantity: (cartId, quantity) =>
-        api.put(`/product/cart/update/${cartId}`, { quantity }),
+        api.put(`/api/product/cart/update/${cartId}`, { quantity }),
 
     updateCartSelected: (cartId, selected) =>
-        api.put(`/product/cart/select/${cartId}`, { selected }),
+        api.put(`/api/product/cart/select/${cartId}`, { selected }),
 
-    deleteCartItem: (cartId) => api.delete(`/product/cart/delete/${cartId}`),
+    deleteCartItem: (cartId) => api.delete(`/api/product/cart/delete/${cartId}`),
 
-    clearCart: () => api.delete('/product/cart/clear'),
+    clearCart: () => api.delete('/api/product/cart/clear'),
 
-    getCartTotal: () => api.get('/product/cart/total')
+    getCartTotal: () => api.get('/api/product/cart/total')
 }
 
 const orderApi = {
+    createOrder: (orderData) =>
+        api.post('/api/product/order/create', orderData),
+
     submitOrder: (cartItems, addressInfo, remark) =>
-        api.post('/product/order/submit', { cartItems, addressInfo, remark }),
+        api.post('/api/product/order/submit', { cartItems, addressInfo, remark }),
 
     getOrderList: (status = null, page = 1, pageSize = 10) =>
-        api.get('/product/order/list', { status, page, pageSize }),
+        api.get('/api/product/order/list', { status, page, pageSize }),
 
-    getOrderDetail: (orderId) => api.get(`/product/order/detail/${orderId}`),
+    getOrderDetail: (orderId) => api.get(`/api/product/order/detail/${orderId}`),
 
     cancelOrder: (orderId, reason) =>
-        api.post(`/product/order/cancel/${orderId}`, { reason })
+        api.post(`/api/product/order/cancel/${orderId}`, { reason }),
+
+    confirmReceipt: (orderId) =>
+        api.post(`/api/product/order/confirm/${orderId}`)
+}
+
+const favoriteApi = {
+    getFavoriteList: (page = 1, pageSize = 10) =>
+        api.get('/api/product/favorite/list', { page, pageSize }),
+
+    addFavorite: (productId) =>
+        api.post('/api/product/favorite/add', { productId }),
+
+    removeFavorite: (productId) =>
+        api.post('/api/product/favorite/remove', { productId }),
+
+    checkFavorite: (productId) =>
+        api.get(`/api/product/favorite/check/${productId}`),
+
+    getFavoriteCount: () =>
+        api.get('/api/product/favorite/count')
 }
 
 const userApi = {
@@ -118,13 +143,35 @@ const talentApi = {
     getTalentInfo: () => api.get('/api/user/talent/info')
 }
 
+const addressApi = {
+    getAddressList: () => api.get('/api/address/list'),
+
+    getAddressDetail: (addressId) => api.get(`/api/address/detail/${addressId}`),
+
+    addAddress: (addressData) => api.post('/api/address/add', addressData),
+
+    updateAddress: (addressId, addressData) =>
+        api.put(`/api/address/update/${addressId}`, addressData),
+
+    deleteAddress: (addressId) => api.delete(`/api/address/delete/${addressId}`),
+
+    setDefaultAddress: (addressId) =>
+        api.put(`/api/address/default/${addressId}`)
+}
+
 module.exports = {
     BASE_URL,
     request,
     api,
+    get: api.get,
+    post: api.post,
+    put: api.put,
+    delete: api.delete,
     productApi,
     cartApi,
     orderApi,
+    favoriteApi,
     userApi,
-    talentApi
+    talentApi,
+    addressApi
 }

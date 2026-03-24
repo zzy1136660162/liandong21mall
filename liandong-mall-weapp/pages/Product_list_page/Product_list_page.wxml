@@ -34,6 +34,29 @@
     </view>
   </view>
 
+  <view class="banner-section">
+    <swiper
+      class="banner-swiper"
+      indicator-dots
+      autoplay
+      circular
+      interval="4000"
+      duration="500"
+      indicator-color="rgba(255, 255, 255, 0.3)"
+      indicator-active-color="#FFC107"
+    >
+      <swiper-item wx:for="{{banners}}" wx:key="productId">
+        <image
+          class="banner-image"
+          src="{{item.mainImage}}"
+          mode="aspectFill"
+          bindtap="goToDetail"
+          data-id="{{item.productId}}"
+        />
+      </swiper-item>
+    </swiper>
+  </view>
+
   <view class="filter-section">
     <view class="filter-tabs">
       <view
@@ -102,8 +125,13 @@
                 <text class="currency">¥</text>
                 <text class="price">{{item.price}}</text>
               </view>
-              <view class="add-btn" bindtap="addToCart" data-id="{{item.productId}}" catchtap="true">
-                <text class="add-icon">＋</text>
+              <view 
+                class="add-btn {{cartProductIds.includes(item.productId) ? 'in-cart' : ''}}" 
+                bindtap="addToCart" 
+                data-id="{{item.productId}}" 
+                catchtap="true"
+              >
+                <text class="add-icon">{{cartProductIds.includes(item.productId) ? '✓' : '＋'}}</text>
               </view>
             </view>
           </view>

@@ -53,11 +53,24 @@ def register_api(app):
     api.add_namespace(talent_ns, path='/api/user/talent')
     api.add_namespace(auth_ns, path='/api/auth')
 
-    from apps.product.api import api as product_api, category_ns, cart_ns, order_ns
+    from apps.product.api import api as product_api, category_ns, cart_ns, order_ns, favorite_ns
     api.add_namespace(product_api, path='/api/product')
     api.add_namespace(category_ns, path='/api/product/category')
     api.add_namespace(cart_ns, path='/api/product/cart')
     api.add_namespace(order_ns, path='/api/product/order')
+    api.add_namespace(favorite_ns, path='/api/product/favorite')
+
+    from apps.sp_product.sp_product_detail_api import sp_product_detail_ns
+    api.add_namespace(sp_product_detail_ns, path='/api/sp_product_detail')
+
+    from apps.sp_mall.sp_api import (
+        sp_product_ns, sp_category_ns, sp_cart_ns, sp_order_ns, sp_address_ns
+    )
+    api.add_namespace(sp_product_ns, path='/api/sp/product')
+    api.add_namespace(sp_category_ns, path='/api/sp/category')
+    api.add_namespace(sp_cart_ns, path='/api/sp/cart')
+    api.add_namespace(sp_order_ns, path='/api/sp/order')
+    api.add_namespace(sp_address_ns, path='/api/sp/address')
 
 
 def configure_database(app):

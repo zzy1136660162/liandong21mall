@@ -5,7 +5,7 @@
 
 from flask import request
 from flask_restx import Namespace, Resource, fields
-from apps.product.services import ProductService, CartService, OrderService
+from apps.product.services import ProductService, CartService, OrderService, ProductFavoriteService
 from apps import db
 
 api = Namespace('product', description='商品相关API')
@@ -13,6 +13,7 @@ api = Namespace('product', description='商品相关API')
 category_ns = Namespace('product/category', description='商品分类API')
 cart_ns = Namespace('product/cart', description='购物车API')
 order_ns = Namespace('product/order', description='订单API')
+favorite_ns = Namespace('product/favorite', description='商品收藏API')
 
 
 def success_response(data=None, message='success'):
@@ -64,12 +65,13 @@ class ProductList(Resource):
     @api.doc('获取商品列表')
     def get(self):
         """获取商品列表"""
+        user_id = get_current_user_id()
         category_id = request.args.get('categoryId', type=int)
         page = request.args.get('page', 1, type=int)
         page_size = request.args.get('pageSize', 10, type=int)
         keyword = request.args.get('keyword')
         
-        result = ProductService.get_products(category_id, page, page_size, keyword)
+        result = ProductService.get_products(category_id, page, page_size, keyword, user_id)
         return success_response(result)
 
 
@@ -225,6 +227,16 @@ class CartClear(Resource):
         return success_response(None, '清空成功')
 
 
+@cart_ns.route('/count')
+class CartCount(Resource):
+    @cart_ns.doc('获取购物车商品数量')
+    def get(self):
+        """获取购物车商品总数量"""
+        user_id = get_current_user_id()
+        count = CartService.get_cart_count(user_id)
+        return success_response({'count': count})
+
+
 @cart_ns.route('/total')
 class CartTotal(Resource):
     @cart_ns.doc('获取购物车总金额')
@@ -319,3 +331,74 @@ class OrderDetailByNo(Resource):
             return error_response('订单不存在', 404)
         
         return success_response(order)
+
+
+# ========== 商品收藏相关API ==========
+
+@favorite_ns.route('/list')
+class FavoriteList(Resource):
+    @favorite_ns.doc('获取收藏列表')
+    def get(self):
+        """获取用户收藏列表"""
+        user_id = get_current_user_id()
+        page = request.args.get('page', 1, type=int)
+        page_size = request.args.get('pageSize', 10, type=int)
+        
+        result = ProductFavoriteService.get_favorite_list(user_id, page, page_size)
+        return success_response(result)
+
+
+@favorite_ns.route('/add')
+class FavoriteAdd(Resource):
+    @favorite_ns.doc('添加收藏')
+    def post(self):
+        """添加商品收藏"""
+        user_id = get_current_user_id()
+        data = request.get_json()
+        product_id = data.get('productId')
+        
+        if not product_id:
+            return error_response('请选择商品')
+        
+        favorite = ProductFavoriteService.add_favorite(user_id, product_id)
+        return success_response(favorite, '收藏成功')
+
+
+@favorite_ns.route('/remove')
+class FavoriteRemove(Resource):
+    @favorite_ns.doc('取消收藏')
+    def post(self):
+        """取消商品收藏"""
+        user_id = get_current_user_id()
+        data = request.get_json()
+        product_id = data.get('productId')
+        
+        if not product_id:
+            return error_response('请选择商品')
+        
+        result = ProductFavoriteService.remove_favorite(user_id, product_id)
+        
+        if not result:
+            return error_response('收藏不存在')
+        
+        return success_response(None, '取消收藏成功')
+
+
+@favorite_ns.route('/check/<int:product_id>')
+class FavoriteCheck(Resource):
+    @favorite_ns.doc('检查收藏状态')
+    def get(self, product_id):
+        """检查商品是否已收藏"""
+        user_id = get_current_user_id()
+        is_favorite = ProductFavoriteService.check_favorite(user_id, product_id)
+        return success_response({'isFavorite': is_favorite})
+
+
+@favorite_ns.route('/count')
+class FavoriteCount(Resource):
+    @favorite_ns.doc('获取收藏数量')
+    def get(self):
+        """获取用户收藏数量"""
+        user_id = get_current_user_id()
+        count = ProductFavoriteService.get_favorite_count(user_id)
+        return success_response({'count': count})
