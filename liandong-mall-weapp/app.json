@@ -1,10 +1,9 @@
 {
   "pages": [
-    "pages/index/index",
+    "pages/xuanpinindex/xuanpinindex",
     "pages/login/index",
     "pages/rd_index/rd_index",
     "pages/Product_list_page/Product_list_page",
-    "pages/xuanpinindex/xuanpinindex",
     "pages/rd/rd",
     "pages/Profile_page/Profile_page",
     "pages/category/category",
@@ -51,12 +50,6 @@
     "backgroundColor": "#ffffff",
     "borderStyle": "black",
     "list": [
-      {
-        "pagePath": "pages/index/index",
-        "text": "首页",
-        "iconPath": "images/tab/首页（未选中）.png",
-        "selectedIconPath": "images/tab/首页 (选中).png"
-      },
       {
         "pagePath": "pages/Product_list_page/Product_list_page",
         "text": "商城",

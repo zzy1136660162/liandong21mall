@@ -70,7 +70,7 @@
     <view class="login-methods">
       <view class="method-item" bindtap="wechatLogin">
         <view class="method-icon-wrapper">
-          <image class="method-icon" src="/assets/images/wechat-icon.png" mode="aspectFit"></image>
+          <image class="method-icon" src="https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico" mode="aspectFit"></image>
         </view>
         <text class="method-name">微信登录</text>
       </view>

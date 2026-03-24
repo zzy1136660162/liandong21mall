@@ -230,12 +230,12 @@
 }
 
 .demand-item {
-  background: #fafafa;
+  background: #fff9f0;
   border-radius: 16rpx;
   padding: 30rpx;
   margin-bottom: 20rpx;
   transition: all 0.3s;
-  border: 2rpx solid transparent;
+  border: 2rpx solid #ffe7ba;
 }
 
 .demand-item:last-child {
@@ -243,10 +243,10 @@
 }
 
 .demand-item:active {
-  background: #f0f7ff;
-  border-color: #1890ff;
+  background: #fff3e0;
+  border-color: #ffc773;
   transform: translateY(-4rpx);
-  box-shadow: 0 8rpx 24rpx rgba(24,144,255,0.15);
+  box-shadow: 0 8rpx 24rpx rgba(255, 165, 0, 0.15);
 }
 
 .demand-header {
@@ -258,7 +258,7 @@
 
 .demand-title {
   font-size: 32rpx;
-  color: #1a1a1a;
+  color: #5c3810;
   font-weight: 600;
   flex: 1;
   overflow: hidden;
