@@ -24,7 +24,7 @@
       "list": [
         {
           "name": "选品首页",
-          "pathName": "pages/rd_index/rd_index",
+          "pathName": "pages/chat/chat",
           "query": "",
           "scene": null,
           "launchMode": "default"

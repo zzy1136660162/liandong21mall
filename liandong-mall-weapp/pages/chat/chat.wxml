@@ -34,7 +34,6 @@
                      nodes="{{item.htmlContent || item.content}}"/>
           <!-- 用户消息使用普通文本 -->
           <text wx:else class="message-text">{{item.content}}</text>
-          <text class="message-text">{{item.content}}</text>
         </view>
 
         <!-- 建议选项 -->

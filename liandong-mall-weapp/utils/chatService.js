@@ -122,7 +122,23 @@ const sendMessage = (message, sessionId = '', userInfo = {}) => {
 const cleanDuplicateReply = (reply) => {
   if (!reply) return reply;
   
-  // 按换行符分割
+  // 首先检查是否有整段重复（同一句话出现多次）
+  // 常见模式：句子A\n句子B\n句子A\n句子B
+  const trimmedReply = reply.trim();
+  const halfLength = Math.floor(trimmedReply.length / 2);
+  
+  // 检查前半部分和后半部分是否相同
+  const firstHalf = trimmedReply.substring(0, halfLength).trim();
+  const secondHalf = trimmedReply.substring(halfLength).trim();
+  
+  // 如果后半部分包含前半部分的主要内容，可能是重复
+  if (secondHalf.includes(firstHalf.substring(0, Math.min(20, firstHalf.length)))) {
+    // 可能是重复，返回前半部分
+    log('检测到整段重复，清理后半部分');
+    return firstHalf;
+  }
+  
+  // 按换行符分割进行行去重
   const lines = reply.split('\n');
   const seen = new Set();
   const uniqueLines = [];
@@ -137,7 +153,22 @@ const cleanDuplicateReply = (reply) => {
     uniqueLines.push(line);
   }
   
-  return uniqueLines.join('\n');
+  const result = uniqueLines.join('\n');
+  
+  // 再次检查：如果结果还是包含明显的重复段落（超过50字重复）
+  if (result.length > 100) {
+    const midPoint = Math.floor(result.length / 2);
+    const firstPart = result.substring(0, midPoint);
+    const secondPart = result.substring(midPoint);
+    
+    // 检查第一部分是否在第二部分中出现
+    if (secondPart.includes(firstPart.substring(0, Math.min(50, firstPart.length)))) {
+      log('检测到段落重复，返回前半部分');
+      return firstPart;
+    }
+  }
+  
+  return result;
 };
 
 /**
