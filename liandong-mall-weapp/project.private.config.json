@@ -24,7 +24,7 @@
       "list": [
         {
           "name": "选品首页",
-          "pathName": "pages/xuanpinindex/xuanpinindex",
+          "pathName": "pages/rd_index/rd_index",
           "query": "",
           "scene": null,
           "launchMode": "default"

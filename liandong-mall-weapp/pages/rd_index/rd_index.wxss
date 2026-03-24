@@ -1,16 +1,16 @@
 /* 页面容器 */
 .container {
   padding: 0;
-  background: linear-gradient(180deg, #f0f7ff 0%, #f5f5f5 100%);
+  background: linear-gradient(180deg, #fffbe6 0%, #f5f5f5 100%);
   min-height: 100vh;
 }
 
 /* Banner区域 */
 .banner {
-  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
+  background: linear-gradient(135deg, #f5d547 0%, #ffec8b 100%);
   padding: 80rpx 40rpx 100rpx;
   text-align: center;
-  color: #fff;
+  color: #333;
   position: relative;
   overflow: hidden;
 }
@@ -141,8 +141,8 @@
 }
 
 .submit-icon {
-  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
-  color: #fff;
+  background: linear-gradient(135deg, #f5d547 0%, #ffec8b 100%);
+  color: #333;
 }
 
 .list-icon {
@@ -155,7 +155,7 @@
   border-radius: 36rpx;
   margin-bottom: 20rpx;
   box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.12);
-  background: linear-gradient(135deg, #f0f7ff 0%, #e6f7ff 100%);
+  background: linear-gradient(135deg, #fffbe6 0%, #fff7e6 100%);
   padding: 30rpx;
   box-sizing: border-box;
 }
@@ -182,7 +182,7 @@
 }
 
 .process-item:active {
-  background: #f0f7ff;
+  background: #fffbe6;
   transform: translateX(10rpx);
 }
 
@@ -194,8 +194,8 @@
   width: 64rpx;
   height: 64rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
-  color: #fff;
+  background: linear-gradient(135deg, #f5d547 0%, #ffec8b 100%);
+  color: #333;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -203,7 +203,7 @@
   font-weight: bold;
   margin-right: 24rpx;
   flex-shrink: 0;
-  box-shadow: 0 4rpx 12rpx rgba(24,144,255,0.3);
+  box-shadow: 0 4rpx 12rpx rgba(245,213,71,0.3);
 }
 
 .process-content {
@@ -326,13 +326,13 @@
   width: 120rpx;
   height: 120rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1890ff 0%, #36cfc9 100%);
-  color: #fff;
+  background: linear-gradient(135deg, #f5d547 0%, #ffec8b 100%);
+  color: #333;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 60rpx;
-  box-shadow: 0 8rpx 32rpx rgba(24,144,255,0.4);
+  box-shadow: 0 8rpx 32rpx rgba(245,213,71,0.4);
   z-index: 100;
   transition: all 0.3s;
 }
@@ -350,7 +350,7 @@
 
 .fab:active {
   transform: scale(0.9);
-  box-shadow: 0 4rpx 16rpx rgba(24,144,255,0.3);
+  box-shadow: 0 4rpx 16rpx rgba(245,213,71,0.3);
 }
 
 /* 客服入口按钮 */

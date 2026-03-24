@@ -74,8 +74,6 @@ page {
   position: relative;
 }
 
-.avatar-text {
-  color: #fff;
 .avatar-service::after {
   content: '客';
   color: #333;
