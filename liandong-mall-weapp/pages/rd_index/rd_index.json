@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText": "需求研发",
-  "navigationBarBackgroundColor": "#1890ff",
-  "navigationBarTextStyle": "white",
+  "navigationBarBackgroundColor": "#f5d547",
+  "navigationBarTextStyle": "black",
   "usingComponents": {}
 }

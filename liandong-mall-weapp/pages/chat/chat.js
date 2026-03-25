@@ -77,28 +77,22 @@ Page({
   // 添加消息到列表
   addMessage(message) {
     log('添加消息', message);
-    const messages = this.data.messages;
+    
+    // 创建新数组，避免直接修改原数组
+    const messages = [...this.data.messages];
     
     // 检查是否是重复消息（防止重复添加）
     const lastMessage = messages[messages.length - 1];
-    if (lastMessage && 
-        lastMessage.type === message.type && 
+    if (lastMessage &&
+        lastMessage.type === message.type &&
         lastMessage.content === message.content &&
         Date.now() - lastMessage.id < 1000) {
       log('检测到重复消息，跳过添加');
       return;
     }
-    
-    // 创建新数组，避免直接修改原数组
-    const messages = [...this.data.messages];
+
     message.id = Date.now();
     message.time = this.formatTime(new Date());
-
-    // 如果是 AI 消息，解析 Markdown
-    if ((message.type === 'agent' || message.type === 'system') && message.content) {
-      message.htmlContent = markdownParser.parseMarkdown(message.content);
-      log('Markdown 解析后', message.htmlContent);
-    }
 
     messages.push(message);
 

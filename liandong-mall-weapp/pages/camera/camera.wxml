@@ -1,0 +1,45 @@
+<view class="page">
+  <!-- 相机预览区域 -->
+  <view class="camera-view">
+    <camera 
+      wx:if="{{showCamera}}"
+      device-position="back" 
+      flash="off" 
+      binderror="error"
+      class="camera"
+    >
+    </camera>
+    
+    <!-- 扫描框 -->
+    <view class="scan-area">
+      <view class="scan-corner top-left"></view>
+      <view class="scan-corner top-right"></view>
+      <view class="scan-corner bottom-left"></view>
+      <view class="scan-corner bottom-right"></view>
+      <view class="scan-line"></view>
+    </view>
+    
+    <!-- 提示文字 -->
+    <view class="scan-tip">将商品放入框内即可识别</view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-action">
+    <!-- 相册按钮 -->
+    <view class="action-btn album" bindtap="chooseFromAlbum">
+      <text class="btn-icon">�️</text>
+      <text class="btn-text">相册</text>
+    </view>
+    
+    <!-- 拍照按钮 -->
+    <view class="capture-btn" bindtap="takePhoto">
+      <view class="capture-inner"></view>
+    </view>
+    
+    <!-- 扫码按钮 -->
+    <view class="action-btn scan" bindtap="scanCode">
+      <text class="btn-icon">🔲</text>
+      <text class="btn-text">扫码</text>
+    </view>
+  </view>
+</view>

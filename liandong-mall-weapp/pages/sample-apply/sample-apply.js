@@ -1,3 +1,6 @@
+const productService = require('../../services/productService');
+const sampleService = require('../../services/sampleService');
+
 Page({
   data: {
     selectedProducts: [],
@@ -31,23 +34,51 @@ Page({
   },
 
   // 加载商品信息
-  loadProductInfo(productId) {
-    // 模拟加载商品数据
-    const product = {
-      id: productId,
-      image: 'https://picsum.photos/120/120?random=' + productId,
-      name: '立白大师香氛洗衣液持久留香护色护衣',
-      price: '39.9',
-      commissionRate: 20,
-      commissionAmount: '7.98'
-    };
-    
-    this.setData({
-      selectedProducts: [product]
-    }, () => {
-      this.calculateTotalCommission();
-      this.checkCanSubmit();
-    });
+  async loadProductInfo(productId) {
+    wx.showLoading({ title: '加载中...' });
+    try {
+      const res = await productService.getProductDetail(productId);
+      console.log('商品详情返回:', res);
+      
+      // 处理不同的返回格式
+      let data = null;
+      if (res.code === 200 && res.data) {
+        data = res.data;
+      } else if (res.id) {
+        // 直接返回商品对象
+        data = res;
+      }
+      
+      if (data) {
+        const product = {
+          id: data.id || productId,
+          image: data.image || data.main_image || '/images/default-product.png',
+          name: data.name || data.product_name || '未知商品',
+          price: data.price || data.sale_price || '0',
+          commissionRate: data.commissionRate || data.commission_rate || 0,
+          commissionAmount: data.commissionAmount || ((parseFloat(data.price || 0) * (data.commissionRate || data.commission_rate || 0) / 100).toFixed(2))
+        };
+        this.setData({
+          selectedProducts: [product]
+        }, () => {
+          this.calculateTotalCommission();
+          this.checkCanSubmit();
+        });
+      } else {
+        wx.showToast({
+          title: '加载商品失败',
+          icon: 'none'
+        });
+      }
+    } catch (error) {
+      console.error('加载商品失败:', error);
+      wx.showToast({
+        title: '加载商品失败',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
+    }
   },
 
   // 计算总佣金
@@ -230,43 +261,63 @@ Page({
   },
 
   // 执行提交
-  doSubmit(data) {
+  async doSubmit(data) {
     wx.showLoading({
       title: '提交中...'
     });
 
-    // 模拟提交
-    setTimeout(() => {
-      wx.hideLoading();
+    try {
+      // 构建请求数据
+      const requestData = {
+        productIds: data.products,
+        recipientName: data.recipient.name,
+        phone: data.recipient.phone,
+        province: data.recipient.province || '',
+        city: data.recipient.city || '',
+        district: data.recipient.district || '',
+        address: data.recipient.address,
+        remark: data.remark || ''
+      };
       
-      // 生成申请记录ID
-      const applicationId = 'SA' + Date.now();
-      
-      // 保存到本地存储（模拟）
-      const applications = wx.getStorageSync('sampleApplications') || [];
-      applications.unshift({
-        id: applicationId,
-        ...data,
-        status: 'pending',
-        statusText: '待审核',
-        shipStatus: 'not_shipped',
-        shipStatusText: '未寄出'
-      });
-      wx.setStorageSync('sampleApplications', applications);
+      console.log('提交样品申请数据:', requestData);
 
+      // 调用后端API提交样品申请
+      const result = await sampleService.applySample(requestData);
+      
+      console.log('提交样品申请返回:', result);
+
+      wx.hideLoading();
+
+      // api.js 在成功时直接返回 data 部分
+      if (result) {
+        wx.showToast({
+          title: '申请成功',
+          icon: 'success',
+          duration: 1500,
+          success: () => {
+            setTimeout(() => {
+              // 跳转到我的样品申请页
+              wx.redirectTo({
+                url: '/pages/my-samples/my-samples'
+              });
+            }, 1500);
+          }
+        });
+      } else {
+        wx.showToast({
+          title: '申请失败',
+          icon: 'none',
+          duration: 3000
+        });
+      }
+    } catch (error) {
+      wx.hideLoading();
+      console.error('提交样品申请失败:', error);
       wx.showToast({
-        title: '申请成功',
-        icon: 'success',
-        duration: 1500,
-        success: () => {
-          setTimeout(() => {
-            // 跳转到我的样品申请页
-            wx.redirectTo({
-              url: '/pages/my-samples/my-samples'
-            });
-          }, 1500);
-        }
+        title: '申请失败: ' + (error.message || '网络错误'),
+        icon: 'none',
+        duration: 3000
       });
-    }, 1500);
+    }
   }
 });
