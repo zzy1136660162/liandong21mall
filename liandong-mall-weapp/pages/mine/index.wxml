@@ -35,7 +35,7 @@
   <view class="order-section">
     <view class="order-header">
       <text class="order-title">我的订单</text>
-      <text class="order-all" bindtap="goToOrderList">全部 ></text>
+      <text class="order-all" bindtap="goToOrderList" data-status="">全部 ></text>
     </view>
     <view class="order-grid">
       <view class="order-item" bindtap="checkLoginAndGo" data-url="order" data-status="pending">

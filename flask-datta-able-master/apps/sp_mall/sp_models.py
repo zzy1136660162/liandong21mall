@@ -85,7 +85,7 @@ class SpProduct(db.Model):
         }
         
         if include_detail:
-            data['description'] = self.description
+            data['description'] = self.description or ''
             data['skus'] = [sku.to_dict() for sku in self.skus.filter_by(status=1).all()]
         
         return data

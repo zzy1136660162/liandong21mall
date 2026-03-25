@@ -1,1 +1,5 @@
-{}
+{
+  "usingComponents": {
+    "sp-home-recommend": "../../components/sp_HomeRecommend/sp_HomeRecommend"
+  }
+}

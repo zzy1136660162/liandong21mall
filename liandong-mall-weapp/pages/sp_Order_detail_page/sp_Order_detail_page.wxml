@@ -10,6 +10,9 @@
         <view class="status-info">
           <text class="status-title">{{orderDetail.statusText}}</text>
           <text class="status-desc">{{orderDetail.statusDesc}}</text>
+          <text class="countdown-text" wx:if="{{orderDetail.status === 'PENDING_PAY' && countdownText}}">
+            ⏰ 剩余支付时间：{{countdownText}}
+          </text>
         </view>
       </view>
 

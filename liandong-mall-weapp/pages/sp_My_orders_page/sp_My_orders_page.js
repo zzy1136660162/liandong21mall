@@ -1,3 +1,4 @@
+
 const orderApi = require('../../utils/sp_api.js').orderApi
 
 Page({
@@ -47,7 +48,7 @@ Page({
     try {
       const { currentTab, page, pageSize } = this.data
       const status = currentTab === 'all' ? null : currentTab
-      const res = await orderApi.getOrderList({ status, page, pageSize })
+      const res = await orderApi.getOrderList(status, page, pageSize)
       
       const orderList = (res || []).map(order => ({
         ...order,
@@ -72,7 +73,7 @@ Page({
 
     if (currentTab === 'all' || currentTab === 'PENDING_PAY') {
       mockOrders.push({
-        orderId: 'ORD20240320001',
+        orderId: 1,
         status: 'PENDING_PAY',
         statusText: '待付款',
         createTime: '2024-03-20 10:30:00',
@@ -92,120 +93,89 @@ Page({
 
     if (currentTab === 'all' || currentTab === 'PAID') {
       mockOrders.push({
-        orderId: 'ORD20240319001',
+        orderId: 2,
         status: 'PAID',
         statusText: '待发货',
         createTime: '2024-03-19 15:20:00',
         products: [
           {
             productId: 43,
-            productName: '深层清洁洁面乳',
-            mainImage: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&h=400&fit=crop',
-            specs: '100ml',
-            price: 158.00,
-            quantity: 1
-          },
-          {
-            productId: 44,
-            productName: '保湿修护面霜',
-            mainImage: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=400&h=400&fit=crop',
+            productName: '水感透白面霜',
+            mainImage: 'https://images.unsplash.com/photo-1608248597279-f99d160bfcbc8?w=400&h=400&fit=crop',
             specs: '50g',
-            price: 358.00,
+            price: 199.00,
             quantity: 1
           }
         ],
-        finalAmount: 516.00
+        finalAmount: 199.00
       })
     }
 
     if (currentTab === 'all' || currentTab === 'SHIPPED') {
       mockOrders.push({
-        orderId: 'ORD20240318001',
+        orderId: 3,
         status: 'SHIPPED',
         statusText: '待收货',
         createTime: '2024-03-18 09:15:00',
         products: [
           {
-            productId: 45,
-            productName: '舒缓修护精华水',
-            mainImage: 'https://images.unsplash.com/photo-1608248597279-f99d160bfcbc8?w=400&h=400&fit=crop',
-            specs: '150ml',
-            price: 228.00,
-            quantity: 2
+            productId: 44,
+            productName: '紧致眼霜',
+            mainImage: 'https://images.unsplash.com/photo-1617897903246-719242758050?w=400&h=400&fit=crop',
+            specs: '15ml',
+            price: 159.00,
+            quantity: 1
           }
         ],
-        finalAmount: 456.00
+        finalAmount: 159.00
       })
     }
 
     if (currentTab === 'all' || currentTab === 'FINISHED') {
       mockOrders.push({
-        orderId: 'ORD20240315001',
+        orderId: 4,
         status: 'FINISHED',
         statusText: '已完成',
         createTime: '2024-03-15 14:45:00',
         products: [
           {
-            productId: 46,
-            productName: '紧致抗皱眼霜',
-            mainImage: 'https://images.unsplash.com/photo-1570194065650-d99fb4b38b15?w=400&h=400&fit=crop',
-            specs: '15g',
-            price: 268.00,
-            quantity: 1
+            productId: 45,
+            productName: '温和洁面乳',
+            mainImage: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop',
+            specs: '100ml',
+            price: 89.00,
+            quantity: 2
           }
         ],
-        finalAmount: 268.00
+        finalAmount: 178.00
       })
     }
 
-    // 添加已取消订单
     if (currentTab === 'all' || currentTab === 'CANCELLED') {
       mockOrders.push({
-        orderId: 'ORD20240321001',
+        orderId: 5,
         status: 'CANCELLED',
         statusText: '已取消',
         createTime: '2024-03-21 09:30:00',
         products: [
           {
-            productId: 47,
-            productName: '美白保湿面膜',
-            mainImage: 'https://images.unsplash.com/photo-1556228578-71154565c555?w=400&h=400&fit=crop',
-            specs: '25ml*10片',
-            price: 198.00,
+            productId: 46,
+            productName: '补水面膜',
+            mainImage: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=400&h=400&fit=crop',
+            specs: '5片装',
+            price: 69.00,
             quantity: 1
           }
         ],
-        finalAmount: 198.00
+        finalAmount: 69.00
       })
     }
 
     this.setData({
       orderList: mockOrders,
-      hasMore: false
+      hasMore: false,
+      useMockData: true
     })
-  },
-
-  async loadMoreOrders() {
-    if (!this.data.hasMore) return
-
-    try {
-      const { currentTab, page, pageSize, orderList } = this.data
-      const status = currentTab === 'all' ? null : currentTab
-      const res = await orderApi.getOrderList({ status, page: page + 1, pageSize })
-      
-      const newOrders = (res || []).map(order => ({
-        ...order,
-        statusText: this.getStatusText(order.status)
-      }))
-
-      this.setData({
-        orderList: [...orderList, ...newOrders],
-        page: page + 1,
-        hasMore: newOrders.length >= pageSize
-      })
-    } catch (error) {
-      console.error('加载更多订单失败:', error)
-    }
   },
 
   switchTab(e) {
@@ -232,14 +202,14 @@ Page({
   },
 
   goToDetail(e) {
-    const { id } = e.currentTarget.dataset
+    const { orderid } = e.currentTarget.dataset
     wx.navigateTo({
-      url: `/pages/sp_Order_detail_page/sp_Order_detail_page?id=${id}`
+      url: `/pages/sp_Order_detail_page/sp_Order_detail_page?orderId=${orderid}`
     })
   },
 
   async cancelOrder(e) {
-    const { id } = e.currentTarget.dataset
+    const { orderid } = e.currentTarget.dataset
     wx.showModal({
       title: '提示',
       content: '确定要取消该订单吗？',
@@ -247,7 +217,7 @@ Page({
         if (res.confirm) {
           try {
             wx.showLoading({ title: '取消中...' })
-            await orderApi.cancelOrder(id)
+            await orderApi.cancelOrder(orderid)
             wx.hideLoading()
             
             wx.showToast({
@@ -270,15 +240,14 @@ Page({
   },
 
   async payOrder(e) {
-    const { id } = e.currentTarget.dataset
-    wx.showToast({
-      title: '支付功能开发中',
-      icon: 'none'
+    const { orderid } = e.currentTarget.dataset
+    wx.navigateTo({
+      url: `/pages/sp_Payment/sp_Payment?orderId=${orderid}`
     })
   },
 
   async confirmReceipt(e) {
-    const { id } = e.currentTarget.dataset
+    const { orderid } = e.currentTarget.dataset
     wx.showModal({
       title: '提示',
       content: '确定要确认收货吗？',
@@ -286,7 +255,7 @@ Page({
         if (res.confirm) {
           try {
             wx.showLoading({ title: '确认中...' })
-            await orderApi.confirmReceipt(id)
+            await orderApi.confirmReceipt(orderid)
             wx.hideLoading()
             
             wx.showToast({
@@ -309,7 +278,7 @@ Page({
   },
 
   buyAgain(e) {
-    const { id } = e.currentTarget.dataset
+    const { orderid } = e.currentTarget.dataset
     wx.showToast({
       title: '再次购买功能开发中',
       icon: 'none'

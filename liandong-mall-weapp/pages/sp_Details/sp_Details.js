@@ -1,4 +1,5 @@
 const cartApi = require('../../utils/sp_api.js').cartApi
+const { checkLogin, getLoginStatus } = require('../../utils/sp_auth.js')
 
 Page({
   data: {
@@ -26,12 +27,18 @@ Page({
     selectedSpecs: {},
     isFavorite: false,
     isInCart: false,
+    currentCartId: null,
     cartCount: 0,
     loading: false,
-    addingToCart: false
+    addingToCart: false,
+    showSpecSelector: false,
+    isLoggedIn: false
   },
 
   onLoad(options) {
+    const loginStatus = getLoginStatus()
+    this.setData({ isLoggedIn: loginStatus.isLoggedIn })
+    
     if (options.id) {
       this.setData({
         productId: options.id
@@ -41,9 +48,14 @@ Page({
   },
 
   onShow() {
-    this.loadCartCount()
-    this.checkInCart()
-    this.checkFavoriteStatus()
+    const loginStatus = getLoginStatus()
+    this.setData({ isLoggedIn: loginStatus.isLoggedIn })
+    
+    if (loginStatus.isLoggedIn) {
+      this.loadCartCount()
+      this.checkInCart()
+      this.checkFavoriteStatus()
+    }
   },
 
   async loadProductDetail() {
@@ -70,9 +82,8 @@ Page({
   getProductDetail(productId) {
     return new Promise((resolve, reject) => {
       wx.request({
-        url: 'http://localhost:5000/api/sp_product_detail/detail',
+        url: `http://localhost:5000/api/sp/product/${productId}`,
         method: 'GET',
-        data: { productId },
         success: (res) => {
           if (res.data.code === 200) {
             resolve(res.data.data)
@@ -111,6 +122,11 @@ Page({
   },
 
   toggleFavorite() {
+    if (!checkLogin({ showToast: false })) {
+      checkLogin({ showToast: true })
+      return
+    }
+    
     const isFavorite = !this.data.isFavorite
     this.setData({ isFavorite })
 
@@ -198,26 +214,54 @@ Page({
   },
 
   async addToCart() {
+    if (!checkLogin({ showToast: false })) {
+      checkLogin({ showToast: true })
+      return
+    }
+    
     if (this.data.addingToCart) return
     
     this.setData({ addingToCart: true })
     
     try {
-      await cartApi.addToCart(this.data.productId, null, 1)
+      const { isInCart, currentCartId, productId, skuId } = this.data
       
-      this.setData({ isInCart: true })
-      
-      wx.showToast({
-        title: '已加入购物车',
-        icon: 'success',
-        duration: 1500
-      })
+      if (isInCart && currentCartId) {
+        await cartApi.deleteCartItem(currentCartId)
+        
+        this.setData({ 
+          isInCart: false,
+          currentCartId: null
+        })
+        
+        wx.showToast({
+          title: '已从购物车中移除',
+          icon: 'success',
+          duration: 1500
+        })
+      } else {
+        await cartApi.addToCart(productId, skuId, 1)
+        
+        const cartList = await cartApi.getCartList()
+        const cartItem = cartList && cartList.find(item => item.productId === parseInt(productId))
+        
+        this.setData({ 
+          isInCart: true,
+          currentCartId: cartItem ? cartItem.cartId : null
+        })
+        
+        wx.showToast({
+          title: '已加入购物车',
+          icon: 'success',
+          duration: 1500
+        })
+      }
       
       this.loadCartCount()
     } catch (error) {
-      console.error('加入购物车失败:', error)
+      console.error('操作购物车失败:', error)
       wx.showToast({
-        title: '加入失败',
+        title: '操作失败',
         icon: 'none',
         duration: 2000
       })
@@ -229,12 +273,58 @@ Page({
   },
 
   buyNow() {
-    this.addToCart().then(() => {
-      wx.navigateTo({
-        url: '/pages/sp_Cart_page/sp_Cart_page'
+    if (!checkLogin({ showToast: false })) {
+      checkLogin({ showToast: true })
+      return
+    }
+    
+    this.setData({ showSpecSelector: true })
+  },
+
+  onSpecSelectorClose() {
+    this.setData({ showSpecSelector: false })
+  },
+
+  onSpecSelectorAddToCart(e) {
+    const { productId, skuId, quantity, specs } = e.detail
+    
+    this.setData({ showSpecSelector: false })
+    
+    cartApi.addToCart(productId, skuId, quantity).then(async () => {
+      const cartList = await cartApi.getCartList()
+      const cartItem = cartList && cartList.find(item => 
+        item.productId === parseInt(productId) && 
+        (!skuId || item.skuId === skuId)
+      )
+      
+      this.setData({ 
+        isInCart: true,
+        currentCartId: cartItem ? cartItem.cartId : null
+      })
+      this.loadCartCount()
+      
+      wx.showToast({
+        title: '已加入购物车',
+        icon: 'success',
+        duration: 1500
       })
     }).catch((error) => {
-      console.error('立即购买失败:', error)
+      console.error('加入购物车失败:', error)
+      wx.showToast({
+        title: '加入失败',
+        icon: 'none',
+        duration: 2000
+      })
+    })
+  },
+
+  onSpecSelectorBuyNow(e) {
+    const { productId, skuId, quantity, specs, price, totalPrice } = e.detail
+    
+    this.setData({ showSpecSelector: false })
+    
+    wx.navigateTo({
+      url: `/pages/sp_Payment/sp_Payment?productId=${productId}&skuId=${skuId}&quantity=${quantity}&price=${price}&totalPrice=${totalPrice}`
     })
   },
 
@@ -257,8 +347,11 @@ Page({
   async checkInCart() {
     try {
       const cartList = await cartApi.getCartList()
-      const isInCart = cartList && cartList.some(item => item.productId === parseInt(this.data.productId))
-      this.setData({ isInCart })
+      const productId = parseInt(this.data.productId)
+      const cartItem = cartList && cartList.find(item => item.productId === productId)
+      const isInCart = !!cartItem
+      const currentCartId = cartItem ? cartItem.cartId : null
+      this.setData({ isInCart, currentCartId })
     } catch (error) {
       console.error('检查购物车状态失败:', error)
     }

@@ -1,3 +1,25 @@
-<view class="container">
-  <text>首页</text>
+<view class="index-page">
+  <!-- 商品推荐区组件 -->
+  <sp-home-recommend 
+    title="热门推荐"
+    productType="recommend"
+    limit="6"
+    showMore="{{true}}"
+  />
+  
+  <!-- 热销商品组件 -->
+  <sp-home-recommend 
+    title="热销商品"
+    productType="hot"
+    limit="6"
+    showMore="{{true}}"
+  />
+  
+  <!-- 新品上市组件 -->
+  <sp-home-recommend 
+    title="新品上市"
+    productType="new"
+    limit="6"
+    showMore="{{true}}"
+  />
 </view>

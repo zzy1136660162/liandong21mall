@@ -2,13 +2,17 @@ const BASE_URL = 'http://localhost:5000'
 
 function request(url, options = {}) {
     return new Promise((resolve, reject) => {
+        const userId = wx.getStorageSync('userId')
+        const token = wx.getStorageSync('token')
+        
         wx.request({
             url: `${BASE_URL}${url}`,
             method: options.method || 'GET',
             data: options.data || {},
             header: {
                 'Content-Type': 'application/json',
-                'X-User-Id': wx.getStorageSync('userId') || '1',
+                'X-User-Id': userId || '1',
+                'Authorization': token ? `Bearer ${token}` : '',
                 ...options.header
             },
             success: (res) => {
@@ -16,11 +20,22 @@ function request(url, options = {}) {
                     if (res.data.code === 200) {
                         resolve(res.data.data)
                     } else {
-                        wx.showToast({
-                            title: res.data.message || '请求失败',
-                            icon: 'none',
-                            duration: 2000
-                        })
+                        if (res.data.code === 401) {
+                            wx.showToast({
+                                title: '请先登录',
+                                icon: 'none',
+                                duration: 2000
+                            })
+                            wx.navigateTo({
+                                url: '/pages/login/index'
+                            })
+                        } else {
+                            wx.showToast({
+                                title: res.data.message || '请求失败',
+                                icon: 'none',
+                                duration: 2000
+                            })
+                        }
                         reject(res.data.message)
                     }
                 } else {
@@ -71,20 +86,17 @@ const productApi = {
 const cartApi = {
     getCartList: () => api.get('/api/sp/cart/list'),
 
-    addToCart: (productId, skuId = null, quantity = 1) =>
+    addToCart: (productId, skuId, quantity) =>
         api.post('/api/sp/cart/add', { productId, skuId, quantity }),
 
-    updateCartQuantity: (cartId, quantity) =>
-        api.put(`/api/sp/cart/update/${cartId}`, { quantity }),
+    updateCartItem: (cartId, quantity) =>
+        api.put(`/api/sp/cart/${cartId}`, { quantity }),
 
-    updateCartSelected: (cartId, selected) =>
-        api.put(`/api/sp/cart/select/${cartId}`, { selected }),
+    deleteCartItem: (cartId) =>
+        api.delete(`/api/sp/cart/${cartId}`),
 
-    deleteCartItem: (cartId) => api.delete(`/api/sp/cart/delete/${cartId}`),
-
-    clearCart: () => api.delete('/api/sp/cart/clear'),
-
-    getCartTotal: () => api.get('/api/sp/cart/total')
+    clearCart: () =>
+        api.delete('/api/sp/cart/clear')
 }
 
 const orderApi = {
@@ -95,6 +107,8 @@ const orderApi = {
         api.get('/api/sp/order/list', { status, page, pageSize }),
 
     getOrderDetail: (orderId) => api.get(`/api/sp/order/detail/${orderId}`),
+
+    getOrderExpireTime: (orderId) => api.get(`/api/sp/order/expire-time/${orderId}`),
 
     cancelOrder: (orderId, reason) =>
         api.post(`/api/sp/order/cancel/${orderId}`, { reason }),
@@ -111,58 +125,32 @@ const favoriteApi = {
         api.post('/api/product/favorite/add', { productId }),
 
     removeFavorite: (productId) =>
-        api.post('/api/product/favorite/remove', { productId }),
-
-    checkFavorite: (productId) =>
-        api.get(`/api/product/favorite/check/${productId}`),
-
-    getFavoriteCount: () =>
-        api.get('/api/product/favorite/count')
-}
-
-const userApi = {
-    getUserInfo: () => api.get('/user/info'),
-
-    updateUserInfo: (data) => api.put('/user/info', data),
-
-    getMemberInfo: () => api.get('/user/member'),
-
-    upgradeToVip: (orderId) => api.post('/user/member/upgrade', { orderId })
-}
-
-const talentApi = {
-    submitApply: (data) => api.post('/user/talent/apply', data),
-
-    getTalentStatus: () => api.get('/user/talent/status'),
-
-    getTalentInfo: () => api.get('/user/talent/info')
+        api.delete(`/api/product/favorite/${productId}`)
 }
 
 const addressApi = {
     getAddressList: () => api.get('/api/sp/address/list'),
 
-    getAddressDetail: (addressId) => api.get(`/api/sp/address/detail/${addressId}`),
+    getAddressDetail: (addressId) => api.get(`/api/sp/address/${addressId}`),
 
-    addAddress: (addressData) => api.post('/api/sp/address/add', addressData),
+    addAddress: (addressData) =>
+        api.post('/api/sp/address/add', addressData),
 
     updateAddress: (addressId, addressData) =>
-        api.put(`/api/sp/address/update/${addressId}`, addressData),
+        api.put(`/api/sp/address/${addressId}`, addressData),
 
-    deleteAddress: (addressId) => api.delete(`/api/sp/address/delete/${addressId}`),
+    deleteAddress: (addressId) =>
+        api.delete(`/api/sp/address/${addressId}`),
 
     setDefaultAddress: (addressId) =>
-        api.put(`/api/sp/address/default/${addressId}`)
+        api.post(`/api/sp/address/set-default/${addressId}`)
 }
 
 module.exports = {
-    BASE_URL,
-    request,
     api,
     productApi,
     cartApi,
     orderApi,
     favoriteApi,
-    userApi,
-    talentApi,
     addressApi
 }

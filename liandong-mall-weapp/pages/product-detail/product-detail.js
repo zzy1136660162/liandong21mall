@@ -2,51 +2,37 @@ Page({
   data: {
     product: {
       id: '',
-      title: '立白大师香氛洗衣液香味持久留香去污渍正品柔顺护色香水洗衣液',
-      price: '39.9',
-      originalPrice: '59.9',
-      commissionRate: 25,
-      commissionAmount: '9.97',
-      images: [
-        'https://picsum.photos/750/750?random=1',
-        'https://picsum.photos/750/750?random=2',
-        'https://picsum.photos/750/750?random=3'
-      ],
-      shopName: '立白Liby旗舰店',
-      shopLogo: 'https://picsum.photos/80/80?random=10',
-      shopSales: '6860',
-      shopScore: '4.84',
-      productScore: '4.96',
-      logisticsScore: '4.74',
-      serviceScore: '4.79',
-      sales: '2473',
-      goodRate: '98',
-      reviewCount: '2652',
-      darenCount: '4',
-      stock: '4',
-      location: '贵州省黔南布依族苗族自治州',
-      monthSales: '182',
-      monthViews: '3166',
-      monthDaren: '1万',
-      reviewTags: ['有图/视频', '很好用', '味道好', '香味很香'],
-      tuanzhangName: '飞鸽传媒团长精选',
-      tuanzhangAvatar: 'https://picsum.photos/80/80?random=20',
-      tuanzhangDesc: '聊高佣·帮申样·响应快',
-      tags: ['官方正品', '大牌大补', '品质保障'],
+      title: '',
+      price: '',
+      originalPrice: '',
+      commissionRate: 0,
+      commissionAmount: '',
+      images: [],
+      shopName: '',
+      shopLogo: '',
+      shopSales: '',
+      shopScore: '',
+      productScore: '',
+      logisticsScore: '',
+      serviceScore: '',
+      sales: '',
+      goodRate: '',
+      reviewCount: '',
+      darenCount: '',
+      stock: '',
+      location: '',
+      monthSales: '',
+      monthViews: '',
+      monthDaren: '',
+      reviewTags: [],
+      tuanzhangName: '',
+      tuanzhangAvatar: '',
+      tuanzhangDesc: '',
+      tags: [],
       // 商品规格信息
       specs: {
-        weight: [
-          { id: 1, name: '500g', price: '29.9', stock: 100 },
-          { id: 2, name: '1.5kg', price: '39.9', stock: 100 },
-          { id: 3, name: '3kg', price: '59.9', stock: 100 },
-          { id: 4, name: '9kg', price: '99.9', stock: 100 }
-        ],
-        scent: [
-          { id: 1, name: '樱花香', stock: 100 },
-          { id: 2, name: '薰衣草', stock: 100 },
-          { id: 3, name: '茉莉香', stock: 100 },
-          { id: 4, name: '柠檬香', stock: 100 }
-        ]
+        weight: [],
+        scent: []
       }
     },
     // 规格选择弹窗相关数据
@@ -65,21 +51,107 @@ Page({
 
   // 加载商品详情
   loadProductDetail(productId) {
-    // 模拟加载商品数据
-    // 实际项目中这里应该是 wx.request 调用接口
-    console.log('加载商品详情:', productId);
+    // 显示加载提示
+    wx.showLoading({
+      title: '加载中...',
+    });
     
-    // 根据ID生成不同的数据
+    // 调用后端API获取商品详情
+    wx.request({
+      url: 'http://localhost:5000/api/sp_product_detail/detail',
+      method: 'GET',
+      data: {
+        productId: productId
+      },
+      success: (res) => {
+        console.log('商品详情数据:', res.data);
+        
+        if (res.data.code === 200 && res.data.data) {
+          // 更新商品数据
+          this.setData({
+            product: res.data.data
+          });
+          
+          // 初始化总价
+          this.setData({
+            totalPrice: parseFloat(res.data.data.price)
+          });
+        } else {
+          wx.showToast({
+            title: res.data.message || '加载失败',
+            icon: 'none'
+          });
+        }
+      },
+      fail: (err) => {
+        console.error('加载商品详情失败:', err);
+        wx.showToast({
+          title: '网络错误',
+          icon: 'none'
+        });
+        
+        // 加载失败时使用默认数据
+        this.setDefaultProductData(productId);
+      },
+      complete: () => {
+        wx.hideLoading();
+      }
+    });
+  },
+  
+  // 设置默认商品数据
+  setDefaultProductData(productId) {
     const randomNum = parseInt(productId) || 1;
     this.setData({
-      'product.id': productId,
-      'product.images': [
-        `https://picsum.photos/750/750?random=${randomNum}`,
-        `https://picsum.photos/750/750?random=${randomNum + 100}`,
-        `https://picsum.photos/750/750?random=${randomNum + 200}`
-      ],
-      'product.shopLogo': `https://picsum.photos/80/80?random=${randomNum + 300}`,
-      'product.tuanzhangAvatar': `https://picsum.photos/80/80?random=${randomNum + 400}`
+      product: {
+        id: productId,
+        title: '立白大师香氛洗衣液香味持久留香去污渍正品柔顺护色香水洗衣液',
+        price: '39.9',
+        originalPrice: '59.9',
+        commissionRate: 25,
+        commissionAmount: '9.97',
+        images: [
+          `https://picsum.photos/750/750?random=${randomNum}`,
+          `https://picsum.photos/750/750?random=${randomNum + 100}`,
+          `https://picsum.photos/750/750?random=${randomNum + 200}`
+        ],
+        shopName: '立白Liby旗舰店',
+        shopLogo: `https://picsum.photos/80/80?random=${randomNum + 300}`,
+        shopSales: '6860',
+        shopScore: '4.84',
+        productScore: '4.96',
+        logisticsScore: '4.74',
+        serviceScore: '4.79',
+        sales: '2473',
+        goodRate: '98',
+        reviewCount: '2652',
+        darenCount: '4',
+        stock: '4',
+        location: '贵州省黔南布依族苗族自治州',
+        monthSales: '182',
+        monthViews: '3166',
+        monthDaren: '1万',
+        reviewTags: ['有图/视频', '很好用', '味道好', '香味很香'],
+        tuanzhangName: '飞鸽传媒团长精选',
+        tuanzhangAvatar: `https://picsum.photos/80/80?random=${randomNum + 400}`,
+        tuanzhangDesc: '聊高佣·帮申样·响应快',
+        tags: ['官方正品', '大牌大补', '品质保障'],
+        specs: {
+          weight: [
+            { id: 1, name: '500g', price: '29.9', stock: 100 },
+            { id: 2, name: '1.5kg', price: '39.9', stock: 100 },
+            { id: 3, name: '3kg', price: '59.9', stock: 100 },
+            { id: 4, name: '9kg', price: '99.9', stock: 100 }
+          ],
+          scent: [
+            { id: 1, name: '樱花香', stock: 100 },
+            { id: 2, name: '薰衣草', stock: 100 },
+            { id: 3, name: '茉莉香', stock: 100 },
+            { id: 4, name: '柠檬香', stock: 100 }
+          ]
+        }
+      },
+      totalPrice: 39.9
     });
   },
 

@@ -5,5 +5,7 @@
   "backgroundColor": "#FAFAFA",
   "backgroundTextStyle": "dark",
   "enablePullDownRefresh": false,
-  "usingComponents": {}
+  "usingComponents": {
+    "sp-spec-selector": "../../components/sp_SpecSelector/sp_SpecSelector"
+  }
 }

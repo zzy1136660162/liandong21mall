@@ -94,7 +94,7 @@ Page({
 
   async loadOrderCount() {
     try {
-      const res = await api.get('/api/order/count');
+      const res = await api.get('/api/sp/order/count');
       if (res.code === 200) {
         this.setData({
           orderCount: res.data
@@ -121,9 +121,28 @@ Page({
     }
 
     if (!this.data.isLogin) {
-      wx.navigateTo({
-        url: '/pages/login/index'
-      });
+      // 如果是订单页面，保存状态参数用于登录后跳转
+      if (url === 'order') {
+        let redirectUrl = '/pages/sp_My_orders_page/sp_My_orders_page';
+        if (status) {
+          const statusMap = {
+            'pending': 'PENDING_PAY',
+            'shipped': 'PAID',
+            'received': 'SHIPPED',
+            'refund': 'CANCELLED'
+          };
+          if (statusMap[status]) {
+            redirectUrl += `?tab=${statusMap[status]}`;
+          }
+        }
+        wx.navigateTo({
+          url: '/pages/login/index?redirect=' + encodeURIComponent(redirectUrl)
+        });
+      } else {
+        wx.navigateTo({
+          url: '/pages/login/index'
+        });
+      }
       return;
     }
 
@@ -139,6 +158,9 @@ Page({
         break;
       case 'address':
         this.goToAddress();
+        break;
+      case 'cart':
+        this.goToCart();
         break;
     }
   },
@@ -178,12 +200,35 @@ Page({
     });
   },
 
+  goToCart() {
+    if (!this.data.isLogin) {
+      this.goToLogin();
+      return;
+    }
+    wx.navigateTo({
+      url: '/pages/sp_Cart_page/sp_Cart_page'
+    });
+  },
+
   goToOrderList(e) {
     const status = e.currentTarget.dataset.status;
-    let url = '/pages/order/list/index';
-    if (status) {
-      url += `?status=${status}`;
+    let url = '/pages/sp_My_orders_page/sp_My_orders_page';
+    
+    // 映射状态参数
+    const statusMap = {
+      'pending': 'PENDING_PAY',   // 待付款
+      'shipped': 'PAID',          // 待发货（已付款）
+      'received': 'SHIPPED',      // 待收货（已发货）
+      'refund': 'REFUND'          // 退款/售后
+    };
+    
+    if (status && statusMap[status]) {
+      url += `?tab=${statusMap[status]}`;
+    } else if (status && status === 'refund') {
+      // 退款/售后暂时使用已取消的筛选
+      url += `?tab=CANCELLED`;
     }
+    
     wx.navigateTo({ url });
   },
 

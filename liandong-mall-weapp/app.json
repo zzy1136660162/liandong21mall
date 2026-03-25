@@ -34,6 +34,7 @@
     "pages/chat/chat",
     "pages/sp_Details/sp_Details",
     "pages/sp_Cart_page/sp_Cart_page",
+    "pages/sp_Payment/sp_Payment",
     "pages/sp_Order_confirm_page/sp_Order_confirm_page",
     "pages/sp_My_orders_page/sp_My_orders_page",
     "pages/sp_Order_detail_page/sp_Order_detail_page",

@@ -91,6 +91,8 @@ page {
 .page-content {
   height: 100vh;
   padding-top: 112rpx;
+  padding-bottom: 120rpx;
+  box-sizing: border-box;
 }
 
 .product-gallery {
@@ -332,6 +334,7 @@ page {
   background: #FFFFFF;
   padding: 40rpx 32rpx;
   margin-bottom: 16rpx;
+  padding-bottom: calc(40rpx + 120rpx);
 }
 
 .description-content {
@@ -422,6 +425,7 @@ page {
   background: #FFFFFF;
   padding: 40rpx 32rpx;
   margin-bottom: 16rpx;
+  padding-bottom: calc(40rpx + 120rpx);
 }
 
 .recommendation-grid {

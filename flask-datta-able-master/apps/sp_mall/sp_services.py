@@ -9,7 +9,7 @@ from apps.sp_mall.sp_models import (
     SpProductCategory, SpProduct, SpProductSku, 
     SpCart, SpOrder, SpOrderItem, SpAddress
 )
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
 import string
 
@@ -56,9 +56,99 @@ class SpProductService:
     def get_product_by_id(product_id):
         """根据ID获取商品详情"""
         product = SpProduct.query.get(product_id)
-        if product and product.status == 1:
-            return product.to_dict(include_detail=True)
-        return None
+        if not product or product.status != 1:
+            return None
+        
+        product_dict = product.to_dict(include_detail=True)
+        
+        product_dict['id'] = product_dict['productId']
+        product_dict['name'] = product_dict['productName']
+        product_dict['title'] = product_dict['productName']
+        
+        product_dict['subtitle'] = product_dict.get('brief', '')
+        
+        original_price = float(product.original_price) if product.original_price else 0
+        current_price = float(product.price)
+        if original_price > 0:
+            discount = round(current_price / original_price * 10, 1)
+        else:
+            discount = 10.0
+        product_dict['discount'] = str(discount)
+        
+        product_dict['memberPrice'] = float(product.member_price) if product.member_price else round(current_price * 0.9, 2)
+        product_dict['saveAmount'] = round(original_price - current_price, 2) if original_price > 0 else 0
+        
+        product_dict['stock'] = product.stock if product.stock else 0
+        product_dict['sales'] = product.sales if product.sales else 0
+        
+        product_dict['reviews'] = 0
+        
+        tags = []
+        if product.is_hot:
+            tags.append('热销')
+        if product.is_new:
+            tags.append('新品')
+        product_dict['tags'] = tags
+        
+        specs_list = []
+        if product.skus and product.skus.count() > 0:
+            spec_keys = set()
+            for sku in product.skus.all():
+                if hasattr(sku, 'spec') and sku.spec:
+                    for key in sku.spec.keys():
+                        spec_keys.add(key)
+            
+            for key in spec_keys:
+                spec_values = set()
+                for sku in product.skus.all():
+                    if hasattr(sku, 'spec') and sku.spec and key in sku.spec:
+                        spec_values.add(sku.spec[key])
+                
+                if spec_values:
+                    specs_list.append({
+                        'name': key,
+                        'values': list(spec_values)
+                    })
+        
+        if not specs_list:
+            specs_list = [
+                {
+                    'name': '规格',
+                    'values': ['默认']
+                }
+            ]
+        
+        product_dict['specs'] = specs_list
+        
+        product_dict['shopName'] = '立白Liby旗舰店'
+        product_dict['shopLogo'] = 'https://picsum.photos/80/80?random=10'
+        product_dict['shopSales'] = '6860'
+        product_dict['shopScore'] = '4.84'
+        product_dict['productScore'] = '4.96'
+        product_dict['logisticsScore'] = '4.74'
+        product_dict['serviceScore'] = '4.79'
+        
+        product_dict['darenCount'] = '4'
+        product_dict['location'] = '贵州省黔南布依族苗族自治州'
+        
+        product_dict['monthSales'] = str(product.sales if product.sales else 0)
+        product_dict['monthViews'] = '3166'
+        product_dict['monthDaren'] = '1万'
+        
+        product_dict['reviewCount'] = '0'
+        product_dict['goodRate'] = '98'
+        product_dict['reviewTags'] = ['有图/视频', '很好用', '味道好', '香味很香']
+        
+        product_dict['tuanzhangName'] = '飞鸽传媒团长精选'
+        product_dict['tuanzhangAvatar'] = 'https://picsum.photos/80/80?random=20'
+        product_dict['tuanzhangDesc'] = '聊高佣·帮申样·响应快'
+        
+        product_dict['reviewList'] = []
+        
+        recommendations = SpProductService.get_recommend_products(6)
+        product_dict['recommendations'] = recommendations
+        
+        return product_dict
     
     @staticmethod
     def get_hot_products(limit=10):
@@ -76,7 +166,15 @@ class SpProductService:
     def get_recommend_products(limit=10):
         """获取推荐商品"""
         products = SpProduct.query.filter_by(status=1, is_recommend=1).order_by(SpProduct.sort.desc()).limit(limit).all()
-        return [product.to_dict() for product in products]
+        result = []
+        for product in products:
+            result.append({
+                'id': product.id,
+                'name': product.product_name,
+                'image': product.main_image,
+                'price': float(product.price)
+            })
+        return result
     
     @staticmethod
     def search_products(keyword, page=1, page_size=10):
@@ -389,6 +487,42 @@ class SpOrderService:
         return order.to_dict(include_items=True), '确认收货成功'
     
     @staticmethod
+    def cancel_expired_orders(timeout_minutes=30):
+        """取消超时的待支付订单"""
+        expired_time = datetime.now() - timedelta(minutes=timeout_minutes)
+        
+        expired_orders = SpOrder.query.filter(
+            SpOrder.status == 'PENDING_PAY',
+            SpOrder.created_at < expired_time
+        ).all()
+        
+        cancelled_count = 0
+        for order in expired_orders:
+            order.status = 'CANCELLED'
+            order.cancel_time = datetime.now()
+            order.cancel_reason = '支付超时，系统自动取消'
+            order.updated_at = datetime.now()
+            cancelled_count += 1
+        
+        if cancelled_count > 0:
+            db.session.commit()
+        
+        return cancelled_count
+
+    @staticmethod
+    def get_order_expire_time(order_id):
+        """获取订单剩余支付时间（秒）"""
+        order = SpOrder.query.get(order_id)
+        if not order or order.status != 'PENDING_PAY':
+            return 0
+        
+        timeout_minutes = 30
+        expire_time = order.created_at + timedelta(minutes=timeout_minutes)
+        remaining_seconds = (expire_time - datetime.now()).total_seconds()
+        
+        return max(0, int(remaining_seconds))
+
+    @staticmethod
     def update_order_status(order_id, status):
         """更新订单状态（后台使用）"""
         order = SpOrder.query.get(order_id)
@@ -489,6 +623,12 @@ class SpAddressService:
         db.session.delete(address)
         db.session.commit()
         return True
+    
+    @staticmethod
+    def get_default_address(user_id):
+        """获取用户默认地址"""
+        address = SpAddress.query.filter_by(user_id=user_id, is_default=1).first()
+        return address.to_dict() if address else None
     
     @staticmethod
     def set_default_address(address_id, user_id):

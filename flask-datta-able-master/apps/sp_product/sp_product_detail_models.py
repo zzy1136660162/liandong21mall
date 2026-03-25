@@ -13,7 +13,7 @@ class SpProductDetail(db.Model):
     __tablename__ = 'sp_product_detail'
     
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True, comment='详情ID')
-    product_id = db.Column(db.BigInteger, db.ForeignKey('product.id'), nullable=False, comment='商品ID')
+    product_id = db.Column(db.BigInteger, db.ForeignKey('xp_products.id'), nullable=False, comment='商品ID')
     subtitle = db.Column(db.String(500), nullable=True, comment='商品副标题')
     tags = db.Column(db.JSON, nullable=True, comment='商品标签JSON数组')
     specs = db.Column(db.JSON, nullable=True, comment='商品规格JSON')
@@ -22,7 +22,7 @@ class SpProductDetail(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now, comment='创建时间')
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now, comment='更新时间')
     
-    product = db.relationship('Product', backref='sp_detail', uselist=False)
+    # 移除直接的relationship引用，避免循环导入问题
     
     def __repr__(self):
         return f'<SpProductDetail {self.product_id}>'
@@ -46,7 +46,7 @@ class SpProductReview(db.Model):
     __tablename__ = 'sp_product_review'
     
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True, comment='评价ID')
-    product_id = db.Column(db.BigInteger, db.ForeignKey('product.id'), nullable=False, comment='商品ID')
+    product_id = db.Column(db.BigInteger, db.ForeignKey('xp_products.id'), nullable=False, comment='商品ID')
     user_id = db.Column(db.BigInteger, db.ForeignKey('user.id'), nullable=False, comment='用户ID')
     order_id = db.Column(db.BigInteger, db.ForeignKey('order.id'), nullable=True, comment='订单ID')
     rating = db.Column(db.SmallInteger, nullable=False, default=5, comment='评分：1-5星')
@@ -59,9 +59,7 @@ class SpProductReview(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now, comment='创建时间')
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now, comment='更新时间')
     
-    product = db.relationship('Product', backref='sp_reviews')
-    user = db.relationship('User', backref='sp_product_reviews')
-    order = db.relationship('Order', backref='sp_product_reviews')
+    # 移除直接的relationship引用，避免循环导入问题
     
     def __repr__(self):
         return f'<SpProductReview {self.id}:{self.product_id}>'
@@ -93,11 +91,11 @@ class SpProductFavorite(db.Model):
     
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True, comment='收藏ID')
     user_id = db.Column(db.BigInteger, db.ForeignKey('user.id'), nullable=False, comment='用户ID')
-    product_id = db.Column(db.BigInteger, db.ForeignKey('product.id'), nullable=False, comment='商品ID')
+    product_id = db.Column(db.BigInteger, db.ForeignKey('xp_products.id'), nullable=False, comment='商品ID')
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now, comment='创建时间')
     
     user = db.relationship('User', backref='sp_product_favorites')
-    product = db.relationship('Product', backref='sp_favorites')
+    # 移除直接的product relationship引用，避免循环导入问题
     
     def __repr__(self):
         return f'<SpProductFavorite {self.user_id}:{self.product_id}>'
@@ -116,13 +114,12 @@ class SpProductRecommendation(db.Model):
     __tablename__ = 'sp_product_recommendation'
     
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True, comment='推荐ID')
-    product_id = db.Column(db.BigInteger, db.ForeignKey('product.id'), nullable=False, comment='商品ID')
-    recommend_product_id = db.Column(db.BigInteger, db.ForeignKey('product.id'), nullable=False, comment='推荐商品ID')
+    product_id = db.Column(db.BigInteger, db.ForeignKey('xp_products.id'), nullable=False, comment='商品ID')
+    recommend_product_id = db.Column(db.BigInteger, db.ForeignKey('xp_products.id'), nullable=False, comment='推荐商品ID')
     sort = db.Column(db.Integer, nullable=False, default=0, comment='排序')
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now, comment='创建时间')
     
-    product = db.relationship('Product', foreign_keys=[product_id], backref='sp_recommendations')
-    recommend_product = db.relationship('Product', foreign_keys=[recommend_product_id])
+    # 移除直接的relationship引用，避免循环导入问题
     
     def __repr__(self):
         return f'<SpProductRecommendation {self.product_id}:{self.recommend_product_id}>'
@@ -143,11 +140,11 @@ class SpProductView(db.Model):
     
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True, comment='浏览ID')
     user_id = db.Column(db.BigInteger, db.ForeignKey('user.id'), nullable=False, comment='用户ID')
-    product_id = db.Column(db.BigInteger, db.ForeignKey('product.id'), nullable=False, comment='商品ID')
+    product_id = db.Column(db.BigInteger, db.ForeignKey('xp_products.id'), nullable=False, comment='商品ID')
     view_time = db.Column(db.DateTime, nullable=False, default=datetime.now, comment='浏览时间')
     
     user = db.relationship('User', backref='sp_product_views')
-    product = db.relationship('Product', backref='sp_views')
+    # 移除直接的product relationship引用，避免循环导入问题
     
     def __repr__(self):
         return f'<SpProductView {self.user_id}:{self.product_id}>'

@@ -170,5 +170,13 @@
         </view>
       </view>
     </view>
+
+    <sp-spec-selector 
+      show="{{showSpecSelector}}" 
+      product="{{product}}"
+      bind:close="onSpecSelectorClose"
+      bind:addtocart="onSpecSelectorAddToCart"
+      bind:buynow="onSpecSelectorBuyNow"
+    />
   </view>
 </view>

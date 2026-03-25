@@ -39,12 +39,21 @@
             <text class="label-text">所在地区</text>
             <text class="required">*</text>
           </view>
-          <view class="form-input region-input" bindtap="chooseRegion">
-            <text class="region-text {{!formData.province ? 'placeholder' : ''}}">
-              {{formData.province ? formData.province + formData.city + formData.district : '请选择省/市/区'}}
-            </text>
-            <text class="region-arrow">›</text>
-          </view>
+          <picker
+            mode="multiSelector"
+            range="{{[provinces, cities, districts]}}"
+            range-key="name"
+            value="{{regionIndex}}"
+            bindchange="onRegionChange"
+            bindcolumnchange="onColumnChange"
+          >
+            <view class="form-input region-input">
+              <text class="region-text {{!formData.province ? 'placeholder' : ''}}">
+                {{formData.province ? formData.province + ' ' + formData.city + ' ' + formData.district : '请选择省/市/区'}}
+              </text>
+              <text class="region-arrow">›</text>
+            </view>
+          </picker>
         </view>
 
         <view class="form-item">

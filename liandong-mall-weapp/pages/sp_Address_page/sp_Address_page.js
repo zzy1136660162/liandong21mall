@@ -1,13 +1,26 @@
 const addressApi = require('../../utils/sp_api.js').addressApi
+const { checkLogin, getLoginStatus } = require('../../utils/sp_auth.js')
 
 Page({
   data: {
     addressList: [],
     useMockData: false,
-    fromOrder: false
+    fromOrder: false,
+    isLoggedIn: false
   },
 
   onLoad(options) {
+    const loginStatus = getLoginStatus()
+    this.setData({ isLoggedIn: loginStatus.isLoggedIn })
+    
+    if (!loginStatus.isLoggedIn) {
+      checkLogin({ showToast: false })
+      setTimeout(() => {
+        checkLogin({ showToast: true })
+      }, 100)
+      return
+    }
+    
     const { fromOrder } = options
     if (fromOrder === 'true') {
       this.setData({ fromOrder: true })
@@ -16,7 +29,12 @@ Page({
   },
 
   onShow() {
-    this.loadAddressList()
+    const loginStatus = getLoginStatus()
+    this.setData({ isLoggedIn: loginStatus.isLoggedIn })
+    
+    if (loginStatus.isLoggedIn) {
+      this.loadAddressList()
+    }
   },
 
   onPullDownRefresh() {
@@ -156,7 +174,7 @@ Page({
         const prevPage = pages[pages.length - 2]
         if (prevPage) {
           prevPage.setData({
-            address: selectedAddress
+            selectedAddress: selectedAddress
           })
           wx.navigateBack()
         }

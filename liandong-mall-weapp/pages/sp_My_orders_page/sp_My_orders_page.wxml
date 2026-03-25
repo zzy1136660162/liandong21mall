@@ -43,7 +43,7 @@
           wx:key="orderId"
           class="order-card"
           bindtap="goToDetail"
-          data-id="{{item.orderId}}"
+          data-orderid="{{item.orderId}}"
         >
           <view class="order-header">
             <view class="order-info">
@@ -62,16 +62,16 @@
               class="order-product"
             >
               <view class="product-image-wrapper">
-                <image class="product-image" src="{{product.mainImage}}" mode="aspectFill" lazy-load="{{true}}" />
+                <image class="product-image" src="{{product.productImage || product.mainImage}}" mode="aspectFill" lazy-load="{{true}}" />
               </view>
 
               <view class="product-info">
                 <view class="product-name">{{product.productName}}</view>
-                <view class="product-specs" wx:if="{{product.specs}}">{{product.specs}}</view>
+                <view class="product-specs" wx:if="{{product.skuName || product.specs}}">{{product.skuName || product.specs}}</view>
                 <view class="product-bottom">
                   <view class="product-price">
                     <text class="currency">¥</text>
-                    <text class="price">{{product.price}}</text>
+                    <text class="price">{{product.memberPrice || product.price}}</text>
                   </view>
                   <view class="product-quantity">×{{product.quantity}}</view>
                 </view>
@@ -84,7 +84,7 @@
               <text class="total-label">实付：</text>
               <view class="total-amount">
                 <text class="currency">¥</text>
-                <text class="amount">{{item.finalAmount}}</text>
+                <text class="amount">{{item.finalAmount || item.payAmount}}</text>
               </view>
             </view>
 
@@ -93,41 +93,38 @@
                 wx:if="{{item.status === 'PENDING_PAY'}}"
                 class="action-btn"
                 bindtap="cancelOrder"
-                data-id="{{item.orderId}}"
+                data-orderid="{{item.orderId}}"
                 catchtap="true"
               >
                 <text class="action-text">取消订单</text>
               </view>
+
               <view
                 wx:if="{{item.status === 'PENDING_PAY'}}"
                 class="action-btn primary"
                 bindtap="payOrder"
-                data-id="{{item.orderId}}"
+                data-orderid="{{item.orderId}}"
                 catchtap="true"
               >
-                <text class="action-text">立即支付</text>
+                <text class="action-text primary">去支付</text>
               </view>
+
               <view
                 wx:if="{{item.status === 'SHIPPED'}}"
                 class="action-btn primary"
                 bindtap="confirmReceipt"
-                data-id="{{item.orderId}}"
+                data-orderid="{{item.orderId}}"
                 catchtap="true"
               >
-                <text class="action-text">确认收货</text>
-              </view>
-              <view
-                wx:if="{{item.status === 'FINISHED'}}"
-                class="action-btn"
-                bindtap="buyAgain"
-                data-id="{{item.orderId}}"
-                catchtap="true"
-              >
-                <text class="action-text">再次购买</text>
+                <text class="action-text primary">确认收货</text>
               </view>
             </view>
           </view>
         </view>
+      </view>
+
+      <view wx:if="{{hasMore && orderList.length > 0}}" class="load-more">
+        <text class="load-more-text">加载更多...</text>
       </view>
     </view>
   </scroll-view>

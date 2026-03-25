@@ -34,24 +34,97 @@ class SpProductDetailService:
         
         product_dict = product.to_dict(include_detail=True)
         
-        detail = SpProductDetail.query.filter_by(product_id=product_id).first()
-        if detail:
-            product_dict.update({
-                'subtitle': detail.subtitle,
-                'tags': detail.tags or [],
-                'specs': detail.specs or [],
-                'description': detail.description,
-                'videoUrl': detail.video_url
-            })
+        product_dict['title'] = product_dict['productName']
+        product_dict['name'] = product_dict['productName']
         
-        if detail and detail.original_price:
-            product_dict['originalPrice'] = float(detail.original_price)
-            product_dict['discount'] = round(float(product.price) / float(detail.original_price) * 10, 1)
-            product_dict['saveAmount'] = round(float(detail.original_price) - float(product.price), 2)
+        product_dict['subtitle'] = product_dict.get('brief', '')
         
-        if product.member_price:
-            product_dict['memberPrice'] = float(product.member_price)
-            product_dict['saveAmount'] = round(float(product.price) - float(product.member_price), 2)
+        original_price = float(product.original_price) if product.original_price else 0
+        current_price = float(product.price)
+        if original_price > 0:
+            discount = round(current_price / original_price * 10, 1)
+        else:
+            discount = 10.0
+        product_dict['discount'] = str(discount)
+        
+        product_dict['memberPrice'] = float(product.member_price) if product.member_price else round(current_price * 0.9, 2)
+        product_dict['saveAmount'] = round(original_price - current_price, 2) if original_price > 0 else 0
+        
+        product_dict['stock'] = product.stock if product.stock else 0
+        product_dict['sales'] = product.sales if product.sales else 0
+        
+        review_count = SpProductReview.query.filter_by(
+            product_id=product_id,
+            is_show=1
+        ).count()
+        product_dict['reviews'] = review_count
+        
+        tags = []
+        if product.is_hot:
+            tags.append('热销')
+        if product.is_new:
+            tags.append('新品')
+        product_dict['tags'] = tags
+        
+        # 从skus中提取规格信息
+        specs_list = []
+        if product.skus and product.skus.count() > 0:
+            # 获取所有SKU的规格键
+            spec_keys = set()
+            for sku in product.skus.all():
+                if hasattr(sku, 'spec') and sku.spec:
+                    for key in sku.spec.keys():
+                        spec_keys.add(key)
+            
+            # 为每个规格键创建规格项
+            for key in spec_keys:
+                spec_values = set()
+                for sku in product.skus.all():
+                    if hasattr(sku, 'spec') and sku.spec and key in sku.spec:
+                        spec_values.add(sku.spec[key])
+                
+                if spec_values:
+                    specs_list.append({
+                        'name': key,
+                        'values': list(spec_values)
+                    })
+        
+        # 如果没有规格信息，使用默认值
+        if not specs_list:
+            specs_list = [
+                {
+                    'name': '规格',
+                    'values': ['默认']
+                }
+            ]
+        
+        product_dict['specs'] = specs_list
+        
+        # product_dict['commissionAmount'] = round(current_price * float(product.commission_rate) / 100, 2)
+        # product_dict['commissionRate'] = float(product.commission_rate)
+        
+        product_dict['shopName'] = '立白Liby旗舰店'
+        product_dict['shopLogo'] = 'https://picsum.photos/80/80?random=10'
+        product_dict['shopSales'] = '6860'
+        product_dict['shopScore'] = '4.84'
+        product_dict['productScore'] = '4.96'
+        product_dict['logisticsScore'] = '4.74'
+        product_dict['serviceScore'] = '4.79'
+        
+        product_dict['darenCount'] = '4'
+        product_dict['location'] = '贵州省黔南布依族苗族自治州'
+        
+        product_dict['monthSales'] = str(product.sales if product.sales else 0)
+        product_dict['monthViews'] = '3166'
+        product_dict['monthDaren'] = '1万'
+        
+        product_dict['reviewCount'] = str(review_count)
+        product_dict['goodRate'] = '98'
+        product_dict['reviewTags'] = ['有图/视频', '很好用', '味道好', '香味很香']
+        
+        product_dict['tuanzhangName'] = '飞鸽传媒团长精选'
+        product_dict['tuanzhangAvatar'] = 'https://picsum.photos/80/80?random=20'
+        product_dict['tuanzhangDesc'] = '聊高佣·帮申样·响应快'
         
         if user_id:
             is_favorite = SpProductFavorite.query.filter_by(
@@ -60,7 +133,8 @@ class SpProductDetailService:
             ).first() is not None
             product_dict['isFavorite'] = is_favorite
             
-            SpProductDetailService.record_view(user_id, product_id)
+            # 暂时注释掉浏览记录功能，避免外键约束错误
+            # SpProductDetailService.record_view(user_id, product_id)
         
         reviews = SpProductReview.query.filter_by(
             product_id=product_id,
@@ -92,13 +166,13 @@ class SpProductDetailService:
         result = []
         for rec in recommendations:
             product = Product.query.filter_by(
-                id=rec.recommend_product_id,
-                status=1
-            ).first()
+                    id=rec.recommend_product_id,
+                    status=1
+                ).first()
             if product:
                 result.append({
                     'id': product.id,
-                    'name': product.product_name,
+                    'name': product.name,
                     'image': product.main_image,
                     'price': float(product.price)
                 })
@@ -115,7 +189,7 @@ class SpProductDetailService:
                 for product in additional_products:
                     result.append({
                         'id': product.id,
-                        'name': product.product_name,
+                        'name': product.name,
                         'image': product.main_image,
                         'price': float(product.price)
                     })

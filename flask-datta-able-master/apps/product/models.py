@@ -21,8 +21,6 @@ class ProductCategory(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now, comment='创建时间')
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now, comment='更新时间')
     
-    products = db.relationship('Product', backref='category', lazy='dynamic')
-    
     def __repr__(self):
         return f'<ProductCategory {self.category_code}:{self.category_name}>'
     
@@ -276,10 +274,8 @@ class ProductFavorite(db.Model):
     
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True, comment='收藏ID')
     user_id = db.Column(db.BigInteger, db.ForeignKey('user.id'), nullable=False, comment='用户ID')
-    product_id = db.Column(db.BigInteger, db.ForeignKey('product.id'), nullable=False, comment='商品ID')
+    product_id = db.Column(db.BigInteger, db.ForeignKey('xp_products.id'), nullable=False, comment='商品ID')
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now, comment='创建时间')
-    
-    product = db.relationship('Product', backref='favorites')
     
     __table_args__ = (
         db.UniqueConstraint('user_id', 'product_id', name='uk_user_product'),
@@ -293,7 +289,6 @@ class ProductFavorite(db.Model):
             'favoriteId': self.id,
             'userId': self.user_id,
             'productId': self.product_id,
-            'product': self.product.to_dict() if self.product else None,
             'createdAt': self.created_at.strftime('%Y-%m-%d %H:%M:%S')
         }
 

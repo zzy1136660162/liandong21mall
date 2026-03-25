@@ -100,6 +100,18 @@ page {
   letter-spacing: 0.3rpx;
 }
 
+.countdown-text {
+  font-size: 26rpx;
+  color: #FFFFFF;
+  font-weight: 600;
+  margin-top: 8rpx;
+  padding: 8rpx 16rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8rpx;
+  display: inline-block;
+  width: fit-content;
+}
+
 .address-section {
   background: #FFFFFF;
   border-radius: 16rpx;

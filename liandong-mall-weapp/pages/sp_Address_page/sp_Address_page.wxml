@@ -29,10 +29,10 @@
               <view class="default-tag" wx:if="{{item.isDefault}}">默认</view>
             </view>
             <view class="address-actions">
-              <view class="action-btn" bindtap="editAddress" data-id="{{item.addressId}}" catchtap="stopPropagation">
+              <view class="action-btn" catchtap="editAddress" data-id="{{item.addressId}}">
                 <text class="action-icon">✏️</text>
               </view>
-              <view class="action-btn" bindtap="deleteAddress" data-id="{{item.addressId}}" catchtap="stopPropagation">
+              <view class="action-btn" catchtap="deleteAddress" data-id="{{item.addressId}}">
                 <text class="action-icon">🗑️</text>
               </view>
             </view>
@@ -43,7 +43,7 @@
           </view>
 
           <view class="address-footer">
-            <view class="default-switch" bindtap="setDefault" data-id="{{item.addressId}}" catchtap="stopPropagation">
+            <view class="default-switch" catchtap="setDefault" data-id="{{item.addressId}}">
               <view class="switch-icon {{item.isDefault ? 'active' : ''}}">
                 <text class="switch-text">{{item.isDefault ? '✓' : ''}}</text>
               </view>

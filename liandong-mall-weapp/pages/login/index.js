@@ -145,9 +145,11 @@ Page({
       .then(res => {
         const token = res.token;
         const userInfo = res.userInfo;
+        const userId = res.userId;
 
         wx.setStorageSync('token', token);
         wx.setStorageSync('userInfo', userInfo);
+        wx.setStorageSync('userId', userId);
 
         wx.showToast({
           title: '登录成功',
@@ -155,9 +157,32 @@ Page({
         });
 
         setTimeout(() => {
-          wx.switchTab({
-            url: '/pages/mine/index'
-          });
+          if (redirect && redirect !== '/pages/login/index') {
+            const url = decodeURIComponent(redirect);
+            if (url.startsWith('/pages')) {
+              const pages = getCurrentPages();
+              const currentPage = pages[pages.length - 1];
+              const redirectPath = url.split('?')[0];
+              
+              let pageExists = false;
+              for (let i = 0; i < pages.length - 1; i++) {
+                if (pages[i].route === redirectPath) {
+                  pageExists = true;
+                  break;
+                }
+              }
+              
+              if (pageExists) {
+                wx.navigateBack({ delta: 1 });
+              } else {
+                wx.redirectTo({ url });
+              }
+            } else {
+              wx.switchTab({ url: '/pages/mine/index' });
+            }
+          } else {
+            wx.switchTab({ url: '/pages/mine/index' });
+          }
         }, 1500);
       })
       .catch(err => {
@@ -247,10 +272,11 @@ Page({
       .then(res => {
         wx.hideLoading();
 
-        const { token, userInfo: serverUserInfo } = res;
+        const { token, userInfo: serverUserInfo, userId } = res;
 
         wx.setStorageSync('token', token);
         wx.setStorageSync('userInfo', serverUserInfo);
+        wx.setStorageSync('userId', userId);
 
         wx.showToast({
           title: '登录成功',
@@ -258,9 +284,31 @@ Page({
         });
 
         setTimeout(() => {
-          wx.switchTab({
-            url: '/pages/mine/index'
-          });
+          if (redirect && redirect !== '/pages/login/index') {
+            const url = decodeURIComponent(redirect);
+            if (url.startsWith('/pages')) {
+              const pages = getCurrentPages();
+              const redirectPath = url.split('?')[0];
+              
+              let pageExists = false;
+              for (let i = 0; i < pages.length - 1; i++) {
+                if (pages[i].route === redirectPath) {
+                  pageExists = true;
+                  break;
+                }
+              }
+              
+              if (pageExists) {
+                wx.navigateBack({ delta: 1 });
+              } else {
+                wx.redirectTo({ url });
+              }
+            } else {
+              wx.switchTab({ url: '/pages/mine/index' });
+            }
+          } else {
+            wx.switchTab({ url: '/pages/mine/index' });
+          }
         }, 1500);
       })
       .catch(err => {

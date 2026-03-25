@@ -1,4 +1,5 @@
 const cartApi = require('../../utils/sp_api.js').cartApi
+const { checkLogin, getLoginStatus } = require('../../utils/sp_auth.js')
 
 Page({
   data: {
@@ -7,15 +8,32 @@ Page({
     selectedCount: 0,
     totalPrice: 0,
     useMockData: false,
-    editMode: false
+    editMode: false,
+    isLoggedIn: false
   },
 
   onLoad(options) {
+    const loginStatus = getLoginStatus()
+    this.setData({ isLoggedIn: loginStatus.isLoggedIn })
+    
+    if (!loginStatus.isLoggedIn) {
+      checkLogin({ showToast: false })
+      setTimeout(() => {
+        checkLogin({ showToast: true })
+      }, 100)
+      return
+    }
+    
     this.loadCart()
   },
 
   onShow() {
-    this.loadCart()
+    const loginStatus = getLoginStatus()
+    this.setData({ isLoggedIn: loginStatus.isLoggedIn })
+    
+    if (loginStatus.isLoggedIn) {
+      this.loadCart()
+    }
   },
 
   onPullDownRefresh() {
@@ -260,6 +278,11 @@ Page({
   },
 
   goToCheckout() {
+    if (!checkLogin({ showToast: false })) {
+      checkLogin({ showToast: true })
+      return
+    }
+    
     const { cartList } = this.data
     const selectedItems = cartList.filter(item => item.selected)
     if (selectedItems.length === 0) {

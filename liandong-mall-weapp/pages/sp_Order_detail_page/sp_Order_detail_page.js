@@ -25,13 +25,15 @@ Page({
       remark: ''
     },
     statusIcon: '📦',
-    useMockData: false
+    useMockData: false,
+    remainingSeconds: 0,  // 剩余支付时间（秒）
+    countdownText: ''     // 倒计时文本
   },
 
   onLoad(options) {
-    const { id } = options
-    if (id) {
-      this.setData({ orderId: id })
+    const { orderId } = options
+    if (orderId) {
+      this.setData({ orderId: orderId })
       this.loadOrderDetail()
     } else {
       wx.showToast({
@@ -91,21 +93,53 @@ Page({
 
   // 检查订单是否需要自动取消
   checkAutoCancelOrder(orderDetail) {
-    // 如果是待付款状态，设置10分钟自动取消
+    // 如果是待付款状态，设置30分钟自动取消
     if (orderDetail.status === 'PENDING_PAY') {
       // 清除之前的定时器（如果有）
       if (this.cancelTimer) {
         clearTimeout(this.cancelTimer)
       }
+      if (this.countdownTimer) {
+        clearInterval(this.countdownTimer)
+      }
       
-      // 计算剩余时间（10分钟）
-      const createTime = new Date(orderDetail.createTime)
-      const expireTime = new Date(createTime.getTime() + 10 * 60 * 1000) // 10分钟后
-      const now = new Date()
-      const remainingTime = expireTime - now
+      // 使用后端返回的剩余时间，如果没有则计算
+      let remainingTime = 30 * 60 * 1000  // 默认30分钟
       
-      // 如果还没到过期时间，设置定时器
+      if (orderDetail.remainingSeconds) {
+        remainingTime = orderDetail.remainingSeconds * 1000
+      } else {
+        // 计算剩余时间
+        const createTime = new Date(orderDetail.createTime)
+        const expireTime = new Date(createTime.getTime() + 30 * 60 * 1000) // 30分钟后
+        const now = new Date()
+        remainingTime = expireTime - now
+      }
+      
+      // 如果还没到过期时间，设置倒计时和定时器
       if (remainingTime > 0) {
+        this.setData({
+          remainingSeconds: Math.floor(remainingTime / 1000),
+          countdownText: this.formatCountdown(Math.floor(remainingTime / 1000))
+        })
+        
+        // 启动倒计时更新（每秒更新一次）
+        this.countdownTimer = setInterval(() => {
+          const currentRemaining = this.data.remainingSeconds - 1
+          if (currentRemaining > 0) {
+            this.setData({
+              remainingSeconds: currentRemaining,
+              countdownText: this.formatCountdown(currentRemaining)
+            })
+          } else {
+            // 时间到，取消订单
+            if (this.countdownTimer) {
+              clearInterval(this.countdownTimer)
+            }
+          }
+        }, 1000)
+        
+        // 设置超时取消定时器
         this.cancelTimer = setTimeout(() => {
           this.autoCancelOrder()
         }, remainingTime)
@@ -113,7 +147,24 @@ Page({
         // 已经过期，直接取消订单
         this.autoCancelOrder()
       }
+    } else {
+      // 非待付款状态，清除定时器
+      if (this.cancelTimer) {
+        clearTimeout(this.cancelTimer)
+        this.cancelTimer = null
+      }
+      if (this.countdownTimer) {
+        clearInterval(this.countdownTimer)
+        this.countdownTimer = null
+      }
     }
+  },
+  
+  // 格式化倒计时文本
+  formatCountdown(seconds) {
+    const minutes = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${minutes}分${secs.toString().padStart(2, '0')}秒`
   },
 
   // 自动取消订单

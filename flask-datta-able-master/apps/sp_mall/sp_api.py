@@ -4,6 +4,7 @@
 成员1负责：商品、购物车、订单、地址
 """
 
+from datetime import datetime
 from flask import request
 from flask_restx import Namespace, Resource, fields
 from apps.sp_mall.sp_services import (
@@ -285,7 +286,52 @@ class SpOrderDetail(Resource):
         if not order:
             return error_response('订单不存在', 404)
         
+        # 添加剩余支付时间
+        if order.get('status') == 'PENDING_PAY':
+            remaining_seconds = SpOrderService.get_order_expire_time(order_id)
+            order['remainingSeconds'] = remaining_seconds
+            order['expireTime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S') if remaining_seconds > 0 else None
+        
         return success_response(order)
+
+
+@sp_order_ns.route('/expire-time/<int:order_id>')
+class SpOrderExpireTime(Resource):
+    @sp_order_ns.doc('获取订单剩余支付时间')
+    def get(self, order_id):
+        """获取订单剩余支付时间"""
+        user_id = get_current_user_id()
+        order = SpOrderService.get_order_by_id(order_id, user_id)
+        
+        if not order:
+            return error_response('订单不存在', 404)
+        
+        remaining_seconds = SpOrderService.get_order_expire_time(order_id)
+        
+        return success_response({
+            'remainingSeconds': remaining_seconds,
+            'expired': remaining_seconds <= 0
+        })
+
+
+@sp_order_ns.route('/count')
+class SpOrderCount(Resource):
+    @sp_order_ns.doc('获取订单数量统计')
+    def get(self):
+        """获取用户各状态订单数量"""
+        user_id = get_current_user_id()
+        
+        from apps.sp_mall.sp_models import SpOrder
+        
+        # 统计各状态订单数量
+        counts = {
+            'pending': SpOrder.query.filter_by(user_id=user_id, status='PENDING_PAY').count(),
+            'shipped': SpOrder.query.filter_by(user_id=user_id, status='PAID').count(),
+            'received': SpOrder.query.filter_by(user_id=user_id, status='SHIPPED').count(),
+            'refund': SpOrder.query.filter_by(user_id=user_id, status='CANCELLED').count()
+        }
+        
+        return success_response(counts)
 
 
 @sp_order_ns.route('/cancel/<int:order_id>')
@@ -330,6 +376,16 @@ class SpAddressList(Resource):
         user_id = get_current_user_id()
         addresses = SpAddressService.get_address_list(user_id)
         return success_response(addresses)
+
+
+@sp_address_ns.route('/default')
+class SpAddressDefault(Resource):
+    @sp_address_ns.doc('获取默认地址')
+    def get(self):
+        """获取用户默认地址"""
+        user_id = get_current_user_id()
+        address = SpAddressService.get_default_address(user_id)
+        return success_response(address)
 
 
 @sp_address_ns.route('/detail/<int:address_id>')
