@@ -1,0 +1,131 @@
+<view class="sp-payment-page">
+  <view class="page-background"></view>
+
+  <view class="page-header">
+    <view class="header-content">
+      <view class="header-top">
+        <view class="back-btn" bindtap="goBack">
+          <text class="back-icon">←</text>
+        </view>
+        <view class="header-title">
+          <text class="title-text">确认订单</text>
+        </view>
+        <view class="header-placeholder"></view>
+      </view>
+    </view>
+  </view>
+
+  <scroll-view class="page-content" scroll-y="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
+    <view class="product-info">
+      <view class="product-image-container">
+        <image class="product-image" src="{{product.mainImage}}" mode="aspectFill" />
+      </view>
+      <view class="product-details">
+        <view class="product-name">{{product.name}}</view>
+        <view class="product-specs" wx:if="{{selectedSpecs && Object.keys(selectedSpecs).length > 0}}">
+          <view class="spec-item" wx:for="{{selectedSpecs}}" wx:for-item="specValue" wx:for-index="specName" wx:key="specName">
+            <text class="spec-name">{{specName}}:</text>
+            <text class="spec-value">{{specValue}}</text>
+          </view>
+        </view>
+        <view class="product-price-info">
+          <view class="price-item">
+            <text class="price-label">单价:</text>
+            <text class="price-value">¥{{price}}</text>
+          </view>
+          <view class="price-item">
+            <text class="price-label">数量:</text>
+            <text class="price-value">{{quantity}}</text>
+          </view>
+          <view class="price-item total">
+            <text class="price-label">合计:</text>
+            <text class="price-value total">¥{{totalPrice}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="address-section">
+      <view class="section-header">
+        <text class="section-title">收货地址</text>
+        <view class="section-action" bindtap="selectAddress">
+          <text class="action-text">{{address ? '更换' : '选择'}}</text>
+        </view>
+      </view>
+      <view class="address-content" wx:if="{{address}}">
+        <view class="address-info">
+          <text class="address-name">{{address.name}}</text>
+          <text class="address-phone">{{address.phone}}</text>
+          <text class="address-detail">{{address.province}}{{address.city}}{{address.district}}{{address.detail}}</text>
+        </view>
+        <view class="address-default" wx:if="{{address.isDefault}}">
+          <text class="default-tag">默认</text>
+        </view>
+      </view>
+      <view class="address-empty" wx:else>
+        <view class="empty-icon">📍</view>
+        <text class="empty-text">请选择收货地址</text>
+      </view>
+    </view>
+
+    <view class="order-section">
+      <view class="section-header">
+        <text class="section-title">订单备注</text>
+      </view>
+      <view class="order-remark">
+        <textarea 
+          class="remark-input"
+          placeholder="请输入订单备注（选填）"
+          value="{{remark}}"
+          bindinput="onRemarkInput"
+          maxlength="200"
+          show-confirm-bar="{{false}}"
+          auto-height="{{true}}"
+        />
+        <text class="remark-count">{{remark.length}}/200</text>
+      </view>
+    </view>
+
+    <view class="payment-section">
+      <view class="section-header">
+        <text class="section-title">支付方式</text>
+      </view>
+      <view class="payment-methods">
+        <view 
+          class="payment-method {{selectedPayment === 'wechat' ? 'active' : ''}}"
+          bindtap="selectPayment"
+          data-method="wechat"
+        >
+          <view class="payment-icon">💳</view>
+          <text class="payment-name">微信支付</text>
+          <view class="payment-check" wx:if="{{selectedPayment === 'wechat'}}">
+            <text class="check-icon">✓</text>
+          </view>
+        </view>
+        <view 
+          class="payment-method {{selectedPayment === 'alipay' ? 'active' : ''}}"
+          bindtap="selectPayment"
+          data-method="alipay"
+        >
+          <view class="payment-icon">💰</view>
+          <text class="payment-name">支付宝</text>
+          <view class="payment-check" wx:if="{{selectedPayment === 'alipay'}}">
+            <text class="check-icon">✓</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="bottom-bar">
+    <view class="bar-content">
+      <view class="total-info">
+        <text class="total-label">实付款:</text>
+        <text class="total-price">¥{{totalPrice}}</text>
+      </view>
+      <view class="submit-btn {{submitting ? 'disabled' : ''}}" bindtap="submitOrder">
+        <text class="btn-text">{{submitting ? '提交中...' : '提交订单'}}</text>
+      </view>
+    </view>
+  </view>
+</view>

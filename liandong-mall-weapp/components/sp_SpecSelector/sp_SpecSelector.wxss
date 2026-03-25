@@ -1,0 +1,296 @@
+.sp-spec-selector-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+}
+
+.sp-spec-selector-container {
+  width: 100%;
+  background: #FFFFFF;
+  border-radius: 32rpx 32rpx 0 0;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.sp-spec-selector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.sp-spec-selector-title {
+  font-size: 32rpx;
+  color: #2C2C2C;
+  font-weight: 600;
+}
+
+.sp-spec-selector-close {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sp-spec-selector-close-icon {
+  font-size: 48rpx;
+  color: #999999;
+  line-height: 1;
+}
+
+.sp-spec-selector-content {
+  flex: 1;
+  padding: 32rpx;
+  overflow-y: auto;
+}
+
+.sp-spec-product-info {
+  display: flex;
+  gap: 24rpx;
+  padding: 24rpx;
+  background: #F5F5F5;
+  border-radius: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.sp-spec-product-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+}
+
+.sp-spec-product-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12rpx;
+}
+
+.sp-spec-product-price {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+}
+
+.sp-spec-price-symbol {
+  font-size: 24rpx;
+  color: #FFC107;
+  font-weight: 600;
+}
+
+.sp-spec-price-value {
+  font-size: 40rpx;
+  color: #FFC107;
+  font-weight: 600;
+}
+
+.sp-spec-product-stock {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.sp-spec-stock-label {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.sp-spec-stock-value {
+  font-size: 24rpx;
+  color: #2C2C2C;
+  font-weight: 500;
+}
+
+.sp-spec-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.sp-spec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.sp-spec-name {
+  font-size: 26rpx;
+  color: #666666;
+  font-weight: 500;
+}
+
+.sp-spec-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.sp-spec-value {
+  padding: 16rpx 28rpx;
+  background: #F5F5F5;
+  color: #666666;
+  font-size: 24rpx;
+  border-radius: 8rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.3s ease;
+}
+
+.sp-spec-value.active {
+  background: #FFC107;
+  color: #FFFFFF;
+  border-color: #FFC107;
+}
+
+.sp-spec-value:active {
+  transform: scale(0.95);
+}
+
+.sp-spec-quantity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx;
+  background: #F5F5F5;
+  border-radius: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.sp-spec-quantity-label {
+  font-size: 26rpx;
+  color: #666666;
+  font-weight: 500;
+}
+
+.sp-spec-quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.sp-spec-quantity-btn {
+  width: 64rpx;
+  height: 64rpx;
+  background: #FFFFFF;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid #E0E0E0;
+  transition: all 0.3s ease;
+}
+
+.sp-spec-quantity-btn.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.sp-spec-quantity-btn:active {
+  transform: scale(0.95);
+  background: #F5F5F5;
+}
+
+.sp-spec-quantity-icon {
+  font-size: 32rpx;
+  color: #2C2C2C;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.sp-spec-quantity-value {
+  min-width: 80rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: #2C2C2C;
+  font-weight: 600;
+}
+
+.sp-spec-selector-footer {
+  padding: 24rpx 32rpx;
+  border-top: 1rpx solid #F5F5F5;
+  background: #FFFFFF;
+}
+
+.sp-spec-total {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+  margin-bottom: 24rpx;
+}
+
+.sp-spec-total-label {
+  font-size: 26rpx;
+  color: #666666;
+}
+
+.sp-spec-total-price {
+  font-size: 36rpx;
+  color: #FFC107;
+  font-weight: 600;
+}
+
+.sp-spec-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.sp-spec-btn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.sp-spec-btn:active {
+  transform: scale(0.98);
+}
+
+.sp-spec-btn-secondary {
+  background: #F5F5F5;
+}
+
+.sp-spec-btn-secondary:active {
+  background: #E8E8E8;
+}
+
+.sp-spec-btn-primary {
+  background: linear-gradient(135deg, #FFC107 0%, #FFB300 100%);
+  box-shadow: 0 4rpx 12rpx rgba(255, 193, 7, 0.2);
+}
+
+.sp-spec-btn-primary:active {
+  box-shadow: 0 2rpx 6rpx rgba(255, 193, 7, 0.15);
+}
+
+.sp-spec-btn-text {
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.sp-spec-btn-primary .sp-spec-btn-text {
+  color: #FFFFFF;
+}

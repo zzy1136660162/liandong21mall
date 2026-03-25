@@ -1,0 +1,83 @@
+<view class="sp-spec-selector-mask" wx:if="{{show}}" bindtap="onClose">
+  <view class="sp-spec-selector-container" catchtap="stopPropagation">
+    <view class="sp-spec-selector-header">
+      <text class="sp-spec-selector-title">选择规格</text>
+      <view class="sp-spec-selector-close" bindtap="onClose">
+        <text class="sp-spec-selector-close-icon">×</text>
+      </view>
+    </view>
+
+    <scroll-view class="sp-spec-selector-content" scroll-y="{{true}}">
+      <view class="sp-spec-product-info">
+        <image class="sp-spec-product-image" src="{{product.mainImage}}" mode="aspectFill" />
+        <view class="sp-spec-product-details">
+          <view class="sp-spec-product-price">
+            <text class="sp-spec-price-symbol">¥</text>
+            <text class="sp-spec-price-value">{{selectedPrice}}</text>
+          </view>
+          <view class="sp-spec-product-stock">
+            <text class="sp-spec-stock-label">库存:</text>
+            <text class="sp-spec-stock-value">{{selectedStock}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="sp-spec-list">
+        <view 
+          wx:for="{{product.specs}}" 
+          wx:key="name"
+          class="sp-spec-item"
+        >
+          <view class="sp-spec-name">{{item.name}}</view>
+          <view class="sp-spec-values">
+            <view 
+              wx:for="{{item.values}}" 
+              wx:for-item="value"
+              wx:key="value"
+              class="sp-spec-value {{selectedSpecs[item.name] === value ? 'active' : ''}}"
+              bindtap="onSelectSpec"
+              data-name="{{item.name}}"
+              data-value="{{value}}"
+            >
+              {{value}}
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="sp-spec-quantity">
+        <text class="sp-spec-quantity-label">购买数量</text>
+        <view class="sp-spec-quantity-controls">
+          <view 
+            class="sp-spec-quantity-btn {{quantity <= 1 ? 'disabled' : ''}}"
+            bindtap="onDecrease"
+          >
+            <text class="sp-spec-quantity-icon">-</text>
+          </view>
+          <view class="sp-spec-quantity-value">{{quantity}}</view>
+          <view 
+            class="sp-spec-quantity-btn {{quantity >= selectedStock ? 'disabled' : ''}}"
+            bindtap="onIncrease"
+          >
+            <text class="sp-spec-quantity-icon">+</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="sp-spec-selector-footer">
+      <view class="sp-spec-total">
+        <text class="sp-spec-total-label">合计:</text>
+        <text class="sp-spec-total-price">¥{{totalPrice}}</text>
+      </view>
+      <view class="sp-spec-actions">
+        <view class="sp-spec-btn sp-spec-btn-secondary" bindtap="onAddToCart">
+          <text class="sp-spec-btn-text">加入购物车</text>
+        </view>
+        <view class="sp-spec-btn sp-spec-btn-primary" bindtap="onBuyNow">
+          <text class="sp-spec-btn-text">立即购买</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
