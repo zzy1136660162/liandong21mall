@@ -58,6 +58,7 @@ def category_delete(category_id):
 
 
 @blueprint.route('/product')
+@blueprint.route('/list')
 def product_list():
     """商品列表页"""
     page = request.args.get('page', 1, type=int)

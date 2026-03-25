@@ -61,61 +61,89 @@ class SampleListAPI(Resource):
 class SampleApplyAPI(Resource):
     """提交样品申请 - POST /api/sample/samples/apply"""
     def post(self):
-        data = request.get_json()
-        
-        product_ids = data.get('productIds', [])
-        recipient_name = data.get('recipientName')
-        phone = data.get('phone')
-        province = data.get('province', '')
-        city = data.get('city', '')
-        district = data.get('district', '')
-        address = data.get('address')
-        remark = data.get('remark', '')
-        
-        if not product_ids:
-            return {'code': 400, 'message': '请选择申请的商品'}, 400
-        if not recipient_name or not phone or not address:
-            return {'code': 400, 'message': '请填写完整的收货信息'}, 400
-        
-        full_address = f'{province}{city}{district}{address}'
-        
-        apply_list = []
-        for product_id in product_ids[:3]:
-            product = Product.query.get(product_id)
-            if not product:
-                continue
+        try:
+            data = request.get_json()
+            print(f"[DEBUG] 收到申请数据: {data}")
             
-            import time
-            apply_no = f'SA{int(time.time() * 1000)}'
+            product_ids = data.get('productIds', [])
+            recipient_name = data.get('recipientName')
+            phone = data.get('phone')
+            province = data.get('province', '')
+            city = data.get('city', '')
+            district = data.get('district', '')
+            address = data.get('address')
+            remark = data.get('remark', '')
             
-            apply = SampleApply(
-                apply_no=apply_no,
-                user_id=1,
-                user_name=recipient_name,
-                user_phone=phone,
-                product_id=product.id,
-                product_name=product.name,
-                product_image=product.main_image,
-                quantity=1,
-                address=full_address,
-                remark=remark,
-                status=0,
-                ship_status=0
-            )
-            db.session.add(apply)
-            apply_list.append(apply_no)
-        
-        db.session.commit()
-        
-        return {
-            'code': 200,
-            'message': '申请提交成功',
-            'data': {
-                'applicationId': apply_list[0] if apply_list else '',
-                'status': 'pending',
-                'applyTime': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(f"[DEBUG] product_ids: {product_ids}, type: {type(product_ids)}")
+            
+            if not product_ids:
+                return {'code': 400, 'message': '请选择申请的商品'}, 400
+            if not recipient_name or not phone or not address:
+                return {'code': 400, 'message': '请填写完整的收货信息'}, 400
+            
+            full_address = f'{province}{city}{district}{address}'
+            
+            apply_list = []
+            for product_id in product_ids[:3]:
+                print(f"[DEBUG] 处理商品ID: {product_id}, type: {type(product_id)}")
+                try:
+                    # 转换product_id为整数
+                    product_id_int = int(product_id)
+                    product = Product.query.get(product_id_int)
+                    print(f"[DEBUG] 查询商品结果: {product}")
+                    
+                    if not product:
+                        print(f"[DEBUG] 商品 {product_id} 不存在")
+                        continue
+                    
+                    import time
+                    apply_no = f'SA{int(time.time() * 1000)}'
+                    
+                    apply = SampleApply(
+                        apply_no=apply_no,
+                        user_id=1,
+                        user_name=recipient_name,
+                        user_phone=phone,
+                        product_id=product.id,
+                        product_name=product.product_name,
+                        product_image=product.main_image,
+                        quantity=1,
+                        address=full_address,
+                        remark=remark,
+                        status=0,
+                        ship_status=0
+                    )
+                    db.session.add(apply)
+                    apply_list.append(apply_no)
+                    print(f"[DEBUG] 成功添加申请: {apply_no}")
+                except Exception as e:
+                    print(f"[ERROR] 处理商品 {product_id} 时出错: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    continue
+            
+            if not apply_list:
+                print("[DEBUG] 没有成功创建任何申请")
+                return {'code': 400, 'message': '所选商品不存在或无法申请'}, 400
+            
+            db.session.commit()
+            print(f"[DEBUG] 提交成功，申请单号: {apply_list}")
+            
+            return {
+                'code': 200,
+                'message': '申请提交成功',
+                'data': {
+                    'applicationId': apply_list[0] if apply_list else '',
+                    'status': 'pending',
+                    'applyTime': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                }
             }
-        }
+        except Exception as e:
+            print(f"[ERROR] 申请处理异常: {e}")
+            import traceback
+            traceback.print_exc()
+            db.session.rollback()
+            return {'code': 500, 'message': f'服务器错误: {str(e)}'}, 500
 
 
 @api.route('/<string:apply_no>')
@@ -160,10 +188,40 @@ class SampleReceiveAPI(Resource):
 
 
 @api.route('/apply/list')
-class SampleApplyDetail(Resource):
-    def get(self, id):
-        apply = SampleApply.query.get_or_404(id)
-        return {'code': 200, 'message': 'success', 'data': apply.to_dict()}
+class SampleApplyList(Resource):
+    def get(self):
+        page = request.args.get('page', 1, type=int)
+        page_size = request.args.get('page_size', 10, type=int)
+        keyword = request.args.get('keyword', '')
+        user_name = request.args.get('user_name', '')
+        product_name = request.args.get('product_name', '')
+        status = request.args.get('status', '')
+        
+        query = SampleApply.query
+        
+        if keyword:
+            query = query.filter(SampleApply.apply_no.like(f'%{keyword}%'))
+        if user_name:
+            query = query.filter(SampleApply.user_name.like(f'%{user_name}%'))
+        if product_name:
+            query = query.filter(SampleApply.product_name.like(f'%{product_name}%'))
+        if status:
+            query = query.filter(SampleApply.status == int(status))
+        
+        pagination = query.order_by(SampleApply.created_at.desc()).paginate(
+            page=page, per_page=page_size, error_out=False
+        )
+        
+        return {
+            'code': 200,
+            'message': 'success',
+            'data': {
+                'list': [p.to_dict() for p in pagination.items],
+                'total': pagination.total,
+                'page': page,
+                'page_size': page_size
+            }
+        }
 
 
 @api.route('/review')

@@ -22,7 +22,7 @@ def register_extensions(app):
 
 
 def register_blueprints(app):
-    for module_name in ('authentication', 'home', 'member', 'demand', 'demand_admin', 'product'):
+    for module_name in ('authentication', 'home', 'member', 'demand', 'demand_admin', 'product', 'sample'):
         module = import_module('apps.{}.routes'.format(module_name))
         if hasattr(module, 'blueprint'):
             app.register_blueprint(module.blueprint)
@@ -71,6 +71,9 @@ def register_api(app):
     api.add_namespace(sp_cart_ns, path='/api/sp/cart')
     api.add_namespace(sp_order_ns, path='/api/sp/order')
     api.add_namespace(sp_address_ns, path='/api/sp/address')
+
+    from apps.sample.api import api as sample_api
+    api.add_namespace(sample_api, path='/api/samples')
 
 
 def configure_database(app):

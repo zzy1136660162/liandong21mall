@@ -1,3 +1,5 @@
+const productService = require('../../services/productService');
+
 Page({
   data: {
     product: {
@@ -64,23 +66,41 @@ Page({
   },
 
   // 加载商品详情
-  loadProductDetail(productId) {
-    // 模拟加载商品数据
-    // 实际项目中这里应该是 wx.request 调用接口
-    console.log('加载商品详情:', productId);
-    
-    // 根据ID生成不同的数据
-    const randomNum = parseInt(productId) || 1;
-    this.setData({
-      'product.id': productId,
-      'product.images': [
-        `https://picsum.photos/750/750?random=${randomNum}`,
-        `https://picsum.photos/750/750?random=${randomNum + 100}`,
-        `https://picsum.photos/750/750?random=${randomNum + 200}`
-      ],
-      'product.shopLogo': `https://picsum.photos/80/80?random=${randomNum + 300}`,
-      'product.tuanzhangAvatar': `https://picsum.photos/80/80?random=${randomNum + 400}`
-    });
+  async loadProductDetail(productId) {
+    wx.showLoading({ title: '加载中...' });
+    try {
+      const res = await productService.getProductDetail(productId);
+      console.log('商品详情返回:', res);
+      
+      let data = null;
+      if (res.code === 200 && res.data) {
+        data = res.data;
+      } else if (res.id) {
+        data = res;
+      }
+      
+      if (data) {
+        this.setData({
+          'product.id': data.id || productId,
+          'product.title': data.name || data.product_name || '未知商品',
+          'product.price': data.price || '0',
+          'product.originalPrice': data.originalPrice || data.original_price || '',
+          'product.commissionRate': data.commissionRate || data.commission_rate || 0,
+          'product.commissionAmount': data.commissionAmount || data.commission_amount || '0',
+          'product.images': data.images || [data.main_image || data.image || '/images/default.png'],
+          'product.shopName': data.shopName || data.shop_name || '店铺',
+          'product.shopLogo': data.shopLogo || '/images/default-shop.png',
+          'product.sales': data.sales || '0',
+          'product.goodRate': data.goodRate || '98',
+          'product.stock': data.stock || '99',
+          'product.location': data.location || '未知'
+        });
+      }
+    } catch (error) {
+      console.error('加载商品详情失败:', error);
+    } finally {
+      wx.hideLoading();
+    }
   },
 
   // 返回上一页

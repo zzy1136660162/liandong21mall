@@ -24,7 +24,7 @@
       "list": [
         {
           "name": "选品首页",
-          "pathName": "pages/chat/chat",
+          "pathName": "pages/xuanpinindex/xuanpinindex",
           "query": "",
           "scene": null,
           "launchMode": "default"

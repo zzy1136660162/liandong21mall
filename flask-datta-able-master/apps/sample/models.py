@@ -11,7 +11,7 @@ class SampleApply(db.Model):
     """样品申请"""
     __tablename__ = 'xp_sample_apply'
 
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     apply_no = db.Column(db.String(50), unique=True, nullable=False)
     user_id = db.Column(db.BigInteger, nullable=False)
     user_name = db.Column(db.String(50))

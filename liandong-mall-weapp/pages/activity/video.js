@@ -1,3 +1,5 @@
+const productService = require('../../services/productService');
+
 Page({
   data: {
     statusBarHeight: 88,
@@ -10,14 +12,29 @@ Page({
     this.setData({ statusBarHeight: (systemInfo.statusBarHeight || 20) * 2 });
     this.loadProducts();
   },
-  loadProducts() {
-    const products = [
-      { id: 'video_1', image: 'https://picsum.photos/400/400?random=20', title: '【视频同款】网红爆款空气炸锅专用纸', price: '9.9', commission: '2.97', rate: '30%', sales: '月销5.2万件', playCount: '128万', duration: '00:32', authorAvatar: 'https://picsum.photos/50/50?random=1', authorName: '美食达人小王' },
-      { id: 'video_2', image: 'https://picsum.photos/400/400?random=21', title: '【视频实测】多功能厨房剪刀不锈钢', price: '15.9', commission: '4.77', rate: '30%', sales: '月销3.8万件', playCount: '96万', duration: '00:45', authorAvatar: 'https://picsum.photos/50/50?random=2', authorName: '生活小妙招' },
-      { id: 'video_3', image: 'https://picsum.photos/400/400?random=22', title: '【视频推荐】便携式榨汁杯充电式', price: '49.9', commission: '12.47', rate: '25%', sales: '月销2.1万件', playCount: '85万', duration: '01:12', authorAvatar: 'https://picsum.photos/50/50?random=3', authorName: '健康生活家' },
-      { id: 'video_4', image: 'https://picsum.photos/400/400?random=23', title: '【视频爆款】懒人拖把免手洗平板拖', price: '29.9', commission: '7.47', rate: '25%', sales: '月销4.5万件', playCount: '152万', duration: '00:58', authorAvatar: 'https://picsum.photos/50/50?random=4', authorName: '家居好物推荐' }
-    ];
-    this.setData({ products });
+  async loadProducts() {
+    wx.showLoading({ title: '加载中...' });
+    try {
+      const res = await productService.getProducts({ page: 1, pageSize: 20 });
+      const products = (res.list || res || []).map(item => ({
+        id: item.id,
+        image: item.image || item.main_image || '/images/default.png',
+        title: item.name || item.title || '未知商品',
+        price: item.price || '0',
+        commission: item.commissionAmount || '0',
+        rate: (item.commissionRate || 0) + '%',
+        sales: item.monthlySales || '0',
+        playCount: '0',
+        duration: '00:30',
+        authorAvatar: '/images/default-avatar.png',
+        authorName: '达人推荐'
+      }));
+      this.setData({ products });
+    } catch (error) {
+      console.error('加载商品失败:', error);
+    } finally {
+      wx.hideLoading();
+    }
   },
   switchFilter(e) { this.setData({ currentFilter: e.currentTarget.dataset.filter }); },
   goBack() { wx.navigateBack(); },
