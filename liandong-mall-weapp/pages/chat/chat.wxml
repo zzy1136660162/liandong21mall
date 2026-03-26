@@ -22,6 +22,7 @@
       <!-- 客服头像 -->
       <view wx:if="{{item.type === 'agent' || item.type === 'system'}}"
              class="avatar avatar-service">
+        <text class="avatar-text">客</text>
       </view>
 
       <view class="message-content">

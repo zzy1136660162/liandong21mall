@@ -77,9 +77,7 @@ Page({
   // 添加消息到列表
   addMessage(message) {
     log('添加消息', message);
-    
-    // 创建新数组，避免直接修改原数组
-    const messages = [...this.data.messages];
+    const messages = this.data.messages;
     
     // 检查是否是重复消息（防止重复添加）
     const lastMessage = messages[messages.length - 1];
