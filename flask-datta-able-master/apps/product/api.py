@@ -3,10 +3,12 @@
 商品商城模块 - REST API
 """
 
-from flask import request
+from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 from apps.product.services import ProductService, CartService, OrderService, ProductFavoriteService
+from apps.product.models import Product
 from apps import db
+from datetime import datetime
 
 api = Namespace('product', description='商品相关API')
 
@@ -402,3 +404,139 @@ class FavoriteCount(Resource):
         user_id = get_current_user_id()
         count = ProductFavoriteService.get_favorite_count(user_id)
         return success_response({'count': count})
+
+
+# ========== 管理员商品API ==========
+
+@api.route('/list/admin')
+class ProductListAdmin(Resource):
+    @api.doc('管理员获取商品列表')
+    def get(self):
+        """管理员获取商品列表（带分页和搜索）"""
+        page = request.args.get('page', 1, type=int)
+        page_size = request.args.get('page_size', 10, type=int)
+        keyword = request.args.get('keyword', '')
+        
+        query = Product.query
+        if keyword:
+            query = query.filter(Product.product_name.like(f'%{keyword}%'))
+        
+        pagination = query.order_by(Product.created_at.desc()).paginate(
+            page=page, per_page=page_size, error_out=False
+        )
+        
+        items = []
+        for p in pagination.items:
+            commission_rate = float(p.commission_rate) if p.commission_rate else 0
+            price = float(p.price) if p.price else 0
+            commission_amount = price * commission_rate / 100 if price else 0
+            items.append({
+                'id': p.id,
+                'name': p.product_name,
+                'productName': p.product_name,
+                'productCode': p.product_code,
+                'price': float(p.price) if p.price else 0,
+                'originalPrice': float(p.original_price) if p.original_price else 0,
+                'stock': p.stock or 0,
+                'sales': p.sales or 0,
+                'status': p.status,
+                'commission_rate': commission_rate,
+                'commissionRate': commission_rate,
+                'commissionAmount': round(commission_amount, 2),
+                'normal_rate': float(p.normal_rate) if p.normal_rate else 20.0,
+                'premium_rate': float(p.premium_rate) if p.premium_rate else 25.0,
+                'top_rate': float(p.top_rate) if p.top_rate else 30.0,
+                'settlement_type': p.settlement_type or 1,
+                'createdAt': p.created_at.strftime('%Y-%m-%d %H:%M:%S') if p.created_at else ''
+            })
+        
+        return {
+            'code': 200,
+            'message': 'success',
+            'data': {
+                'list': items,
+                'total': pagination.total,
+                'page': page,
+                'page_size': page_size
+            }
+        }
+
+
+@api.route('/commission/update/<int:product_id>')
+class CommissionUpdate(Resource):
+    @api.doc('更新商品佣金')
+    def put(self, product_id):
+        """更新单个商品的佣金设置"""
+        data = request.get_json()
+        commission_rate = data.get('commissionRate')
+        commission_amount = data.get('commissionAmount')
+        normal_rate = data.get('normalRate') or data.get('normal_rate')
+        premium_rate = data.get('premiumRate') or data.get('premium_rate')
+        top_rate = data.get('topRate') or data.get('top_rate')
+        settlement_type = data.get('settlementType') or data.get('settlement_type')
+        
+        product = Product.query.get(product_id)
+        if not product:
+            return {'code': 404, 'message': '商品不存在'}, 404
+        
+        if commission_rate is not None:
+            product.commission_rate = commission_rate
+        if commission_amount is not None:
+            product.commission_amount = commission_amount
+        if normal_rate is not None:
+            product.normal_rate = normal_rate
+        if premium_rate is not None:
+            product.premium_rate = premium_rate
+        if top_rate is not None:
+            product.top_rate = top_rate
+        if settlement_type is not None:
+            product.settlement_type = settlement_type
+        
+        try:
+            db.session.commit()
+            return {'code': 200, 'message': '更新成功'}
+        except Exception as e:
+            db.session.rollback()
+            return {'code': 500, 'message': str(e)}, 500
+
+
+@api.route('/commission/batch-update')
+class CommissionBatchUpdate(Resource):
+    @api.doc('批量更新商品佣金')
+    def post(self):
+        """批量更新商品佣金"""
+        data = request.get_json()
+        updates = data.get('updates', [])
+        
+        success_count = 0
+        for item in updates:
+            product_id = item.get('id')
+            commission_rate = item.get('commissionRate') or item.get('commission_rate')
+            commission_amount = item.get('commissionAmount') or item.get('commission_amount')
+            normal_rate = item.get('normalRate') or item.get('normal_rate')
+            premium_rate = item.get('premiumRate') or item.get('premium_rate')
+            top_rate = item.get('topRate') or item.get('top_rate')
+            settlement_type = item.get('settlementType') or item.get('settlement_type')
+            
+            product = Product.query.get(product_id)
+            if product:
+                if commission_rate is not None:
+                    product.commission_rate = commission_rate
+                if commission_amount is not None:
+                    product.commission_amount = commission_amount
+                if normal_rate is not None:
+                    product.normal_rate = normal_rate
+                if premium_rate is not None:
+                    product.premium_rate = premium_rate
+                if top_rate is not None:
+                    product.top_rate = top_rate
+                if settlement_type is not None:
+                    product.settlement_type = settlement_type
+                success_count += 1
+        
+        try:
+            db.session.commit()
+            return {'code': 200, 'message': f'成功更新{success_count}个商品'}
+        except Exception as e:
+            db.session.rollback()
+            return {'code': 500, 'message': str(e)}, 500

@@ -40,6 +40,29 @@ def category_add():
         return jsonify({'code': 500, 'message': str(e), 'data': None})
 
 
+@blueprint.route('/category/<int:category_id>')
+def category_detail(category_id):
+    """获取单个分类详情"""
+    category = ProductCategory.query.get(category_id)
+    
+    if not category:
+        return jsonify({'code': 404, 'message': '分类不存在', 'data': None})
+    
+    return jsonify({
+        'code': 200,
+        'message': 'success',
+        'data': {
+            'id': category.id,
+            'categoryName': category.category_name,
+            'categoryCode': category.category_code,
+            'parentId': category.parent_id,
+            'icon': category.icon,
+            'sort': category.sort,
+            'status': category.status
+        }
+    })
+
+
 @blueprint.route('/category/delete/<int:category_id>', methods=['DELETE'])
 def category_delete(category_id):
     """删除商品分类"""
@@ -219,3 +242,10 @@ def order_cancel(order_id):
         return jsonify({'code': 200, 'message': '订单已取消', 'data': order})
     else:
         return jsonify({'code': 500, 'message': message, 'data': None})
+
+
+@blueprint.route('/commission')
+def commission_list():
+    """佣金管理页面"""
+    # 强制刷新模板缓存
+    return render_template('product/commission.html', cache_timeout=0)
