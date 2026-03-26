@@ -147,7 +147,22 @@ function addCategory() {
 }
 
 function editCategory(id) {
-    alert('编辑分类功能待实现');
+    fetch(`/admin/product/category/${id}`)
+        .then(response => response.json())
+        .then(result => {
+            if (result.code === 200) {
+                const cat = result.data;
+                document.getElementById('categoryId').value = cat.id;
+                document.getElementById('categoryName').value = cat.categoryName || cat.name;
+                document.getElementById('categoryCode').value = cat.categoryCode || cat.code;
+                document.getElementById('parentId').value = cat.parentId || cat.parent_id || 0;
+                document.getElementById('sort').value = cat.sort;
+                document.getElementById('status').value = cat.status;
+                $('#categoryModal').modal('show');
+            } else {
+                alert(result.message || '获取分类信息失败');
+            }
+        });
 }
 
 function deleteCategory(id) {
