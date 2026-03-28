@@ -68,9 +68,13 @@ class Product(db.Model):
     
     skus = db.relationship('ProductSku', backref='product', lazy='dynamic', cascade='all, delete-orphan')
     category = db.relationship('ProductCategory', backref='products', lazy='joined')
-    
+
     def __repr__(self):
         return f'<Product {self.product_code}:{self.product_name}>'
+
+    @property
+    def name(self):
+        return self.product_name
     
     def to_dict(self, include_detail=False):
         price = float(self.price)

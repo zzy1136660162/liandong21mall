@@ -53,9 +53,8 @@ Page({
     wx.showLoading({ title: '加载中...' });
 
     wx.request({
-      url: 'http://localhost:5000/api/sp_product_detail/detail',
+      url: 'http://localhost:5000/api/xp_product/' + productId,
       method: 'GET',
-      data: { productId: productId },
       success: (res) => {
         console.log('商品详情数据:', res.data);
         if (res.data.code === 200 && res.data.data) {

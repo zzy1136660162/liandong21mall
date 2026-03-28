@@ -3,6 +3,6 @@
 商品选品模块
 """
 
-from apps.product.api import api
+from apps.xp_product.api import api
 
 __all__ = ['api']

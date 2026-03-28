@@ -9,7 +9,7 @@ from apps.sp_product.sp_product_detail_models import (
     SpProductDetail, SpProductReview, SpProductFavorite,
     SpProductRecommendation, SpProductView
 )
-from apps.xp_product.models import Product
+from apps.product.models import Product
 from datetime import datetime
 
 
@@ -20,25 +20,25 @@ class SpProductDetailService:
     def get_product_detail(product_id, user_id=None):
         """
         获取商品详情（包含扩展信息）
-
+        
         Args:
             product_id: 商品ID
             user_id: 用户ID（可选，用于记录浏览和收藏状态）
-
+        
         Returns:
             dict: 商品详情数据
         """
         product = Product.query.filter_by(id=product_id, status=1).first()
         if not product:
             return None
-
-        product_dict = product.to_dict()
-
-        product_dict['title'] = product_dict['name']
-        product_dict['productName'] = product_dict['name']
-
-        product_dict['subtitle'] = product_dict.get('subtitle', '')
-
+        
+        product_dict = product.to_dict(include_detail=True)
+        
+        product_dict['title'] = product_dict['productName']
+        product_dict['name'] = product_dict['productName']
+        
+        product_dict['subtitle'] = product_dict.get('brief', '')
+        
         original_price = float(product.original_price) if product.original_price else 0
         current_price = float(product.price)
         if original_price > 0:
@@ -46,36 +46,50 @@ class SpProductDetailService:
         else:
             discount = 10.0
         product_dict['discount'] = str(discount)
-
+        
+        product_dict['memberPrice'] = float(product.member_price) if product.member_price else round(current_price * 0.9, 2)
         product_dict['saveAmount'] = round(original_price - current_price, 2) if original_price > 0 else 0
-
+        
         product_dict['stock'] = product.stock if product.stock else 0
         product_dict['sales'] = product.sales if product.sales else 0
-
+        
         review_count = SpProductReview.query.filter_by(
             product_id=product_id,
             is_show=1
         ).count()
         product_dict['reviews'] = review_count
-
+        
         tags = []
         if product.is_hot:
             tags.append('热销')
         if product.is_new:
             tags.append('新品')
-        if product.is_recommend:
-            tags.append('推荐')
-        if product.is_brand:
-            tags.append('品牌')
-        if product.is_cashback:
-            tags.append('单单返现')
-        if product.is_trust:
-            tags.append('信任购')
         product_dict['tags'] = tags
-
+        
+        # 从skus中提取规格信息
         specs_list = []
-        if product.specifications:
-            specs_list = product.specifications
+        if product.skus and product.skus.count() > 0:
+            # 获取所有SKU的规格键
+            spec_keys = set()
+            for sku in product.skus.all():
+                if hasattr(sku, 'spec') and sku.spec:
+                    for key in sku.spec.keys():
+                        spec_keys.add(key)
+            
+            # 为每个规格键创建规格项
+            for key in spec_keys:
+                spec_values = set()
+                for sku in product.skus.all():
+                    if hasattr(sku, 'spec') and sku.spec and key in sku.spec:
+                        spec_values.add(sku.spec[key])
+                
+                if spec_values:
+                    specs_list.append({
+                        'name': key,
+                        'values': list(spec_values)
+                    })
+        
+        # 如果没有规格信息，使用默认值
         if not specs_list:
             specs_list = [
                 {
@@ -83,9 +97,12 @@ class SpProductDetailService:
                     'values': ['默认']
                 }
             ]
-
+        
         product_dict['specs'] = specs_list
-
+        
+        # product_dict['commissionAmount'] = round(current_price * float(product.commission_rate) / 100, 2)
+        # product_dict['commissionRate'] = float(product.commission_rate)
+        
         product_dict['shopName'] = '立白Liby旗舰店'
         product_dict['shopLogo'] = 'https://picsum.photos/80/80?random=10'
         product_dict['shopSales'] = '6860'
@@ -93,10 +110,10 @@ class SpProductDetailService:
         product_dict['productScore'] = '4.96'
         product_dict['logisticsScore'] = '4.74'
         product_dict['serviceScore'] = '4.79'
-
+        
         product_dict['darenCount'] = '4'
         product_dict['location'] = '贵州省黔南布依族苗族自治州'
-
+        
         product_dict['monthSales'] = str(product.sales if product.sales else 0)
         product_dict['monthViews'] = '3166'
         product_dict['monthDaren'] = '1万'
