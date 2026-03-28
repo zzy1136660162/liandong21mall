@@ -145,7 +145,7 @@ Page({
       .then(res => {
         const token = res.token;
         const userInfo = res.userInfo;
-        const userId = res.userId;
+        const userId = res.userId || (userInfo && userInfo.userId);
 
         wx.setStorageSync('token', token);
         wx.setStorageSync('userInfo', userInfo);
@@ -157,28 +157,28 @@ Page({
         });
 
         setTimeout(() => {
-          if (redirect && redirect !== '/pages/login/index') {
-            const url = decodeURIComponent(redirect);
-            if (url.startsWith('/pages')) {
-              const pages = getCurrentPages();
-              const currentPage = pages[pages.length - 1];
-              const redirectPath = url.split('?')[0];
-              
-              let pageExists = false;
-              for (let i = 0; i < pages.length - 1; i++) {
-                if (pages[i].route === redirectPath) {
-                  pageExists = true;
-                  break;
-                }
+          const url = decodeURIComponent(redirect);
+          
+          const tabBarPages = ['/pages/mine/index', '/pages/index/index', '/pages/xuanpinindex/xuanpinindex', '/pages/rd_index/rd_index', '/pages/Product_list_page/Product_list_page'];
+          
+          if (tabBarPages.includes(url)) {
+            wx.switchTab({ url });
+          } else if (url.startsWith('/pages')) {
+            const pages = getCurrentPages();
+            const redirectPath = url.split('?')[0];
+            
+            let pageExists = false;
+            for (let i = 0; i < pages.length - 1; i++) {
+              if (pages[i].route === redirectPath || pages[i].route === redirectPath.slice(1)) {
+                pageExists = true;
+                break;
               }
-              
-              if (pageExists) {
-                wx.navigateBack({ delta: 1 });
-              } else {
-                wx.redirectTo({ url });
-              }
+            }
+            
+            if (pageExists) {
+              wx.navigateBack({ delta: 1 });
             } else {
-              wx.switchTab({ url: '/pages/mine/index' });
+              wx.redirectTo({ url });
             }
           } else {
             wx.switchTab({ url: '/pages/mine/index' });

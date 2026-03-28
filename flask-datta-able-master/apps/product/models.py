@@ -67,6 +67,7 @@ class Product(db.Model):
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now, comment='更新时间')
     
     skus = db.relationship('ProductSku', backref='product', lazy='dynamic', cascade='all, delete-orphan')
+    category = db.relationship('ProductCategory', backref='products', lazy='joined')
     
     def __repr__(self):
         return f'<Product {self.product_code}:{self.product_name}>'

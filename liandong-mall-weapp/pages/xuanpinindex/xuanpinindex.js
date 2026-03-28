@@ -142,17 +142,22 @@ Page({
       }
       
       const res = await productService.getProducts(params);
+      console.log('API返回数据:', res);
+      console.log('商品列表:', res.list);
       
-      const products = res.list.map(item => ({
+      const list = res.list || [];
+      console.log('处理后的列表:', list);
+      
+      const products = list.map(item => ({
         id: item.id,
         image: item.image,
         title: item.name || item.title,
-        price: item.price.toString(),
+        price: typeof item.price === 'number' ? item.price.toString() : item.price,
         originalPrice: item.originalPrice ? item.originalPrice.toString() : '',
         commissionRate: item.commissionRate || 0,
-        commissionAmount: item.commissionAmount ? item.commissionAmount.toString() : '0',
+        commissionAmount: item.commissionAmount ? item.commissionAmount.toString() : (item.commissionRate ? (parseFloat(item.price) * item.commissionRate / 100).toFixed(2) : '0'),
         sales: item.sales || 0,
-        salesText: item.monthlySales ? item.monthlySales.replace('月销', '').replace('件', '') : '0',
+        salesText: item.monthlySales ? item.monthlySales.replace('月销', '').replace('件', '') : (item.sales ? item.sales.toString() : '0'),
         tags: item.tags || [],
         isBrand: item.isBrand || false,
         hasCashback: item.hasCashback || false
@@ -167,41 +172,12 @@ Page({
       });
     } catch (error) {
       console.error('加载商品失败:', error);
-      this.setData({ loading: false });
+      this.setData({ loading: false, products: [], allProducts: [] });
       wx.showToast({
-        title: '加载失败，使用默认数据',
+        title: '加载失败',
         icon: 'none'
       });
-      // 使用默认数据
-      this.loadDefaultProducts();
     }
-  },
-
-  // 加载默认商品数据（当API失败时使用）
-  loadDefaultProducts() {
-    const products = [
-      {
-        id: 1,
-        image: 'https://picsum.photos/400/400?random=1',
-        title: '立白大师香氛洗衣液持久留香护色护衣天然酵素',
-        price: '39.9',
-        originalPrice: '69.9',
-        commissionRate: 20,
-        commissionAmount: '7.98',
-        sales: 120000,
-        salesText: '12万',
-        tag: '爆款',
-        tags: ['正品保障', '7天无理由', '运费险'],
-        shop: '立白官方旗舰店',
-        shopScore: 4.9,
-        location: '广东广州'
-      }
-    ];
-
-    this.setData({
-      products: products,
-      allProducts: products
-    });
   },
 
   // 搜索输入

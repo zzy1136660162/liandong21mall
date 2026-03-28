@@ -1,16 +1,4 @@
 <view class="page">
-  <!-- 状态栏占位 -->
-  <view class="status-bar" style="height: {{statusBarHeight}}rpx;"></view>
-  
-  <!-- 顶部导航栏 -->
-  <view class="nav-bar">
-    <view class="nav-back" bindtap="goBack">
-      <text class="nav-icon">←</text>
-    </view>
-    <view class="nav-title">超级爆品</view>
-    <view class="nav-right"></view>
-  </view>
-
   <!-- 活动Banner -->
   <view class="activity-banner">
     <image class="banner-image" src="https://picsum.photos/750/300?random=100" mode="aspectFill"/>
