@@ -1,6 +1,5 @@
 Page({
   data: {
-    statusBarHeight: 88,
     currentFilter: 'all',
     stats: {
       followerCount: '12.5万',
@@ -12,19 +11,10 @@ Page({
   },
 
   onLoad() {
-    // 获取系统状态栏高度
-    const systemInfo = wx.getSystemInfoSync();
-    const statusBarHeight = systemInfo.statusBarHeight || 20;
-    
-    this.setData({
-      statusBarHeight: statusBarHeight * 2
-    });
-    
     this.loadTalents();
     this.loadProducts();
   },
 
-  // 加载达人数据
   loadTalents() {
     const talents = [
       {
@@ -72,7 +62,6 @@ Page({
     this.setData({ talents });
   },
 
-  // 加载商品数据
   loadProducts() {
     const products = [
       {
@@ -142,13 +131,11 @@ Page({
     this.setData({ products });
   },
 
-  // 切换筛选
   switchFilter(e) {
     const filter = e.currentTarget.dataset.filter;
     this.setData({ currentFilter: filter });
   },
 
-  // 关注达人
   followTalent(e) {
     const id = e.currentTarget.dataset.id;
     const talents = this.data.talents.map(t => {
@@ -158,32 +145,15 @@ Page({
       return t;
     });
     this.setData({ talents });
-    
-    wx.showToast({
-      title: '操作成功',
-      icon: 'success'
-    });
+    wx.showToast({ title: '操作成功', icon: 'success' });
   },
 
-  // 返回
-  goBack() {
-    wx.navigateBack();
-  },
-
-  // 去商品详情
   goToProductDetail(e) {
     const id = e.currentTarget.dataset.id;
-    wx.navigateTo({
-      url: '/pages/product-detail/product-detail?id=' + id
-    });
+    wx.navigateTo({ url: '/pages/product-detail/product-detail?id=' + id });
   },
 
-  // 加入货架
   addToShelf(e) {
-    const id = e.currentTarget.dataset.id;
-    wx.showToast({
-      title: '已加入货架',
-      icon: 'success'
-    });
+    wx.showToast({ title: '已加入货架', icon: 'success' });
   }
 });

@@ -2,15 +2,12 @@ const productService = require('../../services/productService');
 
 Page({
   data: {
-    statusBarHeight: 88,
     currentFilter: 'all',
     currentPrice: 'all',
     stats: { productCount: '12.8万', avgPrice: '¥15.9', avgCommission: '25' },
     products: []
   },
   onLoad() {
-    const systemInfo = wx.getSystemInfoSync();
-    this.setData({ statusBarHeight: (systemInfo.statusBarHeight || 20) * 2 });
     this.loadProducts();
   },
   async loadProducts() {
@@ -39,7 +36,6 @@ Page({
   },
   switchFilter(e) { this.setData({ currentFilter: e.currentTarget.dataset.filter }); },
   switchPrice(e) { this.setData({ currentPrice: e.currentTarget.dataset.price }); },
-  goBack() { wx.navigateBack(); },
   goToProductDetail(e) { wx.navigateTo({ url: '/pages/product-detail/product-detail?id=' + e.currentTarget.dataset.id }); },
   addToShelf(e) { wx.showToast({ title: '已加入货架', icon: 'success' }); }
 });
