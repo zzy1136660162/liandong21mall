@@ -1,0 +1,92 @@
+<view class="container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-wrapper">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="搜索人才姓名、专长..."
+        value="{{searchKeyword}}"
+        bindconfirm="onSearchConfirm"
+        bindinput="onSearch"
+      />
+      <text class="clear-btn" wx:if="{{searchKeyword}}" bindtap="clearSearch">✕</text>
+    </view>
+  </view>
+
+  <!-- 领域筛选 -->
+  <view class="filter-bar">
+    <scroll-view class="filter-scroll" scroll-x="true">
+      <view
+        class="filter-item {{currentArea === '' ? 'active' : ''}}"
+        bindtap="filterByArea"
+        data-area=""
+      >
+        全部
+      </view>
+      <view
+        class="filter-item {{currentArea === item ? 'active' : ''}}"
+        wx:for="{{areas}}"
+        wx:key="index"
+        bindtap="filterByArea"
+        data-area="{{item}}"
+      >
+        {{item}}
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 人才列表 -->
+  <view class="talent-list" wx:if="{{talentList.length > 0}}">
+    <view
+      class="talent-card"
+      wx:for="{{talentList}}"
+      wx:key="id"
+      bindtap="goToDetail"
+      data-id="{{item.id}}"
+    >
+      <view class="card-left">
+        <image class="talent-avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+      </view>
+      <view class="card-right">
+        <view class="card-header">
+          <text class="talent-name">{{item.name}}</text>
+          <text class="talent-experience">{{item.experienceYears}}年</text>
+        </view>
+        <view class="talent-title">{{item.title}}</view>
+        <view class="talent-region" wx:if="{{item.region}}">
+          <text class="region-icon">📍</text>
+          <text class="region-text">{{item.region}}</text>
+        </view>
+        <view class="talent-tags">
+          <text class="tag" wx:for="{{item.expertiseAreas}}" wx:key="index" wx:for-item="tag">{{tag}}</text>
+        </view>
+      </view>
+      <text class="arrow">></text>
+    </view>
+
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{hasMore}}">
+      <text bindtap="loadMore">点击加载更多</text>
+    </view>
+    <view class="no-more" wx:else>
+      <text>没有更多了</text>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && talentList.length === 0}}">
+    <image class="empty-icon" src="/images/empty.png" mode="aspectFit" wx:if="{{false}}"></image>
+    <view class="empty-content">
+      <text class="empty-title">暂无人才信息</text>
+      <text class="empty-desc">敬请期待更多优秀人才加入</text>
+    </view>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading-state" wx:if="{{loading && talentList.length === 0}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+</view>

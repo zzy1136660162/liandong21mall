@@ -78,6 +78,9 @@ def register_api(app):
     from apps.sample.api import api as sample_api
     api.add_namespace(sample_api, path='/api/samples')
 
+    from apps.talent_pool.api import api as talent_pool_api
+    api.add_namespace(talent_pool_api, path='/api/talent_pool')
+
 
 def configure_database(app):
     initialized = False

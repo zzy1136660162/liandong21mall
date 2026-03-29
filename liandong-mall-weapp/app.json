@@ -31,6 +31,8 @@
     "pages/demandList/demandList",
     "pages/demandDetail/demandDetail",
     "pages/demandProgress/demandProgress",
+    "pages/talent_pool/index/index",
+    "pages/talent_pool/detail/detail",
     "pages/chat/chat",
     "pages/sp_Details/sp_Details",
     "pages/sp_Cart_page/sp_Cart_page",
