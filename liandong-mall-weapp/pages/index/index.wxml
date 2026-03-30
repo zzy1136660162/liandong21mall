@@ -22,4 +22,11 @@
     limit="6"
     showMore="{{true}}"
   />
+
+  <!-- 研发人才库组件 -->
+  <home-talent-pool 
+    title="研发人才库"
+    limit="3"
+    showMore="{{true}}"
+  />
 </view>
