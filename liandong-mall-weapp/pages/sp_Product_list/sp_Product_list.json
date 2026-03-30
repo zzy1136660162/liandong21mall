@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "sp-searchbar": "/components/sp_SearchBar/sp_SearchBar"
+  },
+  "navigationBarTitleText": "商品列表",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
+}

@@ -1,0 +1,136 @@
+<view class="sp-mall">
+  <!-- 搜索框 -->
+  <view class="search-bar" bindtap="goToSearch">
+    <view class="search-box">
+      <icon type="search" size="16" color="#999"/>
+      <text class="search-text">搜索商品</text>
+    </view>
+  </view>
+
+  <!-- 内容区域 -->
+  <scroll-view 
+    class="content"
+    scroll-y="{{true}}"
+    refresher-enabled="{{true}}"
+    bindrefresherrefresh="loadData"
+  >
+    <!-- 加载状态 -->
+    <view class="loading" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+
+    <!-- 商品区域 -->
+    <view class="product-section" wx:if="{{!loading}}">
+      <!-- 热销商品 -->
+      <view class="section" wx:if="{{hotProducts.length > 0}}">
+        <view class="section-header">
+          <text class="section-title">🔥 热销爆款</text>
+          <view class="more-btn" bindtap="goToProductList" data-type="hot">
+            <text>查看更多</text>
+            <text class="arrow">></text>
+          </view>
+        </view>
+        <scroll-view class="product-scroll" scroll-x="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
+          <view class="product-row">
+            <view
+              class="product-card"
+              wx:for="{{hotProducts}}"
+              wx:key="productId"
+              bindtap="goToDetail"
+              data-id="{{item.productId || item.id}}"
+            >
+              <view class="card-image">
+                <image src="{{item.mainImage || item.image}}" mode="aspectFill" lazy-load="{{true}}"/>
+                <view class="hot-tag">热销</view>
+              </view>
+              <view class="card-info">
+                <text class="product-name">{{item.productName || item.name}}</text>
+                <view class="price-row">
+                  <text class="price">¥{{item.memberPrice || item.price}}</text>
+                </view>
+                <view class="add-btn" catchtap="addToCart" data-id="{{item.productId || item.id}}">+</view>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+
+      <!-- 新品上市 -->
+      <view class="section" wx:if="{{newProducts.length > 0}}">
+        <view class="section-header">
+          <text class="section-title">✨ 新品上市</text>
+          <view class="more-btn" bindtap="goToProductList" data-type="new">
+            <text>查看更多</text>
+            <text class="arrow">></text>
+          </view>
+        </view>
+        <scroll-view class="product-scroll" scroll-x="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
+          <view class="product-row">
+            <view
+              class="product-card"
+              wx:for="{{newProducts}}"
+              wx:key="productId"
+              bindtap="goToDetail"
+              data-id="{{item.productId || item.id}}"
+            >
+              <view class="card-image">
+                <image src="{{item.mainImage || item.image}}" mode="aspectFill" lazy-load="{{true}}"/>
+                <view class="new-tag">新品</view>
+              </view>
+              <view class="card-info">
+                <text class="product-name">{{item.productName || item.name}}</text>
+                <view class="price-row">
+                  <text class="price">¥{{item.memberPrice || item.price}}</text>
+                </view>
+                <view class="add-btn" catchtap="addToCart" data-id="{{item.productId || item.id}}">+</view>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+
+      <!-- 推荐商品 -->
+      <view class="section" wx:if="{{recommendProducts.length > 0}}">
+        <view class="section-header">
+          <text class="section-title">💝 为你推荐</text>
+          <view class="more-btn" bindtap="goToProductList" data-type="recommend">
+            <text>查看更多</text>
+            <text class="arrow">></text>
+          </view>
+        </view>
+        <scroll-view class="product-scroll" scroll-x="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
+          <view class="product-row">
+            <view
+              class="product-card"
+              wx:for="{{recommendProducts}}"
+              wx:key="productId"
+              bindtap="goToDetail"
+              data-id="{{item.productId || item.id}}"
+            >
+              <view class="card-image">
+                <image src="{{item.mainImage || item.image}}" mode="aspectFill" lazy-load="{{true}}"/>
+              </view>
+              <view class="card-info">
+                <text class="product-name">{{item.productName || item.name}}</text>
+                <view class="price-row">
+                  <text class="price">¥{{item.memberPrice || item.price}}</text>
+                </view>
+                <view class="add-btn" catchtap="addToCart" data-id="{{item.productId || item.id}}">+</view>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 购物车悬浮按钮 -->
+  <view class="cart-float" bindtap="goToCart" wx:if="{{cartCount > 0}}">
+    <view class="cart-icon-wrapper">
+      <text class="cart-icon">🛒</text>
+      <view class="cart-badge">
+        <text>{{cartCount > 99 ? '99+' : cartCount}}</text>
+      </view>
+    </view>
+  </view>
+</view>

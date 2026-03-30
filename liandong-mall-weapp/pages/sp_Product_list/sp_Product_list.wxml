@@ -1,0 +1,114 @@
+<view class="sp-product-list">
+  <!-- 搜索组件 -->
+  <sp-searchbar
+    placeholder="搜索商品"
+    historyKey="spProductSearchHistory"
+    bind:searchtap="onSearch"
+    bind:confirm="onSearchConfirm"
+  />
+
+  <!-- 分类选择 -->
+  <scroll-view class="category-scroll" scroll-x="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
+    <view class="category-list">
+      <view
+        wx:for="{{categories}}"
+        wx:key="id"
+        class="category-item {{currentCategoryId === item.id ? 'active' : ''}}"
+        bindtap="onCategoryChange"
+        data-id="{{item.id}}"
+      >
+        <text class="category-name">{{item.name}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 筛选排序 -->
+  <view class="filter-bar">
+    <view class="filter-list">
+      <view
+        wx:for="{{filters}}"
+        wx:key="id"
+        class="filter-item {{currentFilterId === item.id ? 'active' : ''}}"
+        bindtap="onFilterChange"
+        data-id="{{item.id}}"
+      >
+        <text>{{item.name}}</text>
+        <text class="filter-arrow" wx:if="{{currentFilterId === item.id}}">↓</text>
+      </view>
+    </view>
+    <view class="filter-right">
+      <text class="product-count">共{{products.length}}件商品</text>
+    </view>
+  </view>
+
+  <!-- 商品列表 -->
+  <scroll-view
+    class="product-scroll"
+    scroll-y="{{true}}"
+    bindscrolltolower="onScrollToLower"
+    enable-back-to-top="{{true}}"
+  >
+    <!-- 商品网格 -->
+    <view class="product-grid" wx:if="{{products.length > 0}}">
+      <view
+        wx:for="{{products}}"
+        wx:key="productId"
+        class="product-card"
+        bindtap="goToDetail"
+        data-id="{{item.productId || item.id}}"
+      >
+        <view class="product-image-wrapper">
+          <image
+            class="product-image"
+            src="{{item.mainImage || item.image}}"
+            mode="aspectFill"
+            lazy-load="{{true}}"
+          />
+          <view class="product-tag" wx:if="{{item.isNew || item.isHot}}">
+            <text wx:if="{{item.isNew}}">新品</text>
+            <text wx:if="{{item.isHot}}">热销</text>
+          </view>
+        </view>
+        <view class="product-info">
+          <text class="product-name">{{item.productName || item.name}}</text>
+          <view class="product-price-row">
+            <text class="product-price">¥{{item.memberPrice || item.price}}</text>
+            <text class="product-original-price" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+          </view>
+          <view class="product-bottom">
+            <text class="product-sales">已售{{item.sales || 0}}</text>
+            <view class="add-cart-btn" catchtap="addToCart" data-id="{{item.productId || item.id}}">
+              <text>加入购物车</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 加载状态 -->
+    <view class="loading-state" wx:if="{{loading && products.length > 0}}">
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!loading && products.length === 0}}">
+      <text class="empty-text">暂无商品</text>
+    </view>
+
+    <!-- 没有更多 -->
+    <view class="no-more-state" wx:if="{{!hasMore && products.length > 0}}">
+      <text class="no-more-text">没有更多了</text>
+    </view>
+  </scroll-view>
+
+  <!-- 底部购物车入口 -->
+  <view class="cart-tab" bindtap="goToCart">
+    <view class="cart-icon-wrapper">
+      <text class="cart-icon">🛒</text>
+      <view class="cart-badge" wx:if="{{cartCount > 0}}">
+        <text>{{cartCount > 99 ? '99+' : cartCount}}</text>
+      </view>
+    </view>
+    <text class="cart-text">购物车</text>
+  </view>
+</view>

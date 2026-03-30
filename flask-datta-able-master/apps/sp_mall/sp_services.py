@@ -154,13 +154,47 @@ class SpProductService:
     def get_hot_products(limit=10):
         """获取热销商品"""
         products = SpProduct.query.filter_by(status=1, is_hot=1).order_by(SpProduct.sales.desc()).limit(limit).all()
-        return [product.to_dict() for product in products]
+        result = []
+        for product in products:
+            result.append({
+                'productId': product.id,
+                'id': product.id,
+                'productName': product.product_name,
+                'name': product.product_name,
+                'mainImage': product.main_image,
+                'image': product.main_image,
+                'price': float(product.price),
+                'originalPrice': float(product.original_price) if product.original_price else None,
+                'memberPrice': float(product.member_price) if product.member_price else float(product.price),
+                'stock': product.stock,
+                'sales': product.sales,
+                'isHot': product.is_hot == 1,
+                'isNew': product.is_new == 1
+            })
+        return result
     
     @staticmethod
     def get_new_products(limit=10):
         """获取新品商品"""
         products = SpProduct.query.filter_by(status=1, is_new=1).order_by(SpProduct.created_at.desc()).limit(limit).all()
-        return [product.to_dict() for product in products]
+        result = []
+        for product in products:
+            result.append({
+                'productId': product.id,
+                'id': product.id,
+                'productName': product.product_name,
+                'name': product.product_name,
+                'mainImage': product.main_image,
+                'image': product.main_image,
+                'price': float(product.price),
+                'originalPrice': float(product.original_price) if product.original_price else None,
+                'memberPrice': float(product.member_price) if product.member_price else float(product.price),
+                'stock': product.stock,
+                'sales': product.sales,
+                'isHot': product.is_hot == 1,
+                'isNew': product.is_new == 1
+            })
+        return result
     
     @staticmethod
     def get_recommend_products(limit=10):
@@ -169,10 +203,19 @@ class SpProductService:
         result = []
         for product in products:
             result.append({
+                'productId': product.id,
                 'id': product.id,
+                'productName': product.product_name,
                 'name': product.product_name,
+                'mainImage': product.main_image,
                 'image': product.main_image,
-                'price': float(product.price)
+                'price': float(product.price),
+                'originalPrice': float(product.original_price) if product.original_price else None,
+                'memberPrice': float(product.member_price) if product.member_price else float(product.price),
+                'stock': product.stock,
+                'sales': product.sales,
+                'isHot': product.is_hot == 1,
+                'isNew': product.is_new == 1
             })
         return result
     
@@ -351,6 +394,7 @@ class SpOrderService:
                 'sku_id': item.get('skuId'),
                 'product_name': product.product_name,
                 'sku_name': sku.sku_name if sku else None,
+                'specs': sku.sku_name if sku else item.get('specs', ''),
                 'product_image': product.main_image,
                 'price': price,
                 'member_price': float(sku.member_price) if sku and sku.member_price else float(product.member_price) if product.member_price else None,
@@ -370,6 +414,7 @@ class SpOrderService:
             total_amount=total_amount,
             discount_amount=0.0,
             pay_amount=pay_amount,
+            final_amount=pay_amount,
             freight_amount=freight_amount,
             receiver_name=address.get('name'),
             receiver_phone=address.get('phone'),
