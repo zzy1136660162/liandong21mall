@@ -111,7 +111,7 @@
 </div>
 {% endblock %}
 
-{% block javascript %}
+{% block javascripts %}
 <script>
 let currentPage = 1;
 let pageSize = 10;
@@ -136,7 +136,7 @@ function loadData(page = 1) {
     const productName = document.getElementById('productName').value;
     const status = document.getElementById('status').value;
 
-    fetch(`/api/samples/apply/list?page=${page}&page_size=${page_size}&keyword=${keyword}&user_name=${userName}&product_name=${productName}&status=${status}`)
+    fetch(`/api/samples/apply/list?page=${page}&page_size=${pageSize}&keyword=${keyword}&user_name=${userName}&product_name=${productName}&status=${status}`)
         .then(response => response.json())
         .then(res => {
             if (res.code === 200) {
@@ -171,7 +171,7 @@ function renderTable(data) {
             <td>${shipStatusMap[item.ship_status]}</td>
             <td>${item.created_at || '-'}</td>
             <td>
-                <button class="btn btn-sm btn-primary" onclick="viewDetail(${item.id})">查看</button>
+                <button class="btn btn-sm btn-primary" onclick="viewDetail('${item.apply_no}')">查看</button>
             </td>
         </tr>
     `).join('');
@@ -202,9 +202,17 @@ function renderPagination(total) {
 }
 
 function viewDetail(id) {
-    fetch(`/api/samples/apply/${id}`)
-        .then(response => response.json())
+    console.log('查看申请详情, ID:', id);
+    fetch(`/api/samples/${id}`)
+        .then(response => {
+            console.log('API 响应状态:', response.status);
+            if (!response.ok) {
+                throw new Error('API 请求失败: ' + response.status);
+            }
+            return response.json();
+        })
         .then(res => {
+            console.log('API 返回数据:', res);
             if (res.code === 200) {
                 const item = res.data;
                 document.getElementById('detailContent').innerHTML = `
@@ -233,7 +241,14 @@ function viewDetail(id) {
                     </div>
                 `;
                 $('#detailModal').modal('show');
+            } else {
+                console.error('API 返回错误:', res.message);
+                alert('获取详情失败: ' + (res.message || '未知错误'));
             }
+        })
+        .catch(err => {
+            console.error('请求出错:', err);
+            alert('请求出错: ' + err.message);
         });
 }
 
@@ -248,4 +263,4 @@ document.getElementById('checkAll').addEventListener('change', function() {
 
 loadData();
 </script>
-{% endblock %}
+{% endblock javascripts %}

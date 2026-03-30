@@ -60,6 +60,9 @@ def register_api(app):
     api.add_namespace(order_ns, path='/api/product/order')
     api.add_namespace(favorite_ns, path='/api/product/favorite')
 
+    from apps.xp_product.api import api as xp_product_api
+    api.add_namespace(xp_product_api, path='/api/xp_product')
+
     from apps.sp_product.sp_product_detail_api import sp_product_detail_ns
     api.add_namespace(sp_product_detail_ns, path='/api/sp_product_detail')
 
@@ -74,6 +77,9 @@ def register_api(app):
 
     from apps.sample.api import api as sample_api
     api.add_namespace(sample_api, path='/api/samples')
+
+    from apps.talent_pool.api import api as talent_pool_api
+    api.add_namespace(talent_pool_api, path='/api/talent_pool')
 
 
 def configure_database(app):

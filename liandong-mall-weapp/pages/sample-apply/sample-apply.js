@@ -37,7 +37,7 @@ Page({
   async loadProductInfo(productId) {
     wx.showLoading({ title: '加载中...' });
     try {
-      const res = await productService.getProductDetail(productId);
+      const res = await productService.getXpProductDetail(productId);
       console.log('商品详情返回:', res);
       
       // 处理不同的返回格式

@@ -2,14 +2,11 @@ const productService = require('../../services/productService');
 
 Page({
   data: {
-    statusBarHeight: 88,
     currentFilter: 'all',
     stats: { videoCount: '8.6万', playCount: '28亿', conversion: '3.2' },
     products: []
   },
   onLoad() {
-    const systemInfo = wx.getSystemInfoSync();
-    this.setData({ statusBarHeight: (systemInfo.statusBarHeight || 20) * 2 });
     this.loadProducts();
   },
   async loadProducts() {
@@ -37,7 +34,6 @@ Page({
     }
   },
   switchFilter(e) { this.setData({ currentFilter: e.currentTarget.dataset.filter }); },
-  goBack() { wx.navigateBack(); },
   goToProductDetail(e) { wx.navigateTo({ url: '/pages/product-detail/product-detail?id=' + e.currentTarget.dataset.id }); },
   addToShelf(e) { wx.showToast({ title: '已加入货架', icon: 'success' }); }
 });

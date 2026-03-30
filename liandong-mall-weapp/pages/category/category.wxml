@@ -14,7 +14,7 @@
   <!-- 主分类标签 -->
   <scroll-view class="main-category-scroll" scroll-x enhanced show-scrollbar="{{false}}">
     <view class="main-category-list">
-      <view class="main-category-item" bindtap="switchMainCategory" data-category="home">
+      <view class="main-category-item" bindtap="goToHome">
         <text class="category-text">首页</text>
       </view>
       <view class="main-category-item {{currentMainCategory === 'spring' ? 'active' : ''}}" bindtap="switchMainCategory" data-category="spring">

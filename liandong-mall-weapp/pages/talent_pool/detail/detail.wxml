@@ -1,0 +1,124 @@
+<view class="container">
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 人才详情 -->
+  <view class="detail-content" wx:if="{{!loading && talentInfo}}">
+    <!-- 头部信息卡片 -->
+    <view class="header-card">
+      <view class="header-bg"></view>
+      <view class="header-info">
+        <image class="avatar" src="{{talentInfo.avatar}}" mode="aspectFill"></image>
+        <view class="info-text">
+          <text class="name">{{talentInfo.name}}</text>
+          <text class="title">{{talentInfo.title}}</text>
+          <view class="region" wx:if="{{talentInfo.region}}">
+            <text class="region-icon">📍</text>
+            <text class="region-text">{{talentInfo.region}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 基本信息 -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-icon">📋</text>
+        <text class="section-title">基本信息</text>
+      </view>
+      <view class="section-body">
+        <view class="info-grid">
+          <view class="info-item">
+            <text class="info-label">从业年限</text>
+            <text class="info-value">{{talentInfo.experienceYears}}年</text>
+          </view>
+          <view class="info-item" wx:if="{{talentInfo.education}}">
+            <text class="info-label">学历</text>
+            <text class="info-value">{{talentInfo.education}}</text>
+          </view>
+        </view>
+        <view class="info-row" wx:if="{{talentInfo.expertiseAreas.length > 0}}">
+          <text class="info-label">专注领域</text>
+          <view class="tag-list">
+            <text class="tag" wx:for="{{talentInfo.expertiseAreas}}" wx:key="index">{{item}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 专业技能 -->
+    <view class="section" wx:if="{{talentInfo.skills.length > 0}}">
+      <view class="section-header">
+        <text class="section-icon">🎯</text>
+        <text class="section-title">专业技能</text>
+      </view>
+      <view class="section-body">
+        <view class="skill-list">
+          <view class="skill-item" wx:for="{{talentInfo.skills}}" wx:key="index">
+            <text class="skill-dot">•</text>
+            <text class="skill-text">{{item}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 个人简介 -->
+    <view class="section" wx:if="{{talentInfo.intro}}">
+      <view class="section-header">
+        <text class="section-icon">💬</text>
+        <text class="section-title">个人简介</text>
+      </view>
+      <view class="section-body">
+        <text class="intro-text">{{talentInfo.intro}}</text>
+      </view>
+    </view>
+
+    <!-- 项目经验 -->
+    <view class="section" wx:if="{{talentInfo.projectExperience.length > 0}}">
+      <view class="section-header">
+        <text class="section-icon">💼</text>
+        <text class="section-title">项目经验</text>
+      </view>
+      <view class="section-body">
+        <view class="project-list">
+          <view class="project-item" wx:for="{{talentInfo.projectExperience}}" wx:key="index">
+            <view class="project-header">
+              <text class="project-index">{{index + 1}}</text>
+              <text class="project-name">{{item.name}}</text>
+            </view>
+            <view class="project-desc" wx:if="{{item.description}}">
+              <text class="desc-label">项目描述：</text>
+              <text class="desc-text">{{item.description}}</text>
+            </view>
+            <view class="project-result" wx:if="{{item.result}}">
+              <text class="result-label">项目成果：</text>
+              <text class="result-text">{{item.result}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 成果荣誉 -->
+    <view class="section" wx:if="{{talentInfo.achievements.length > 0}}">
+      <view class="section-header">
+        <text class="section-icon">🏆</text>
+        <text class="section-title">成果荣誉</text>
+      </view>
+      <view class="section-body">
+        <view class="achievement-list">
+          <view class="achievement-item" wx:for="{{talentInfo.achievements}}" wx:key="index">
+            <text class="achievement-icon">✦</text>
+            <text class="achievement-text">{{item}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部占位 -->
+  <view class="bottom-space"></view>
+</view>

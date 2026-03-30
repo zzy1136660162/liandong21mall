@@ -166,30 +166,44 @@
 </div>
 {% endblock %}
 
-{% block javascript %}
+{% block javascripts %}
 <script>
 let currentPage = 1;
 let pageSize = 10;
 let selectedIds = [];
 
+document.addEventListener('DOMContentLoaded', function() {
+    loadProducts();
+});
+
 function loadProducts() {
+    const tbody = document.getElementById('commissionTable');
+    tbody.innerHTML = '<tr><td colspan="9" class="text-center">加载中...</td></tr>';
+    
     const params = new URLSearchParams(window.location.search);
     const keyword = params.get('keyword') || '';
     
-    fetch(`/api/products/list/admin?page=${currentPage}&page_size=${pageSize}&keyword=${keyword}`)
+    fetch(`/api/product/list/admin?page=${currentPage}&page_size=${pageSize}&keyword=${keyword}`)
         .then(res => res.json())
         .then(res => {
             if (res.code === 200) {
                 renderTable(res.data.list);
                 renderPagination(res.data.total);
+            } else {
+                const tbody = document.getElementById('commissionTable');
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">加载失败: ${res.message || '未知错误'}</td></tr>`;
             }
+        })
+        .catch(err => {
+            const tbody = document.getElementById('commissionTable');
+            tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">网络错误: ${err.message}</td></tr>`;
         });
 }
 
 function renderTable(list) {
     const tbody = document.getElementById('commissionTable');
     if (!list || list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="text-center">暂无数据</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center">暂无数据</td></tr>';
         return;
     }
     
@@ -246,7 +260,7 @@ function goPage(page) {
 }
 
 function editCommission(id) {
-    fetch(`/api/products/list/admin?page=1&page_size=100`)
+    fetch(`/api/product/list/admin?page=1&page_size=100`)
         .then(res => res.json())
         .then(res => {
             if (res.code === 200) {
@@ -275,7 +289,7 @@ function saveCommission() {
         settlement_type: parseInt(document.getElementById('settlementType').value)
     };
     
-    fetch(`/api/products/commission/update/${id}`, {
+    fetch(`/api/product/commission/update/${id}`, {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
@@ -319,7 +333,7 @@ function saveBatch() {
         return;
     }
     
-    fetch('/api/products/commission/batch-update', {
+    fetch('/api/product/commission/batch-update', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ids: selectedIds, ...data})
@@ -337,13 +351,13 @@ function saveBatch() {
 }
 
 function exportCommission() {
-    window.location.href = '/api/products/commission/export';
+    window.location.href = '/api/product/commission/export';
 }
 
 document.getElementById('checkAll').addEventListener('change', function() {
     document.querySelectorAll('.product-check').forEach(cb => cb.checked = this.checked);
     if (this.checked) {
-        fetch(`/api/products/list/admin?page=1&page_size=1000`)
+        fetch(`/api/product/list/admin?page=1&page_size=1000`)
             .then(res => res.json())
             .then(res => {
                 if (res.code === 200) {
@@ -354,7 +368,5 @@ document.getElementById('checkAll').addEventListener('change', function() {
         selectedIds = [];
     }
 });
-
-loadProducts();
 </script>
-{% endblock %}
+{% endblock javascripts %}

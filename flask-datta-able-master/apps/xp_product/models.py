@@ -55,7 +55,7 @@ class Product(db.Model):
     """商品"""
     __tablename__ = 'xp_products'
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     product_no = db.Column(db.String(50), unique=True, nullable=False)
     name = db.Column(db.String(200), nullable=False)
     subtitle = db.Column(db.String(500))
@@ -155,12 +155,14 @@ class Product(db.Model):
             tags.append('信任购')
         if self.is_cashback:
             tags.append('单单返现')
-        
+
         settlement_map = {1: '月结', 2: '周结', 3: '实时'}
-        
+
         return {
             'id': str(self.id),
+            'title': self.name,
             'name': self.name,
+            'subtitle': self.subtitle or '',
             'images': self.images if self.images else [self.main_image],
             'price': float(self.price) if self.price else 0,
             'originalPrice': float(self.original_price) if self.original_price else 0,
@@ -173,12 +175,33 @@ class Product(db.Model):
                 'top': float(self.top_rate) if self.top_rate else 20
             },
             'sales': self.sales,
+            'monthSales': str(self.sales) if self.sales else '0',
+            'stock': self.stock if self.stock else 0,
             'positiveRate': '98%',
             'description': self.description or '',
             'specifications': self.specifications if self.specifications else [],
+            'specs': self.specifications if self.specifications else [],
             'samplePolicy': {
                 'canApply': True,
                 'maxCount': 3,
                 'description': '每位达人限申请3件'
-            }
+            },
+            'shopName': '立白Liby旗舰店',
+            'shopLogo': 'https://picsum.photos/80/80?random=10',
+            'shopSales': '6860',
+            'shopScore': '4.84',
+            'productScore': '4.96',
+            'logisticsScore': '4.74',
+            'serviceScore': '4.79',
+            'darenCount': '4',
+            'location': '贵州省黔南布依族苗族自治州',
+            'monthViews': '3166',
+            'monthDaren': '1万',
+            'reviewCount': '0',
+            'goodRate': '98',
+            'reviewTags': ['有图/视频', '很好用', '味道好', '香味很香'],
+            'tuanzhangName': '飞鸽传媒团长精选',
+            'tuanzhangAvatar': 'https://picsum.photos/80/80?random=20',
+            'tuanzhangDesc': '聊高佣·帮申样·响应快',
+            'tags': tags
         }

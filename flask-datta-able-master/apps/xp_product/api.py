@@ -7,7 +7,7 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 from apps import db
-from apps.product.models import Product, Category
+from apps.xp_product.models import Product, Category
 from datetime import datetime
 
 api = Namespace('product', description='商品选品模块')

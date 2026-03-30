@@ -1,16 +1,4 @@
 <view class="page">
-  <!-- 状态栏占位 -->
-  <view class="status-bar" style="height: {{statusBarHeight}}rpx;"></view>
-  
-  <!-- 顶部导航栏 -->
-  <view class="nav-bar">
-    <view class="nav-back" bindtap="goBack">
-      <text class="nav-icon">←</text>
-    </view>
-    <view class="nav-title">同行跟选</view>
-    <view class="nav-right"></view>
-  </view>
-
   <!-- 活动Banner -->
   <view class="activity-banner">
     <image class="banner-image" src="https://picsum.photos/750/300?random=200" mode="aspectFill"/>
@@ -85,7 +73,7 @@
         <image class="product-image" src="{{item.image}}" mode="aspectFill"/>
         <view class="product-tag" wx:if="{{item.tag}}">{{item.tag}}</view>
       </view>
-      
+
       <view class="product-info">
         <!-- 跟选信息 -->
         <view class="follow-info">
@@ -93,29 +81,29 @@
           <text class="follower-name">{{item.followerName}}</text>
           <text class="follow-count">{{item.followCount}}人跟选</text>
         </view>
-        
+
         <!-- 标签 -->
         <view class="product-tags">
           <view class="tag cashback" wx:if="{{item.cashback}}">单单返现</view>
           <view class="tag trust" wx:if="{{item.trust}}">信任购</view>
           <view class="tag brand" wx:if="{{item.isBrand}}">品牌</view>
         </view>
-        
+
         <!-- 标题 -->
         <view class="product-title">{{item.title}}</view>
-        
+
         <!-- 佣金信息 -->
         <view class="commission-row">
           <text class="commission-text">赚¥{{item.commission}}</text>
           <text class="commission-rate">{{item.rate}}佣</text>
         </view>
-        
+
         <!-- 价格销量 -->
         <view class="price-row">
           <text class="price-label">售价¥{{item.price}}</text>
           <text class="sales-text">{{item.sales}}</text>
         </view>
-        
+
         <!-- 加入货架按钮 -->
         <view class="add-btn" catchtap="addToShelf" data-id="{{item.id}}">加入货架</view>
       </view>

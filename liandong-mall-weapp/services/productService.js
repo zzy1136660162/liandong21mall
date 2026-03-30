@@ -3,8 +3,9 @@
  */
 const { get, post } = require('../utils/api');
 
-const API_BASE = '/api/product';
-const API_LIST_BASE = '/api/product/list';
+const API_BASE = '/api/sp_product_detail';
+const API_LIST_BASE = '/api/xp_product';
+const API_XP_PRODUCT = '/api/xp_product';
 
 module.exports = {
   /**
@@ -99,5 +100,13 @@ module.exports = {
    */
   queryLogistics(company, trackingNo) {
     return get(`${API_BASE}/logistics/query`, { company, trackingNo });
+  },
+
+  /**
+   * 获取选品模块商品详情
+   * @param {string|number} id - 商品ID
+   */
+  getXpProductDetail(id) {
+    return get(`${API_XP_PRODUCT}/${id}`);
   }
 };

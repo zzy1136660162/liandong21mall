@@ -2,7 +2,6 @@ const productService = require('../../services/productService');
 
 Page({
   data: {
-    statusBarHeight: 88,
     currentFilter: 'all',
     stats: {
       productCount: '2,580',
@@ -13,14 +12,6 @@ Page({
   },
 
   onLoad() {
-    // 获取系统状态栏高度
-    const systemInfo = wx.getSystemInfoSync();
-    const statusBarHeight = systemInfo.statusBarHeight || 20;
-    
-    this.setData({
-      statusBarHeight: statusBarHeight * 2
-    });
-    
     this.loadProducts();
   },
 
