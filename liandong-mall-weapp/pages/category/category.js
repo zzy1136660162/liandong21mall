@@ -144,12 +144,6 @@ Page({
   // 切换主分类
   switchMainCategory(e) {
     const category = e.currentTarget.dataset.category;
-    if (category === 'home') {
-      wx.switchTab({
-        url: '/pages/xuanpinindex/xuanpinindex'
-      });
-      return;
-    }
     this.setData({
       currentMainCategory: category
     });
@@ -196,6 +190,13 @@ Page({
   // 返回
   goBack() {
     wx.navigateBack();
+  },
+
+  // 返回首页
+  goToHome() {
+    wx.switchTab({
+      url: '/pages/xuanpinindex/xuanpinindex'
+    });
   },
 
   // 去搜索

@@ -7,8 +7,8 @@
       <text class="search-icon">🔍</text>
       <view class="search-input-wrapper">
         <input class="search-input" placeholder="搜索商品" placeholder-class="placeholder" 
-               confirm-type="search"/>
-        <image class="camera-btn" src="https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260319090524623_666695127685.png" mode="aspectFit" bindtap="goToCamera"></image>
+               confirm-type="search" disabled/>
+        <image class="camera-btn" src="https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260319090524623_666695127685.png" mode="aspectFit" catchtap="goToCamera"></image>
       </view>
     </view>
   </view>
