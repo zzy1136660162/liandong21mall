@@ -66,7 +66,15 @@ function request(url, options = {}) {
 }
 
 const api = {
-    get: (url, data) => request(url, { method: 'GET', data }),
+    get: (url, data) => {
+        const params = {}
+        for (const key in data) {
+            if (data[key] !== null && data[key] !== undefined && data[key] !== '') {
+                params[key] = data[key]
+            }
+        }
+        return request(url, { method: 'GET', data: params })
+    },
     post: (url, data) => request(url, { method: 'POST', data }),
     put: (url, data) => request(url, { method: 'PUT', data }),
     delete: (url, data) => request(url, { method: 'DELETE', data })
@@ -109,18 +117,28 @@ const orderApi = {
     createOrder: (orderData) =>
         api.post('/api/sp/order/create', orderData),
 
-    getOrderList: (status = null, page = 1, pageSize = 10) =>
-        api.get('/api/sp/order/list', { status, page, pageSize }),
+    getOrderList: (status = null, page = 1, pageSize = 10, keyword = '') =>
+        api.get('/api/sp/order/list', { status, page, pageSize, keyword }),
 
     getOrderDetail: (orderId) => api.get(`/api/sp/order/detail/${orderId}`),
 
     getOrderExpireTime: (orderId) => api.get(`/api/sp/order/expire-time/${orderId}`),
 
+    getOrderStatistics: () => api.get('/api/sp/order/statistics'),
+
+    getOrderCount: () => api.get('/api/sp/order/count'),
+
     cancelOrder: (orderId, reason) =>
         api.post(`/api/sp/order/cancel/${orderId}`, { reason }),
 
     confirmReceipt: (orderId) =>
-        api.post(`/api/sp/order/confirm/${orderId}`)
+        api.post(`/api/sp/order/confirm/${orderId}`),
+
+    payOrder: (orderId, paymentMethod = 'WECHAT_PAY') =>
+        api.post(`/api/sp/order/pay/${orderId}`, { paymentMethod }),
+
+    searchOrders: (keyword, page = 1, pageSize = 10) =>
+        api.get('/api/sp/order/list', { keyword, page, pageSize })
 }
 
 const favoriteApi = {

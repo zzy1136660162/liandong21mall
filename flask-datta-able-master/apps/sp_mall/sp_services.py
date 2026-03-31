@@ -365,88 +365,138 @@ class SpOrderService:
     @staticmethod
     def create_order(user_id, order_data):
         """创建订单"""
-        items = order_data.get('items', [])
-        address = order_data.get('address', {})
-        remark = order_data.get('remark', '')
-        
-        if not items:
-            return None, '请选择商品'
-        
-        if not address or not address.get('name'):
-            return None, '请选择收货地址'
-        
-        total_amount = 0.0
-        order_items_data = []
-        
-        for item in items:
-            product = SpProduct.query.get(item['productId'])
-            if not product or product.status != 1:
-                continue
+        try:
+            items = order_data.get('items', [])
+            address = order_data.get('address', {})
+            remark = order_data.get('remark', '')
             
-            sku = SpProductSku.query.get(item['skuId']) if item.get('skuId') else None
-            price = float(sku.price) if sku else float(product.price)
-            quantity = item.get('quantity', 1)
-            item_total = price * quantity
-            total_amount += item_total
+            print(f"\n[订单服务] 开始创建订单")
+            print(f"  user_id: {user_id}")
+            print(f"  items: {items}")
+            print(f"  address: {address}")
+            print(f"  remark: {remark}")
             
-            order_items_data.append({
-                'product_id': product.id,
-                'sku_id': item.get('skuId'),
-                'product_name': product.product_name,
-                'sku_name': sku.sku_name if sku else None,
-                'specs': sku.sku_name if sku else item.get('specs', ''),
-                'product_image': product.main_image,
-                'price': price,
-                'member_price': float(sku.member_price) if sku and sku.member_price else float(product.member_price) if product.member_price else None,
-                'quantity': quantity,
-                'total_amount': item_total
-            })
-        
-        if not order_items_data:
-            return None, '购物车中没有有效商品'
-        
-        freight_amount = 0.0 if total_amount >= 99 else 10.0
-        pay_amount = total_amount + freight_amount
-        
-        order = SpOrder(
-            order_no=SpOrderService._generate_order_no(),
-            user_id=user_id,
-            total_amount=total_amount,
-            discount_amount=0.0,
-            pay_amount=pay_amount,
-            final_amount=pay_amount,
-            freight_amount=freight_amount,
-            receiver_name=address.get('name'),
-            receiver_phone=address.get('phone'),
-            receiver_province=address.get('province'),
-            receiver_city=address.get('city'),
-            receiver_district=address.get('district'),
-            receiver_address=f"{address.get('province', '')}{address.get('city', '')}{address.get('district', '')}{address.get('detail', '')}",
-            status='PENDING_PAY',
-            remark=remark
-        )
-        
-        db.session.add(order)
-        db.session.flush()
-        
-        for item_data in order_items_data:
-            order_item = SpOrderItem(
-                order_id=order.id,
-                **item_data
+            if not items:
+                print(f"  [订单服务] 错误: 没有选择商品")
+                return None, '请选择商品'
+            
+            if not address or not address.get('name'):
+                print(f"  [订单服务] 错误: 没有收货地址")
+                return None, '请选择收货地址'
+            
+            total_amount = 0.0
+            order_items_data = []
+            
+            for item in items:
+                print(f"  [订单服务] 处理商品: productId={item.get('productId')}")
+                
+                product = SpProduct.query.get(item['productId'])
+                if not product:
+                    print(f"  [订单服务] 商品不存在: productId={item['productId']}")
+                    continue
+                
+                if product.status != 1:
+                    print(f"  [订单服务] 商品已下架: productId={item['productId']}")
+                    continue
+                
+                print(f"  [订单服务] 商品信息: name={product.product_name}, price={product.price}, stock={product.stock}")
+                
+                sku = SpProductSku.query.get(item['skuId']) if item.get('skuId') else None
+                if sku:
+                    print(f"  [订单服务] SKU信息: skuId={sku.id}, name={sku.sku_name}, price={sku.price}")
+                
+                price = float(sku.price) if sku else float(product.price)
+                quantity = item.get('quantity', 1)
+                item_total = price * quantity
+                total_amount += item_total
+                
+                print(f"  [订单服务] 计算: price={price}, quantity={quantity}, item_total={item_total}")
+                
+                order_items_data.append({
+                    'product_id': product.id,
+                    'sku_id': item.get('skuId'),
+                    'product_name': product.product_name,
+                    'sku_name': sku.sku_name if sku else None,
+                    'specs': sku.sku_name if sku else item.get('specs', ''),
+                    'product_image': product.main_image,
+                    'price': price,
+                    'member_price': float(sku.member_price) if sku and sku.member_price else float(product.member_price) if product.member_price else None,
+                    'quantity': quantity,
+                    'total_amount': item_total
+                })
+            
+            if not order_items_data:
+                print(f"  [订单服务] 错误: 没有有效商品")
+                return None, '购物车中没有有效商品'
+            
+            print(f"  [订单服务] 总金额: {total_amount}")
+            
+            freight_amount = 0.0 if total_amount >= 99 else 10.0
+            pay_amount = total_amount + freight_amount
+            
+            print(f"  [订单服务] 运费: {freight_amount}, 实付金额: {pay_amount}")
+            
+            order = SpOrder(
+                order_no=SpOrderService._generate_order_no(),
+                user_id=user_id,
+                total_amount=total_amount,
+                discount_amount=0.0,
+                pay_amount=pay_amount,
+                final_amount=pay_amount,
+                freight_amount=freight_amount,
+                receiver_name=address.get('name'),
+                receiver_phone=address.get('phone'),
+                receiver_province=address.get('province'),
+                receiver_city=address.get('city'),
+                receiver_district=address.get('district'),
+                receiver_address=f"{address.get('province', '')}{address.get('city', '')}{address.get('district', '')}{address.get('detail', '')}",
+                status='PENDING_PAY',
+                remark=remark
             )
-            db.session.add(order_item)
-        
-        db.session.commit()
-        
-        return order.to_dict(include_items=True), '下单成功'
+            
+            print(f"  [订单服务] 创建订单对象...")
+            db.session.add(order)
+            db.session.flush()
+            
+            print(f"  [订单服务] 订单已添加到会话, order_id={order.id}")
+            
+            for item_data in order_items_data:
+                order_item = SpOrderItem(
+                    order_id=order.id,
+                    **item_data
+                )
+                db.session.add(order_item)
+            
+            print(f"  [订单服务] 订单项已添加, 共{len(order_items_data)}项")
+            
+            db.session.commit()
+            
+            print(f"  [订单服务] 订单提交成功!")
+            
+            return order.to_dict(include_items=True), '下单成功'
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"\n❌ [订单服务] 创建订单异常: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            raise e
     
     @staticmethod
-    def get_order_list(user_id, status=None, page=1, page_size=10):
+    def get_order_list(user_id, status=None, page=1, page_size=10, keyword=None):
         """获取用户订单列表"""
         query = SpOrder.query.filter_by(user_id=user_id)
         
         if status:
             query = query.filter_by(status=status)
+        
+        if keyword:
+            from apps.sp_mall.sp_models import SpOrderItem
+            keyword_filter = f'%{keyword}%'
+            order_ids = db.session.query(SpOrderItem.order_id).filter(
+                SpOrderItem.product_name.like(keyword_filter)
+            ).distinct().subquery()
+            query = query.filter(SpOrder.id.in_(db.session.query(order_ids)))
         
         pagination = query.order_by(SpOrder.created_at.desc()).paginate(
             page=page, per_page=page_size, error_out=False
@@ -455,13 +505,6 @@ class SpOrderService:
         orders = []
         for order in pagination.items:
             order_dict = order.to_dict(include_items=True)
-            order_dict['products'] = [{
-                'productId': item['productId'],
-                'productName': item['productName'],
-                'productImage': item['productImage'],
-                'price': item['price'],
-                'quantity': item['quantity']
-            } for item in order_dict.get('items', [])]
             orders.append(order_dict)
         
         return {
@@ -481,7 +524,9 @@ class SpOrderService:
         
         order = query.first()
         if order:
-            return order.to_dict(include_items=True)
+            order_dict = order.to_dict(include_items=True)
+            order_dict['remainingSeconds'] = SpOrderService.get_order_expire_time(order_id) if order.status == 'PENDING_PAY' else 0
+            return order_dict
         return None
     
     @staticmethod
@@ -588,6 +633,98 @@ class SpOrderService:
         db.session.commit()
         
         return order.to_dict(include_items=True), '订单状态已更新'
+    
+    @staticmethod
+    def get_order_statistics(user_id):
+        """获取用户订单统计"""
+        try:
+            print(f"\n[订单服务] 获取订单统计, user_id={user_id}")
+            
+            total_orders = SpOrder.query.filter_by(user_id=user_id).count()
+            pending_orders = SpOrder.query.filter_by(user_id=user_id, status='PENDING_PAY').count()
+            paid_orders = SpOrder.query.filter_by(user_id=user_id, status='PAID').count()
+            shipped_orders = SpOrder.query.filter_by(user_id=user_id, status='SHIPPED').count()
+            finished_orders = SpOrder.query.filter_by(user_id=user_id, status='FINISHED').count()
+            cancelled_orders = SpOrder.query.filter_by(user_id=user_id, status='CANCELLED').count()
+            
+            total_amount = db.session.query(db.func.sum(SpOrder.final_amount)).filter(
+                SpOrder.user_id == user_id,
+                SpOrder.status.in_(['PAID', 'SHIPPED', 'FINISHED'])
+            ).scalar() or 0
+            
+            statistics = {
+                'totalOrders': total_orders,
+                'pendingOrders': pending_orders,
+                'paidOrders': paid_orders,
+                'shippedOrders': shipped_orders,
+                'finishedOrders': finished_orders,
+                'cancelledOrders': cancelled_orders,
+                'totalAmount': float(total_amount)
+            }
+            
+            print(f"  [订单服务] 统计结果: {statistics}")
+            return statistics
+            
+        except Exception as e:
+            print(f"  [订单服务] 获取统计失败: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            
+            # 返回默认值，避免前端报错
+            return {
+                'totalOrders': 0,
+                'pendingOrders': 0,
+                'paidOrders': 0,
+                'shippedOrders': 0,
+                'finishedOrders': 0,
+                'cancelledOrders': 0,
+                'totalAmount': 0.0
+            }
+    
+    @staticmethod
+    def pay_order(order_id, user_id, payment_method='WECHAT_PAY'):
+        """支付订单"""
+        order = SpOrder.query.filter_by(id=order_id, user_id=user_id).first()
+        
+        if not order:
+            return None, '订单不存在'
+        
+        if order.status != 'PENDING_PAY':
+            return None, '订单状态不允许支付'
+        
+        remaining = SpOrderService.get_order_expire_time(order_id)
+        if remaining <= 0:
+            return None, '订单已超时，无法支付'
+        
+        order.status = 'PAID'
+        order.pay_time = datetime.now()
+        order.payment_method = payment_method
+        order.updated_at = datetime.now()
+        
+        db.session.commit()
+        
+        return order.to_dict(include_items=True), '支付成功'
+    
+    @staticmethod
+    def ship_order(order_id, logistics_company, logistics_no):
+        """发货（后台使用）"""
+        order = SpOrder.query.get(order_id)
+        
+        if not order:
+            return None, '订单不存在'
+        
+        if order.status != 'PAID':
+            return None, '只有已支付订单才能发货'
+        
+        order.status = 'SHIPPED'
+        order.ship_time = datetime.now()
+        order.logistics_company = logistics_company
+        order.logistics_no = logistics_no
+        order.updated_at = datetime.now()
+        
+        db.session.commit()
+        
+        return order.to_dict(include_items=True), '发货成功'
 
 
 class SpAddressService:

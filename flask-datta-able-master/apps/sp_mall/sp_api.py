@@ -11,6 +11,7 @@ from apps.sp_mall.sp_services import (
     SpProductService, SpCartService, 
     SpOrderService, SpAddressService
 )
+from apps.sp_mall.sp_models import SpOrder, SpOrderItem, SpProduct, SpCart, SpAddress
 from apps import db
 
 api = Namespace('sp_mall', description='商品商城模块API')
@@ -250,15 +251,33 @@ class SpOrderCreate(Resource):
     @sp_order_ns.doc('创建订单')
     def post(self):
         """创建订单"""
-        user_id = get_current_user_id()
-        data = request.get_json()
-        
-        order, message = SpOrderService.create_order(user_id, data)
-        
-        if not order:
-            return error_response(message)
-        
-        return success_response(order, message)
+        try:
+            user_id = get_current_user_id()
+            data = request.get_json()
+            
+            print(f"\n{'='*70}")
+            print(f"【创建订单API】")
+            print(f"  用户ID: {user_id}")
+            print(f"  请求数据: {data}")
+            print(f"{'='*70}")
+            
+            order, message = SpOrderService.create_order(user_id, data)
+            
+            if not order:
+                print(f"  创建失败: {message}")
+                print(f"{'='*70}\n")
+                return error_response(message)
+            
+            print(f"  创建成功: orderId={order.get('orderId')}, orderNo={order.get('orderNo')}")
+            print(f"{'='*70}\n")
+            return success_response(order, message)
+            
+        except Exception as e:
+            print(f"\n❌ 创建订单异常: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            print(f"{'='*70}\n")
+            return error_response(f'服务器内部错误: {str(e)}', 500)
 
 
 @sp_order_ns.route('/list')
@@ -270,8 +289,9 @@ class SpOrderList(Resource):
         status = request.args.get('status')
         page = request.args.get('page', 1, type=int)
         page_size = request.args.get('pageSize', 10, type=int)
+        keyword = request.args.get('keyword')
         
-        result = SpOrderService.get_order_list(user_id, status, page, page_size)
+        result = SpOrderService.get_order_list(user_id, status, page, page_size, keyword)
         return success_response(result)
 
 
@@ -281,10 +301,29 @@ class SpOrderDetail(Resource):
     def get(self, order_id):
         """根据ID获取订单详情"""
         user_id = get_current_user_id()
+        
+        print(f"\n{'='*70}")
+        print(f"【订单详情API】")
+        print(f"  请求参数: order_id={order_id}, user_id={user_id}")
+        print(f"{'='*70}")
+        
+        # 先检查订单是否存在
+        order_check = SpOrder.query.get(order_id)
+        print(f"  数据库查询结果 (不限制用户ID): {'存在' if order_check else '不存在'}")
+        if order_check:
+            print(f"    订单信息: ID={order_check.id}, 编号={order_check.order_no}, 用户={order_check.user_id}, 状态={order_check.status}")
+        
+        # 执行正式查询
         order = SpOrderService.get_order_by_id(order_id, user_id)
         
         if not order:
+            print(f"  ⚠️ 订单不存在或用户ID不匹配!")
+            print(f"  查询条件: order_id={order_id}, user_id={user_id}")
+            print(f"{'='*70}\n")
             return error_response('订单不存在', 404)
+        
+        print(f"  ✓ 订单查询成功")
+        print(f"{'='*70}\n")
         
         # 添加剩余支付时间
         if order.get('status') == 'PENDING_PAY':
@@ -319,19 +358,72 @@ class SpOrderCount(Resource):
     @sp_order_ns.doc('获取订单数量统计')
     def get(self):
         """获取用户各状态订单数量"""
+        try:
+            user_id = get_current_user_id()
+            
+            print(f"\n{'='*70}")
+            print(f"【订单统计API】")
+            print(f"  用户ID: {user_id}")
+            print(f"{'='*70}")
+            
+            statistics = SpOrderService.get_order_statistics(user_id)
+            
+            print(f"  统计结果: {statistics}")
+            print(f"{'='*70}\n")
+            
+            return success_response(statistics)
+            
+        except Exception as e:
+            print(f"\n❌ 订单统计异常: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            print(f"{'='*70}\n")
+            return error_response(f'服务器内部错误: {str(e)}', 500)
+
+
+@sp_order_ns.route('/statistics')
+class SpOrderStatistics(Resource):
+    @sp_order_ns.doc('获取订单统计数据')
+    def get(self):
+        """获取用户订单完整统计数据"""
+        try:
+            user_id = get_current_user_id()
+            
+            print(f"\n{'='*70}")
+            print(f"【订单统计API】")
+            print(f"  用户ID: {user_id}")
+            print(f"{'='*70}")
+            
+            statistics = SpOrderService.get_order_statistics(user_id)
+            
+            print(f"  统计结果: {statistics}")
+            print(f"{'='*70}\n")
+            
+            return success_response(statistics)
+            
+        except Exception as e:
+            print(f"\n❌ 订单统计异常: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            print(f"{'='*70}\n")
+            return error_response(f'服务器内部错误: {str(e)}', 500)
+
+
+@sp_order_ns.route('/pay/<int:order_id>')
+class SpOrderPay(Resource):
+    @sp_order_ns.doc('支付订单')
+    def post(self, order_id):
+        """支付订单"""
         user_id = get_current_user_id()
+        data = request.get_json() or {}
+        payment_method = data.get('paymentMethod', 'WECHAT_PAY')
         
-        from apps.sp_mall.sp_models import SpOrder
+        order, message = SpOrderService.pay_order(order_id, user_id, payment_method)
         
-        # 统计各状态订单数量
-        counts = {
-            'pending': SpOrder.query.filter_by(user_id=user_id, status='PENDING_PAY').count(),
-            'shipped': SpOrder.query.filter_by(user_id=user_id, status='PAID').count(),
-            'received': SpOrder.query.filter_by(user_id=user_id, status='SHIPPED').count(),
-            'refund': SpOrder.query.filter_by(user_id=user_id, status='CANCELLED').count()
-        }
+        if not order:
+            return error_response(message)
         
-        return success_response(counts)
+        return success_response(order, message)
 
 
 @sp_order_ns.route('/cancel/<int:order_id>')
