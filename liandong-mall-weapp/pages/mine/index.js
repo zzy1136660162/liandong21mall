@@ -335,6 +335,19 @@ Page({
   },
 
   goToRNDemandDirect() {
+    const token = wx.getStorageSync('token');
+    if (!token) {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      });
+      setTimeout(() => {
+        wx.navigateTo({
+          url: '/pages/login/index?redirect=' + encodeURIComponent('/pages/rd_index/rd_index')
+        });
+      }, 1500);
+      return;
+    }
     wx.switchTab({
       url: '/pages/rd_index/rd_index'
     });

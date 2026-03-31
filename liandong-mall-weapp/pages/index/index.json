@@ -1,5 +1,6 @@
 {
   "usingComponents": {
-    "sp-home-recommend": "../../components/sp_HomeRecommend/sp_HomeRecommend"
+    "sp-home-recommend": "../../components/sp_HomeRecommend/sp_HomeRecommend",
+    "home-talent-pool": "../../components/home_talent_pool/home_talent_pool"
   }
 }

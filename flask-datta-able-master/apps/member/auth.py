@@ -39,23 +39,36 @@ class SendCode(Resource):
     }))
     def post(self):
         """发送验证码"""
+        print('=' * 50)
+        print('【DEBUG】收到发送验证码请求')
+        print(f'【DEBUG】请求方法: {request.method}')
+        print(f'【DEBUG】请求URL: {request.url}')
+        print(f'【DEBUG】请求头: {dict(request.headers)}')
         data = request.get_json()
+        print(f'【DEBUG】请求body数据: {data}')
         phone = data.get('phone')
+        print(f'【DEBUG】提取的手机号: {phone}')
 
         if not phone:
+            print('【DEBUG】错误: 手机号为空')
             return error_response('手机号不能为空')
 
         if not re.match(r'^1[3-9]\d{9}$', phone):
+            print(f'【DEBUG】错误: 手机号格式不正确 - {phone}')
             return error_response('手机号格式不正确')
 
         code = generate_code()
+        print(f'【DEBUG】生成的验证码: {code}')
+        
         verification_codes[phone] = {
             'code': code,
             'expires': datetime.now() + timedelta(minutes=5),
             'used': False
         }
-
+        
+        print(f'【DEBUG】验证码已保存，当前所有验证码: {verification_codes}')
         print(f'【测试用】验证码: {code}')
+        print('=' * 50)
 
         return success_response({
             'expiresIn': 300,
