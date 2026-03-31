@@ -1,0 +1,11 @@
+<view class="category-tab">
+  <view
+    wx:for="{{tabs}}"
+    wx:key="id"
+    class="tab-item {{currentTab === item.id ? 'active' : ''}}"
+    bindtap="switchTab"
+    data-id="{{item.id}}"
+  >
+    <text class="tab-text">{{item.name}}</text>
+  </view>
+</view>

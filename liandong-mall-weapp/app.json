@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/categoryList/categoryList",
     "pages/Product_list_page/Product_list_page",
     "pages/sp_SearchPage/sp_SearchPage",
     "pages/sp_SearchResult/sp_SearchResult",

@@ -11,28 +11,26 @@
   </view>
 
   <view class="talent-list" wx:if="{{!loading && !error && talents.length > 0}}">
-    <view class="talent-grid">
-      <view 
-        wx:for="{{talents}}" 
-        wx:key="id"
-        class="talent-card"
-        bindtap="goToTalentDetail"
-        data-id="{{item.id}}"
-      >
-        <view class="talent-avatar-wrapper">
-          <image 
-            class="talent-avatar" 
-            src="{{item.avatar}}" 
-            mode="aspectFill"
-            lazy-load="{{true}}"
-          />
-        </view>
-        <view class="talent-info">
-          <text class="talent-name">{{item.name}}</text>
-          <text class="talent-title">{{item.title}}</text>
-          <view class="talent-tags">
-            <text class="tag" wx:for="{{item.expertiseAreas}}" wx:key="index" wx:for-item="tag">{{tag}}</text>
-          </view>
+    <view
+      wx:for="{{talents}}"
+      wx:key="id"
+      class="talent-card"
+      bindtap="goToTalentDetail"
+      data-id="{{item.id}}"
+    >
+      <view class="talent-avatar-wrapper">
+        <image
+          class="talent-avatar"
+          src="{{item.avatar}}"
+          mode="aspectFill"
+          lazy-load="{{true}}"
+        />
+      </view>
+      <view class="talent-info">
+        <text class="talent-name">{{item.name}}</text>
+        <text class="talent-title">{{item.title}}</text>
+        <view class="talent-tags">
+          <text class="tag" wx:for="{{item.expertiseAreas}}" wx:key="index" wx:for-item="tag">{{tag}}</text>
         </view>
       </view>
     </view>
