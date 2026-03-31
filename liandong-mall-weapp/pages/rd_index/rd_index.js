@@ -29,6 +29,14 @@ Page({
     })
   },
   goToSubmit() {
+    // 检查是否已登录
+    const token = wx.getStorageSync('token')
+    if (!token) {
+      wx.navigateTo({
+        url: '/pages/login/index'
+      })
+      return
+    }
     wx.navigateTo({
       url: '/pages/demandSubmit/demandSubmit'
     })
