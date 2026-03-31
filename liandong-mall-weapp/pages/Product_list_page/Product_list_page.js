@@ -105,6 +105,24 @@ Page({
     this.loadProducts()
   },
 
+  // 跳转到搜索页面
+  goToSearchPage() {
+    wx.navigateTo({
+      url: '/pages/sp_SearchPage/sp_SearchPage',
+      success: () => {
+        console.log('跳转到搜索页成功')
+      },
+      fail: (err) => {
+        console.error('跳转搜索页失败:', err)
+        wx.showToast({
+          title: '页面跳转失败',
+          icon: 'none',
+          duration: 2000
+        })
+      }
+    })
+  },
+
   goToDetail(e) {
     const productId = e.currentTarget.dataset.id
     wx.navigateTo({

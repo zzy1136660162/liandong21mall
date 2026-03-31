@@ -9,16 +9,10 @@
           <view class="brand-line"></view>
         </view>
 
-        <view class="search-container">
+        <view class="search-container" bindtap="goToSearchPage">
           <view class="search-wrapper">
             <text class="search-icon">✦</text>
-            <input
-              class="search-input"
-              placeholder="探索好物"
-              placeholder-class="search-placeholder"
-              bindinput="onSearch"
-              bindconfirm="onSearchConfirm"
-            />
+            <text class="search-text">探索好物</text>
           </view>
         </view>
 

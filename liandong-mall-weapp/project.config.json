@@ -1,28 +1,40 @@
 {
-  "compileType": "miniprogram",
-  "libVersion": "3.15.0",
+  "description": "链动商城小程序",
   "packOptions": {
     "ignore": [],
     "include": []
   },
   "setting": {
-    "es6": true,
-    "postcss": true,
-    "minified": true,
-    "uglifyFileName": false,
-    "enhance": true,
-    "packNpmRelationList": [],
     "babelSetting": {
       "ignore": [],
       "disablePlugins": [],
       "outputPath": ""
     },
-    "useCompilerPlugins": false,
+    "disableSWC": true,
+    "disableUseStrict": false,
+    "condition": false,
+    "minifyWXSS": true,
     "minifyWXML": true,
+    "minified": true,
+    "enhance": true,
+    "useCompilerPlugins": false,
     "compileWorklet": false,
-    "uploadWithSourceMap": true
+    "uploadWithSourceMap": true,
+    "localPlugins": false,
+    "swc": false,
+    "es6": true,
+    "postcss": true,
+    "uglifyFileName": false,
+    "packNpmRelationList": [],
+    "packNpmManually": false
   },
-  "simulatorPluginLibVersion": {},
+  "compileType": "miniprogram",
+  "libVersion": "3.15.0",
   "appid": "wx7013c78ed355233f",
-  "editorSetting": {}
+  "projectname": "liandong-mall-weapp",
+  "simulatorPluginLibVersion": {},
+  "editorSetting": {
+    "tabIndent": "auto",
+    "tabSize": 2
+  }
 }

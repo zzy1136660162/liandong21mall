@@ -164,6 +164,7 @@ class SpOrder(db.Model):
     total_amount = db.Column(db.Numeric(10, 2), nullable=False, comment='订单总金额')
     discount_amount = db.Column(db.Numeric(10, 2), nullable=False, default=0.00, comment='优惠金额')
     pay_amount = db.Column(db.Numeric(10, 2), nullable=False, comment='实付金额')
+    final_amount = db.Column(db.Numeric(10, 2), nullable=False, comment='最终金额')
     freight_amount = db.Column(db.Numeric(10, 2), nullable=False, default=0.00, comment='运费')
     receiver_name = db.Column(db.String(50), nullable=False, comment='收货人姓名')
     receiver_phone = db.Column(db.String(20), nullable=False, comment='收货人手机号')
@@ -178,6 +179,7 @@ class SpOrder(db.Model):
     cancel_time = db.Column(db.DateTime, nullable=True, comment='取消时间')
     cancel_reason = db.Column(db.String(500), nullable=True, comment='取消原因')
     remark = db.Column(db.String(500), nullable=True, comment='订单备注')
+    remaining_seconds = db.Column(db.Integer, nullable=True, comment='剩余支付秒数')
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now, comment='创建时间')
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now, comment='更新时间')
     
@@ -202,6 +204,7 @@ class SpOrder(db.Model):
             'totalAmount': float(self.total_amount),
             'discountAmount': float(self.discount_amount),
             'payAmount': float(self.pay_amount),
+            'finalAmount': float(self.final_amount),
             'freightAmount': float(self.freight_amount),
             'receiverName': self.receiver_name,
             'receiverPhone': self.receiver_phone,
@@ -217,6 +220,7 @@ class SpOrder(db.Model):
             'cancelTime': self.cancel_time.strftime('%Y-%m-%d %H:%M:%S') if self.cancel_time else None,
             'cancelReason': self.cancel_reason,
             'remark': self.remark,
+            'remainingSeconds': self.remaining_seconds,
             'createdAt': self.created_at.strftime('%Y-%m-%d %H:%M:%S')
         }
         
@@ -236,6 +240,7 @@ class SpOrderItem(db.Model):
     sku_id = db.Column(db.BigInteger, db.ForeignKey('sp_product_sku.id'), nullable=True, comment='SKU ID')
     product_name = db.Column(db.String(200), nullable=False, comment='商品名称')
     sku_name = db.Column(db.String(100), nullable=True, comment='SKU名称')
+    specs = db.Column(db.String(200), nullable=True, comment='规格描述')
     product_image = db.Column(db.String(500), nullable=False, comment='商品图片')
     price = db.Column(db.Numeric(10, 2), nullable=False, comment='商品单价')
     member_price = db.Column(db.Numeric(10, 2), nullable=True, comment='会员价')
@@ -251,6 +256,7 @@ class SpOrderItem(db.Model):
             'skuId': self.sku_id,
             'productName': self.product_name,
             'skuName': self.sku_name,
+            'specs': self.specs,
             'productImage': self.product_image,
             'price': float(self.price),
             'memberPrice': float(self.member_price) if self.member_price else None,

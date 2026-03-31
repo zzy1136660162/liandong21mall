@@ -207,15 +207,23 @@ Page({
 
   async deleteItem(e) {
     const { id } = e.currentTarget.dataset
+    console.log('准备删除购物车商品, cartId:', id)
+    
     wx.showModal({
       title: '提示',
       content: '确定要删除该商品吗？',
       success: async (res) => {
         if (res.confirm) {
+          console.log('用户确认删除, cartId:', id)
           try {
-            await cartApi.deleteCartItem(id)
+            console.log('调用删除API...')
+            const result = await cartApi.deleteCartItem(id)
+            console.log('删除API返回:', result)
+            
             const { cartList } = this.data
             const newCartList = cartList.filter(item => item.cartId !== id)
+            console.log('删除前商品数:', cartList.length, '删除后商品数:', newCartList.length)
+            
             this.setData({ cartList: newCartList })
             this.calculateTotal()
             wx.showToast({
@@ -223,12 +231,14 @@ Page({
               icon: 'success'
             })
           } catch (error) {
-            console.error('删除失败:', error)
+            console.error('删除失败, 错误:', error)
             wx.showToast({
               title: '删除失败',
               icon: 'none'
             })
           }
+        } else {
+          console.log('用户取消删除')
         }
       }
     })

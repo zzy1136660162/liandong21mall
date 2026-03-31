@@ -1,0 +1,92 @@
+<view class="sp-search-page">
+  <!-- 搜索头部 -->
+  <view class="search-header">
+    <view class="search-box">
+      <icon type="search" size="16" color="#999" class="search-icon"/>
+      <input
+        class="search-input"
+        type="text"
+        value="{{searchKey}}"
+        placeholder="搜索商品"
+        placeholder-class="placeholder"
+        confirm-type="search"
+        bindinput="onInput"
+        bindconfirm="onConfirm"
+        focus="{{true}}"
+      />
+      <view class="clear-btn" wx:if="{{searchKey}}" bindtap="onClear">
+        <icon type="clear" size="14" color="#999"/>
+      </view>
+    </view>
+    <view class="search-btn" bindtap="onSearch">搜索</view>
+  </view>
+
+  <!-- 搜索建议 -->
+  <view class="suggestions-wrap" wx:if="{{showSuggestions}}">
+    <view class="loading" wx:if="{{searching}}">
+      <text>搜索中...</text>
+    </view>
+    <view class="suggestion-list" wx:if="{{!searching && suggestions.length > 0}}">
+      <view
+        class="suggestion-item"
+        wx:for="{{suggestions}}"
+        wx:key="productId"
+        bindtap="onSuggestionTap"
+        data-id="{{item.productId || item.id}}"
+        data-name="{{item.productName || item.name}}"
+      >
+        <icon type="search" size="14" color="#999" class="item-icon"/>
+        <text class="item-name">{{item.productName || item.name}}</text>
+        <text class="item-price">¥{{item.memberPrice || item.price}}</text>
+      </view>
+    </view>
+    <view class="empty" wx:if="{{!searching && suggestions.length === 0 && searchKey}}">
+      <text>未找到相关商品</text>
+    </view>
+  </view>
+
+  <!-- 搜索内容区 -->
+  <view class="search-content" wx:if="{{!showSuggestions}}">
+    <!-- 历史搜索 -->
+    <view class="history-section" wx:if="{{historyList.length > 0}}">
+      <view class="section-header">
+        <text class="section-title">搜索历史</text>
+        <view class="clear-btn" bindtap="onClearHistory">
+          <text>清空</text>
+        </view>
+      </view>
+      <view class="history-list">
+        <view
+          class="history-item"
+          wx:for="{{historyList}}"
+          wx:key="index"
+          bindtap="onHistoryTap"
+          data-keyword="{{item}}"
+        >
+          <text>{{item}}</text>
+          <view class="delete-icon" catchtap="onDeleteHistory" data-keyword="{{item}}">
+            <icon type="clear" size="10" color="#999"/>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 热门搜索 -->
+    <view class="hot-section">
+      <view class="section-header">
+        <text class="section-title">热门搜索</text>
+      </view>
+      <view class="hot-list">
+        <view
+          class="hot-item {{item.hot ? 'hot' : ''}}"
+          wx:for="{{hotList}}"
+          wx:key="index"
+          bindtap="onHotTap"
+          data-keyword="{{item.keyword}}"
+        >
+          <text>{{item.keyword}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

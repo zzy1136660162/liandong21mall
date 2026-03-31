@@ -5,6 +5,8 @@ function request(url, options = {}) {
         const userId = wx.getStorageSync('userId')
         const token = wx.getStorageSync('token')
         
+        console.log('API请求:', options.method, url, 'UserID:', userId || '1')
+        
         wx.request({
             url: `${BASE_URL}${url}`,
             method: options.method || 'GET',
@@ -16,6 +18,8 @@ function request(url, options = {}) {
                 ...options.header
             },
             success: (res) => {
+                console.log('API响应:', url, '状态:', res.statusCode, '数据:', res.data)
+                
                 if (res.statusCode === 200) {
                     if (res.data.code === 200) {
                         resolve(res.data.data)
@@ -39,6 +43,7 @@ function request(url, options = {}) {
                         reject(res.data.message)
                     }
                 } else {
+                    console.error('API错误:', url, res.statusCode, res)
                     wx.showToast({
                         title: '网络错误',
                         icon: 'none',
@@ -48,6 +53,7 @@ function request(url, options = {}) {
                 }
             },
             fail: (err) => {
+                console.error('API请求失败:', url, err)
                 wx.showToast({
                     title: '网络连接失败',
                     icon: 'none',
@@ -90,10 +96,10 @@ const cartApi = {
         api.post('/api/sp/cart/add', { productId, skuId, quantity }),
 
     updateCartItem: (cartId, quantity) =>
-        api.put(`/api/sp/cart/${cartId}`, { quantity }),
+        api.put(`/api/sp/cart/update/${cartId}`, { quantity }),
 
     deleteCartItem: (cartId) =>
-        api.delete(`/api/sp/cart/${cartId}`),
+        api.delete(`/api/sp/cart/delete/${cartId}`),
 
     clearCart: () =>
         api.delete('/api/sp/cart/clear')
