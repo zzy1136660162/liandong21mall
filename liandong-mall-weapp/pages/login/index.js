@@ -1,4 +1,5 @@
 // 登录页面
+const app = getApp();
 const { api } = require('../../utils/api');
 
 Page({
@@ -150,6 +151,7 @@ Page({
         wx.setStorageSync('token', token);
         wx.setStorageSync('userInfo', userInfo);
         wx.setStorageSync('userId', userId);
+        app.globalData.userId = userId;
 
         wx.showToast({
           title: '登录成功',
@@ -277,6 +279,7 @@ Page({
         wx.setStorageSync('token', token);
         wx.setStorageSync('userInfo', serverUserInfo);
         wx.setStorageSync('userId', userId);
+        app.globalData.userId = userId;
 
         wx.showToast({
           title: '登录成功',

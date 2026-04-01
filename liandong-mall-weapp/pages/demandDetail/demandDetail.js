@@ -27,19 +27,13 @@ Page({
     const { demandId } = this.data;
     const submitterId = app.globalData.userId;
 
-    wx.showLoading({ title: '加载中...' });
-
     app.request({
       url: `/demand/detail/${demandId}?submitterId=${submitterId}`,
       success: (res) => {
-        wx.hideLoading();
         this.setData({
           detail: res.data,
           statusClass: this.getStatusClass(res.data.status)
         });
-      },
-      fail: () => {
-        wx.hideLoading();
       }
     });
   },
