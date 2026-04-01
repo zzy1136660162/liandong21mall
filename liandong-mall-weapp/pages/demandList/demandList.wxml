@@ -106,6 +106,3 @@
     <button class="btn btn-primary empty-btn" bindtap="goToSubmit">立即提交需求</button>
   </view>
 </view>
-
-<!-- 浮动提交按钮 -->
-<view class="fab" bindtap="goToSubmit">+</view>

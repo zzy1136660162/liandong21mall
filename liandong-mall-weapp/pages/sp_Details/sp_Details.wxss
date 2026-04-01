@@ -90,7 +90,6 @@ page {
 
 .page-content {
   height: 100vh;
-  padding-top: 112rpx;
   padding-bottom: 120rpx;
   box-sizing: border-box;
 }

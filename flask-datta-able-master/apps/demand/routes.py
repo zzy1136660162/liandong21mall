@@ -243,8 +243,9 @@ def withdraw_demand():
         if demand.status != 0:
             return error_response('该需求状态不允许撤回')
         
-        # 验证提交人
-        if submitter_id and demand.submitter_id != submitter_id:
+        # 验证提交人（统一转为字符串比较）
+        if submitter_id and str(demand.submitter_id) != str(submitter_id):
+            print(f'权限验证失败: demand.submitter_id={demand.submitter_id}({type(demand.submitter_id)}), submitter_id={submitter_id}({type(submitter_id)})')
             return error_response('无权限操作')
         
         # 更新状态为已取消
@@ -290,8 +291,8 @@ def reapply_demand():
         if demand.status != 5:
             return error_response('该需求状态不允许重新申请')
         
-        # 验证提交人
-        if submitter_id and demand.submitter_id != submitter_id:
+        # 验证提交人（统一转为字符串比较）
+        if submitter_id and str(demand.submitter_id) != str(submitter_id):
             return error_response('无权限操作')
         
         # 生成新的需求编号
@@ -345,8 +346,8 @@ def delete_demand():
         if demand.status != 5:
             return error_response('该需求状态不允许删除')
         
-        # 验证提交人
-        if submitter_id and demand.submitter_id != submitter_id:
+        # 验证提交人（统一转为字符串比较）
+        if submitter_id and str(demand.submitter_id) != str(submitter_id):
             return error_response('无权限操作')
         
         # 删除需求（级联删除进度记录）

@@ -1,0 +1,57 @@
+<view class="sp-home-xuanpin">
+  <view class="section-header">
+    <view class="header-left">
+      <text class="section-icon">📦</text>
+      <text class="section-title">{{title}}</text>
+    </view>
+    <view class="header-right" bindtap="goToXuanpin" wx:if="{{showMore}}">
+      <text class="more-text">查看更多</text>
+      <text class="arrow">></text>
+    </view>
+  </view>
+
+  <view class="product-list" wx:if="{{!loading && !error && products.length > 0}}">
+    <view
+      wx:for="{{products}}"
+      wx:key="id"
+      class="product-item"
+      bindtap="goToProduct"
+      data-id="{{item.id}}"
+    >
+      <image
+        class="product-image"
+        src="{{item.image}}"
+        mode="aspectFill"
+        lazy-load="{{true}}"
+      />
+      <view class="product-content">
+        <text class="product-name">{{item.title}}</text>
+        <view class="product-tags" wx:if="{{item.tags && item.tags.length > 0}}">
+          <text class="tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="tag">{{tag}}</text>
+        </view>
+        <view class="product-bottom">
+          <view class="price-info">
+            <text class="product-price">¥{{item.price}}</text>
+            <text class="product-original-price" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+          </view>
+          <view class="commission-info" wx:if="{{item.commissionRate}}">
+            <text class="commission-text">佣金 {{item.commissionRate}}%</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="loading-state" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view class="error-state" wx:if="{{error}}">
+    <text class="error-text">{{error}}</text>
+    <text class="retry-btn" bindtap="refresh">点击重试</text>
+  </view>
+
+  <view class="empty-state" wx:if="{{!loading && !error && products.length === 0}}">
+    <text class="empty-text">暂无选品商品</text>
+  </view>
+</view>

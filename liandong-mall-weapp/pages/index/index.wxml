@@ -1,25 +1,57 @@
 <view class="index-page">
+  <!-- 分类Tab切换 -->
+  <sp-category-tab
+    currentTab="{{currentTab}}"
+    bind:tabchange="onTabChange"
+  />
+
+  <!-- 轮播图区域 -->
+  <view class="home-banner">
+    <swiper class="banner-swiper" indicator-dots autoplay circular interval="3500" duration="500" indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#ff5000">
+      <swiper-item wx:for="{{banners}}" wx:key="id">
+        <image class="banner-image" src="{{item.image}}" mode="aspectFill"/>
+        <view class="banner-content" wx:if="{{item.title || item.subtitle}}">
+          <text class="banner-title" wx:if="{{item.title}}">{{item.title}}</text>
+          <text class="banner-subtitle" wx:if="{{item.subtitle}}">{{item.subtitle}}</text>
+        </view>
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <!-- 分类列表 -->
+  <sp-category-list
+    currentTab="{{currentTab}}"
+    bind:categorychange="onCategoryChange"
+  />
+
   <!-- 商品推荐区组件 -->
-  <sp-home-recommend 
+  <sp-home-recommend
     title="热门推荐"
     productType="recommend"
-    limit="6"
+    limit="4"
     showMore="{{true}}"
   />
   
   <!-- 热销商品组件 -->
-  <sp-home-recommend 
+  <!-- <sp-home-recommend
     title="热销商品"
     productType="hot"
-    limit="6"
+    limit="4"
     showMore="{{true}}"
-  />
-  
+  /> -->
+
   <!-- 新品上市组件 -->
-  <sp-home-recommend 
+  <!-- <sp-home-recommend
     title="新品上市"
     productType="new"
-    limit="6"
+    limit="4"
+    showMore="{{true}}"
+  /> -->
+
+  <!-- 选品商品推荐组件 -->
+  <sp-home-xuanpin
+    title="选品推荐"
+    limit="3"
     showMore="{{true}}"
   />
 

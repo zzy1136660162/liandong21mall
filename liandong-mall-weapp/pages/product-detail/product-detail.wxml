@@ -6,10 +6,6 @@
         <image class="gallery-image" src="{{item}}" mode="aspectFill" bindtap="previewImage" data-url="{{item}}"/>
       </swiper-item>
     </swiper>
-    <!-- 促销标签 -->
-    <view class="promo-badge">
-      <text class="promo-text">超值装9斤</text>
-    </view>
   </view>
 
   <!-- 价格佣金区域 -->
@@ -25,21 +21,12 @@
         <text class="commission-value">¥{{product.commissionAmount}}</text>
         <text class="commission-rate">佣金率{{product.commissionRate}}%</text>
       </view>
-      <view class="promo-tag">
-        <text class="promo-tag-text">大牌大补</text>
-        <text class="promo-tag-sub">正品保障 官方补贴</text>
-      </view>
+
     </view>
   </view>
 
   <!-- 商品信息 -->
   <view class="info-section">
-    <view class="brand-row">
-      <view class="brand-tag">大牌大补</view>
-      <view class="brand-tag brand">品牌</view>
-      <text class="brand-name">{{product.shopName}}</text>
-      <text class="detail-arrow">详情 ></text>
-    </view>
     <view class="title-row">
       <text class="product-title">{{product.title}}</text>
     </view>
@@ -97,39 +84,6 @@
       <text class="sample-label">物流</text>
       <text class="sample-value">24小时内从{{product.location}}发货</text>
       <text class="arrow">></text>
-    </view>
-  </view>
-
-  <!-- 店铺信息 -->
-  <view class="shop-section">
-    <view class="shop-header">
-      <image class="shop-logo" src="{{product.shopLogo}}"/>
-      <view class="shop-info">
-        <view class="shop-name-row">
-          <view class="shop-badge">旗舰店</view>
-          <text class="shop-name">{{product.shopName}}</text>
-        </view>
-        <text class="shop-sales">近半年分销销量 {{product.shopSales}}</text>
-      </view>
-    </view>
-    <view class="shop-scores">
-      <view class="score-item main">
-        <text class="score-value">{{product.shopScore}}</text>
-        <text class="score-label">店铺体验分</text>
-        <text class="score-rank">超92%同行</text>
-      </view>
-      <view class="score-item">
-        <text class="score-value">{{product.productScore}}</text>
-        <text class="score-label">商品体验</text>
-      </view>
-      <view class="score-item">
-        <text class="score-value">{{product.logisticsScore}}</text>
-        <text class="score-label">物流体验</text>
-      </view>
-      <view class="score-item">
-        <text class="score-value">{{product.serviceScore}}</text>
-        <text class="score-label">售后服务</text>
-      </view>
     </view>
   </view>
 
@@ -199,12 +153,8 @@
       <text class="action-icon">🏪</text>
       <text class="action-text">进店选品</text>
     </view>
-    <view class="action-promo">
-      <text class="promo-title">买样后返</text>
-      <text class="promo-desc">履约全额返现</text>
-    </view>
     <view class="action-btn btn-add" bindtap="addToShelf">加入货架</view>
-    <view class="action-btn btn-buy" bindtap="buyNow">立即购买</view>
+    <view class="action-btn btn-buy" bindtap="goToSampleApply">申请样品</view>
   </view>
 </view>
 

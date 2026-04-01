@@ -99,9 +99,32 @@ class UserMember(db.Model):
     
     def to_dict(self):
         level_info = MemberLevel.query.get(self.level_id)
+        benefits = []
+        upgrade_condition = ''
+        if level_info:
+            if level_info.level_code == 'normal':
+                benefits = [{'type': 'base', 'name': '基础购物'}]
+                upgrade_condition = '完成首单购买自动升级为VIP'
+            elif level_info.level_code == 'vip':
+                benefits = [
+                    {'type': 'discount', 'name': '全场95折'},
+                    {'type': 'points', 'name': '积分翻倍'},
+                    {'type': 'shipping', 'name': '专享运费'}
+                ]
+                upgrade_condition = '已升级为VIP会员'
+            elif level_info.level_code == 'partner':
+                benefits = [
+                    {'type': 'discount', 'name': '全场9折'},
+                    {'type': 'points', 'name': '积分3倍'},
+                    {'type': 'shipping', 'name': '包邮'},
+                    {'type': 'exclusive', 'name': '专属客服'}
+                ]
+                upgrade_condition = '已升级为合伙人'
+
         return {
             'id': self.id,
             'userId': self.user_id,
+            'isMember': self.level_code != 'normal',
             'levelCode': self.level_code,
             'levelName': level_info.level_name if level_info else '',
             'discount': float(level_info.discount) if level_info else 1.0,
@@ -109,6 +132,8 @@ class UserMember(db.Model):
             'upgradeTime': self.upgrade_time.strftime('%Y-%m-%d %H:%M:%S') if self.upgrade_time else None,
             'validStart': self.valid_start.strftime('%Y-%m-%d %H:%M:%S') if self.valid_start else None,
             'validEnd': self.valid_end.strftime('%Y-%m-%d %H:%M:%S') if self.valid_end else None,
+            'benefits': benefits,
+            'upgradeCondition': upgrade_condition,
             'memberLevel': level_info.to_dict() if level_info else None
         }
 

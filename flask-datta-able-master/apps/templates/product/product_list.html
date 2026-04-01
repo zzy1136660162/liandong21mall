@@ -68,10 +68,10 @@
                                                     <td>
                                                         <img src="{{ product.main_image }}" alt="商品图片" style="width: 60px; height: 60px;">
                                                     </td>
-                                                    <td>{{ product.product_name }}</td>
-                                                    <td>{{ product.category.category_name if product.category else '-' }}</td>
+                                                    <td>{{ product.name }}</td>
+                                                    <td>{{ product.category_id }}</td>
                                                     <td>¥{{ product.price }}</td>
-                                                    <td>¥{{ product.member_price if product.member_price else '-' }}</td>
+                                                    <td>¥{{ product.supply_price if product.supply_price else '-' }}</td>
                                                     <td>{{ product.stock }}</td>
                                                     <td>{{ product.sales }}</td>
                                                     <td>

@@ -8,11 +8,16 @@ Page({
   onLoad() {
     this.loadRecentDemands()
   },
+  onShow() {
+    this.loadRecentDemands()
+  },
   loadRecentDemands() {
+    const submitterId = app.globalData.userId;
     wx.request({
       url: `${app.globalData.apiBaseUrl}/demand/list`,
       method: 'GET',
       data: {
+        submitterId,
         page: 1,
         pageSize: 3
       },

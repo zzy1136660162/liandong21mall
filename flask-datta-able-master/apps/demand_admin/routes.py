@@ -119,6 +119,22 @@ def update_status():
     return redirect(url_for('demand_admin.detail', demand_id=demand_id))
 
 
+@blueprint.route('/delete/<int:demand_id>', methods=['POST'])
+@login_required
+def delete_demand(demand_id):
+    """删除需求"""
+    demand = RDDemand.query.get_or_404(demand_id)
+    
+    try:
+        RDDemandProgress.query.filter_by(demand_id=demand_id).delete()
+        db.session.delete(demand)
+        db.session.commit()
+        return {'code': 200, 'message': '删除成功'}
+    except Exception as e:
+        db.session.rollback()
+        return {'code': 400, 'message': f'删除失败: {str(e)}'}, 400
+
+
 @blueprint.route('/statistics')
 @login_required
 def statistics():

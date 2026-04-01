@@ -6,9 +6,10 @@
 
 from apps import db
 from apps.sp_mall.sp_models import (
-    SpProductCategory, SpProduct, SpProductSku, 
+    SpProductCategory, SpProduct, SpProductSku,
     SpCart, SpOrder, SpOrderItem, SpAddress
 )
+from apps.member.models import UserMember, MemberLevel
 from datetime import datetime, timedelta
 import random
 import string
@@ -626,20 +627,65 @@ class SpOrderService:
     def confirm_receipt(order_id, user_id):
         """确认收货"""
         order = SpOrder.query.filter_by(id=order_id, user_id=user_id).first()
-        
+
         if not order:
             return None, '订单不存在'
-        
+
         if order.status != 'SHIPPED':
             return None, '只有已发货订单可以确认收货'
-        
+
         order.status = 'FINISHED'
         order.finish_time = datetime.now()
         order.updated_at = datetime.now()
-        
+
         db.session.commit()
-        
+
+        SpOrderService._check_and_upgrade_to_vip(user_id, order_id)
+
         return order.to_dict(include_items=True), '确认收货成功'
+
+    @staticmethod
+    def _check_and_upgrade_to_vip(user_id, order_id=None):
+        """检查并自动升级为VIP会员（如果用户有已完成的首个订单）"""
+        try:
+            existing_member = UserMember.query.filter_by(user_id=user_id).first()
+            if existing_member and existing_member.level_code == 'vip':
+                return
+
+            finished_order_count = SpOrder.query.filter_by(
+                user_id=user_id,
+                status='FINISHED'
+            ).count()
+
+            if finished_order_count == 1:
+                vip_level = MemberLevel.query.filter_by(level_code='vip').first()
+                if not vip_level:
+                    return
+
+                now = datetime.now()
+
+                if existing_member:
+                    existing_member.level_id = vip_level.id
+                    existing_member.level_code = 'vip'
+                    existing_member.upgrade_type = 1
+                    existing_member.upgrade_time = now
+                    existing_member.first_order_id = order_id
+                else:
+                    new_member = UserMember(
+                        user_id=user_id,
+                        level_id=vip_level.id,
+                        level_code='vip',
+                        upgrade_type=1,
+                        upgrade_time=now,
+                        first_order_id=order_id,
+                        valid_start=now,
+                        valid_end=None
+                    )
+                    db.session.add(new_member)
+
+                db.session.commit()
+        except Exception as e:
+            print(f"自动升级VIP失败: {e}")
     
     @staticmethod
     def cancel_expired_orders(timeout_minutes=30):

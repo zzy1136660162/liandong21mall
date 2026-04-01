@@ -38,8 +38,8 @@
                                                 {% for category in categories %}
                                                 <tr>
                                                     <td>{{ category.id }}</td>
-                                                    <td>{{ category.category_name }}</td>
-                                                    <td>{{ category.category_code }}</td>
+                                                    <td>{{ category.name }}</td>
+                                                    <td>{{ category.id }}</td>
                                                     <td>
                                                         {% if category.icon %}
                                                         <img src="{{ category.icon }}" alt="图标" style="width: 40px; height: 40px;">

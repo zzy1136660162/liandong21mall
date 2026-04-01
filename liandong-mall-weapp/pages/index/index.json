@@ -1,6 +1,9 @@
 {
   "usingComponents": {
     "sp-home-recommend": "../../components/sp_HomeRecommend/sp_HomeRecommend",
-    "home-talent-pool": "../../components/home_talent_pool/home_talent_pool"
+    "home-talent-pool": "../../components/home_talent_pool/home_talent_pool",
+    "sp-home-xuanpin": "../../components/sp_HomeXuanpin/sp_HomeXuanpin",
+    "sp-category-tab": "../../components/sp_CategoryTab/sp_CategoryTab",
+    "sp-category-list": "../../components/sp_CategoryList/sp_CategoryList"
   }
 }
