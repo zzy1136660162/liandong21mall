@@ -165,6 +165,23 @@ Page({
     this.hideSpecsModal();
   },
 
+  addToShelf() {
+    wx.showToast({ title: '已加入货架', icon: 'success' });
+  },
+
+  goToSampleApply() {
+    const productId = this.data.product.id;
+    wx.navigateTo({
+      url: '/pages/sample-apply/sample-apply?productId=' + productId
+    });
+  },
+
+  goToShop() {
+    wx.switchTab({
+      url: '/pages/xuanpinindex/xuanpinindex'
+    });
+  },
+
   buyNow() {
     wx.showToast({ title: '正在下单...', icon: 'loading' });
     setTimeout(() => {

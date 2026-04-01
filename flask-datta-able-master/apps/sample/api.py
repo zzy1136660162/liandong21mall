@@ -12,6 +12,28 @@ from datetime import datetime
 
 api = Namespace('sample', description='样品申请模块')
 
+
+def get_current_user_id():
+    """获取当前用户ID"""
+    user_id = request.headers.get('X-User-Id')
+    if user_id:
+        try:
+            return int(user_id)
+        except:
+            pass
+    return None
+
+
+def require_login(func):
+    """登录装饰器"""
+    def wrapper(*args, **kwargs):
+        user_id = get_current_user_id()
+        if not user_id:
+            return {'code': 401, 'message': '请先登录', 'data': None}, 401
+        return func(*args, **kwargs)
+    wrapper.__name__ = func.__name__
+    return wrapper
+
 SampleApplyModel = api.model('SampleApply', {
     'id': fields.Integer,
     'apply_no': fields.String,
@@ -60,7 +82,9 @@ class SampleListAPI(Resource):
 @api.route('/apply')
 class SampleApplyAPI(Resource):
     """提交样品申请 - POST /api/sample/samples/apply"""
+    @require_login
     def post(self):
+        user_id = get_current_user_id()
         try:
             data = request.get_json()
             print(f"[DEBUG] 收到申请数据: {data}")
@@ -101,7 +125,7 @@ class SampleApplyAPI(Resource):
                     
                     apply = SampleApply(
                         apply_no=apply_no,
-                        user_id=1,
+                        user_id=user_id,
                         user_name=recipient_name,
                         user_phone=phone,
                         product_id=product.id,

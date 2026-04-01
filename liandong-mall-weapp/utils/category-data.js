@@ -4,103 +4,82 @@
 
 const categories = [
   {
-    id: 'food',
-    name: '食品生鲜',
-    icon: '🍔',
-    subCategories: [
-      { id: 'snacks', name: '休闲零食' },
-      { id: 'drinks', name: '饮料冲调' },
-      { id: 'fresh', name: '生鲜果蔬' },
-      { id: 'grains', name: '粮油调味' },
-      { id: 'tea', name: '茗茶' },
-      { id: 'wine', name: '酒类' }
-    ]
+    id: 'nasal_care',
+    name: '鼻部护理',
+    icon: '👃'
   },
   {
-    id: 'home',
-    name: '家居日用',
-    icon: '🏠',
-    subCategories: [
-      { id: 'cleaning', name: '清洁用品' },
-      { id: 'kitchen', name: '厨房用具' },
-      { id: 'storage', name: '收纳整理' },
-      { id: 'textile', name: '家纺布艺' },
-      { id: 'decor', name: '家居装饰' }
-    ]
+    id: 'pain_relief',
+    name: '缓解疼痛',
+    icon: '💊'
   },
   {
-    id: 'clothing',
-    name: '服饰内衣',
-    icon: '👔',
-    subCategories: [
-      { id: 'women', name: '女装' },
-      { id: 'men', name: '男装' },
-      { id: 'underwear', name: '内衣' },
-      { id: 'shoes', name: '鞋靴' },
-      { id: 'bags', name: '箱包' },
-      { id: 'accessories', name: '配饰' }
-    ]
+    id: 'eye_care',
+    name: '护眼',
+    icon: '👁️'
   },
   {
-    id: 'beauty',
-    name: '美妆护肤',
-    icon: '💄',
-    subCategories: [
-      { id: 'skincare', name: '面部护肤' },
-      { id: 'makeup', name: '彩妆' },
-      { id: 'perfume', name: '香氛' },
-      { id: 'tools', name: '美妆工具' },
-      { id: 'beauty-devices', name: '美容仪器' }
-    ]
+    id: 'sub_health',
+    name: '调理亚健康',
+    icon: '💪'
   },
   {
-    id: 'personal',
-    name: '个护清洁',
-    icon: '🧴',
-    subCategories: [
-      { id: 'hair', name: '洗发护发' },
-      { id: 'body', name: '身体护理' },
-      { id: 'oral', name: '口腔护理' },
-      { id: 'feminine', name: '女性护理' }
-    ]
+    id: 'kidney_care',
+    name: '固肾养肾',
+    icon: '🌿'
   },
   {
-    id: 'digital',
-    name: '数码家电',
-    icon: '📱',
-    subCategories: [
-      { id: 'phones', name: '手机通讯' },
-      { id: 'computers', name: '电脑办公' },
-      { id: 'appliances', name: '家用电器' },
-      { id: 'smart', name: '智能设备' },
-      { id: 'accessories-digital', name: '数码配件' }
-    ]
+    id: 'body_odor',
+    name: '狐臭护理',
+    icon: '🧴'
   },
   {
-    id: 'sports',
-    name: '运动户外',
-    icon: '⚽',
-    subCategories: [
-      { id: 'fitness', name: '运动健身' },
-      { id: 'outdoor', name: '户外装备' },
-      { id: 'sports-shoes', name: '运动鞋包' },
-      { id: 'cycling', name: '骑行运动' }
-    ]
+    id: 'skin_care',
+    name: '美肤护肤',
+    icon: '✨'
   },
   {
-    id: 'toys',
-    name: '母婴玩具',
-    icon: '🍼',
-    subCategories: [
-      { id: 'baby-food', name: '奶粉辅食' },
-      { id: 'diapers', name: '尿裤湿巾' },
-      { id: 'baby-care', name: '洗护用品' },
-      { id: 'toys-games', name: '玩具乐器' },
-      { id: 'baby-gear', name: '孕产用品' }
-    ]
+    id: 'facial_rehab',
+    name: '面瘫康复',
+    icon: '🏥'
+  },
+  {
+    id: 'women_health',
+    name: '女性调理',
+    icon: '🌸'
+  },
+  {
+    id: 'solid_drink',
+    name: '固体饮料',
+    icon: '🥤'
+  },
+  {
+    id: 'tablet_candy',
+    name: '压片糖果',
+    icon: '🍬'
+  },
+  {
+    id: 'herbal_paste',
+    name: '膏滋',
+    icon: '🫙'
+  },
+  {
+    id: 'herbal_drink',
+    name: '植物饮品',
+    icon: '🍵'
+  },
+  {
+    id: 'prepared_wine',
+    name: '配制酒',
+    icon: '🍷'
+  },
+  {
+    id: 'tea_substitute',
+    name: '代用茶',
+    icon: '🍃'
   }
 ];
 
 module.exports = {
-  categories
+  categories: categories
 };
