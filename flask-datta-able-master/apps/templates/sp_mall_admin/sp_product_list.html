@@ -1,0 +1,794 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 商品管理 {% endblock %}
+
+{% block stylesheets %}
+{{ super() }}
+<style>
+    .pcoded-content {
+        margin-left: 260px;
+        padding: 20px;
+    }
+    @media (max-width: 992px) {
+        .pcoded-content {
+            margin-left: 0;
+        }
+    }
+    .upload-section {
+        position: relative;
+    }
+    .image-upload-area {
+        width: 100%;
+        max-width: 400px;
+        height: 280px;
+        border: 2px dashed #ced4da;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+        overflow: hidden;
+        position: relative;
+    }
+    .image-upload-area:hover {
+        border-color: #007bff;
+        background: #e7f3ff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+    }
+    .image-upload-area.dragover {
+        border-color: #28a745;
+        background: #e8f5e9;
+        transform: scale(1.02);
+    }
+    .upload-placeholder {
+        text-align: center;
+        padding: 20px;
+    }
+    .upload-preview {
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+    .preview-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+    .upload-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 6px;
+    }
+    .upload-preview:hover .upload-overlay {
+        opacity: 1;
+    }
+    .upload-overlay .btn {
+        transform: translateY(20px);
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+    .upload-preview:hover .upload-overlay .btn {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    .upload-preview:hover .upload-overlay .btn:nth-child(2) {
+        transition-delay: 0.1s;
+    }
+    #uploadProgress {
+        background: #f8f9fa;
+        padding: 10px 15px;
+        border-radius: 6px;
+        border-left: 3px solid #007bff;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    .upload-progress-animating {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <div class="main-body">
+            <div class="page-wrapper">
+                <div class="page-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>商品管理</h5>
+                                    <div class="card-header-right">
+                                        <button class="btn btn-primary" onclick="addProduct()">
+                                            <i class="feather icon-plus"></i> 添加商品
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-block">
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <select class="form-control" id="categoryFilter">
+                                                <option value="">全部分类</option>
+                                                {% for category in categories %}
+                                                <option value="{{ category.id }}" {% if request.args.get('categoryId') | int == category.id %}selected{% endif %}>
+                                                    {{ category.category_name }}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <select class="form-control" id="statusFilter">
+                                                <option value="">全部状态</option>
+                                                <option value="1" {% if request.args.get('status') == '1' %}selected{% endif %}>上架</option>
+                                                <option value="0" {% if request.args.get('status') == '0' %}selected{% endif %}>下架</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="keywordInput" placeholder="搜索商品名称" value="{{ request.args.get('keyword', '') }}">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-info" onclick="filterProducts()">
+                                                        <i class="feather icon-search"></i> 搜索
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button class="btn btn-secondary" onclick="resetFilter()">
+                                                <i class="feather icon-refresh-cw"></i> 重置
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center" style="width: 80px;">ID</th>
+                                                    <th class="text-center" style="width: 100px;">商品图片</th>
+                                                    <th>商品名称</th>
+                                                    <th class="text-center">分类</th>
+                                                    <th class="text-right">价格</th>
+                                                    <th class="text-center">库存</th>
+                                                    <th class="text-center">销量</th>
+                                                    <th class="text-center">状态</th>
+                                                    <th class="text-center">标签</th>
+                                                    <th class="text-center" style="width: 200px;">操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for product in products %}
+                                                <tr data-id="{{ product.id }}">
+                                                    <td class="text-center">{{ product.id }}</td>
+                                                    <td class="text-center">
+                                                        <img src="{{ product.main_image }}" alt="" 
+                                                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"
+                                                             onerror="this.src='/static/assets/images/no-image.png'">
+                                                    </td>
+                                                    <td>
+                                                        <strong>{{ product.product_name }}</strong>
+                                                        <br>
+                                                        <small class="text-muted">{{ product.product_code }}</small>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="badge badge-light">{{ product.category.category_name if product.category else '-' }}</span>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <div class="text-danger font-weight-bold">¥{{ "%.2f"|format(product.price) }}</div>
+                                                        {% if product.original_price and product.original_price > product.price %}
+                                                        <small class="text-muted text-line-through">¥{{ "%.2f"|format(product.original_price) }}</small>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        {% if product.stock < 10 %}
+                                                        <span class="text-danger">{{ product.stock }}</span>
+                                                        {% else %}
+                                                        {{ product.stock }}
+                                                        {% endif %}
+                                                    </td>
+                                                    <td class="text-center">{{ product.sales }}</td>
+                                                    <td class="text-center">
+                                                        <span class="badge badge-pill badge-{% if product.status == 1 %}success{% else %}secondary{% endif %}">
+                                                            {% if product.status == 1 %}上架{% else %}下架{% endif %}
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        {% if product.is_hot == 1 %}
+                                                        <span class="badge badge-danger">热销</span>
+                                                        {% endif %}
+                                                        {% if product.is_new == 1 %}
+                                                        <span class="badge badge-info">新品</span>
+                                                        {% endif %}
+                                                        {% if product.is_recommend == 1 %}
+                                                        <span class="badge badge-warning">推荐</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button class="btn btn-sm btn-primary" onclick="editProduct({{ product.id }})">
+                                                            <i class="feather icon-edit-2"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-{% if product.status == 1 %}warning{% else %}success{% endif %}" onclick="toggleStatus({{ product.id }})">
+                                                            <i class="feather icon-{% if product.status == 1 %}toggle-right{% else %}toggle-left{% endif %}"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger" onclick="deleteProduct({{ product.id }})">
+                                                            <i class="feather icon-trash-2"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                                {% if not products %}
+                                                <tr>
+                                                    <td colspan="10" class="text-center text-muted">暂无商品数据</td>
+                                                </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    {% if pagination.pages > 1 %}
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                            <nav>
+                                                <ul class="pagination justify-content-center">
+                                                    {% if pagination.has_prev %}
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page={{ pagination.prev_num }}&categoryId={{ request.args.get('categoryId', '') }}&status={{ request.args.get('status', '') }}&keyword={{ request.args.get('keyword', '') }}">上一页</a>
+                                                    </li>
+                                                    {% endif %}
+                                                    
+                                                    {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                                        {% if page_num %}
+                                                            {% if page_num == current_page %}
+                                                            <li class="page-item active">
+                                                                <span class="page-link">{{ page_num }}</span>
+                                                            </li>
+                                                            {% else %}
+                                                            <li class="page-item">
+                                                                <a class="page-link" href="?page={{ page_num }}&categoryId={{ request.args.get('categoryId', '') }}&status={{ request.args.get('status', '') }}&keyword={{ request.args.get('keyword', '') }}">{{ page_num }}</a>
+                                                            </li>
+                                                            {% endif %}
+                                                        {% else %}
+                                                        <li class="page-item disabled">
+                                                            <span class="page-link">...</span>
+                                                        </li>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    
+                                                    {% if pagination.has_next %}
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page={{ pagination.next_num }}&categoryId={{ request.args.get('categoryId', '') }}&status={{ request.args.get('status', '') }}&keyword={{ request.args.get('keyword', '') }}">下一页</a>
+                                                    </li>
+                                                    {% endif %}
+                                                </ul>
+                                            </nav>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="productModal" tabindex="-1" role="dialog" data-id="">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productModalTitle">添加商品</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <form id="productForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>商品名称 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="productName" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>商品编码 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="productCode" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>商品分类 <span class="text-danger">*</span></label>
+                                <select class="form-control" name="categoryId" required>
+                                    <option value="">请选择分类</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.category_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>商品状态</label>
+                                <select class="form-control" name="status">
+                                    <option value="1">上架</option>
+                                    <option value="0">下架</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>商品价格 <span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" class="form-control" name="price" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>原价</label>
+                                <input type="number" step="0.01" class="form-control" name="originalPrice">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>会员价</label>
+                                <input type="number" step="0.01" class="form-control" name="memberPrice">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>库存数量</label>
+                                <input type="number" class="form-control" name="stock" value="0">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>销量</label>
+                                <input type="number" class="form-control" name="sales" value="0">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>排序</label>
+                                <input type="number" class="form-control" name="sort" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>商品主图 <span class="text-danger">*</span></label>
+                        <div class="upload-section">
+                            <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('imageUpload').click()">
+                                <div class="upload-placeholder" id="uploadPlaceholder">
+                                    <i class="feather icon-upload" style="font-size: 48px; color: #6c757d;"></i>
+                                    <p class="mt-2 mb-1" style="color: #6c757d; font-weight: 500;">点击上传图片</p>
+                                    <small style="color: #adb5bd;">支持 JPG、PNG、GIF、WebP 格式</small>
+                                </div>
+                                <div class="upload-preview" id="uploadPreview" style="display: none;">
+                                    <img id="previewImg" src="" alt="预览" class="preview-image">
+                                    <div class="upload-overlay">
+                                        <button type="button" class="btn btn-sm btn-light" onclick="event.stopPropagation(); changeImage()">
+                                            <i class="feather icon-edit-2"></i> 更换
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="event.stopPropagation(); removeImage()">
+                                            <i class="feather icon-trash-2"></i> 删除
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="text" class="form-control mt-2" name="mainImage" id="mainImageInput" placeholder="上传图片后自动填充，或手动输入图片URL">
+                            <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="uploadImage(this)">
+                            <div id="uploadProgress" class="mt-2" style="display: none;">
+                                <div class="d-flex align-items-center">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                                    <span class="ml-2">上传中，请稍候...</span>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted" id="imageHint">请上传商品主图或输入图片URL地址</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>商品简介</label>
+                        <textarea class="form-control" name="brief" rows="2" placeholder="商品简短描述"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>商品详情</label>
+                        <textarea class="form-control" name="description" rows="5" placeholder="商品详细描述（支持HTML）"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="isHot" name="isHot" value="1">
+                                    <label class="custom-control-label" for="isHot">热销商品</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="isNew" name="isNew" value="1">
+                                    <label class="custom-control-label" for="isNew">新品上架</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="isRecommend" name="isRecommend" value="1">
+                                    <label class="custom-control-label" for="isRecommend">推荐商品</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+$(document).ready(function() {
+    // 拖拽上传功能
+    var uploadArea = $('#imageUploadArea');
+    
+    uploadArea.on('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).addClass('dragover');
+    });
+    
+    uploadArea.on('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).removeClass('dragover');
+    });
+    
+    uploadArea.on('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).removeClass('dragover');
+        
+        var files = e.originalEvent.dataTransfer.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+    
+    $('#productForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        // 验证必填字段
+        var productName = $('input[name="productName"]', this).val().trim();
+        var productCode = $('input[name="productCode"]', this).val().trim();
+        var categoryId = $('select[name="categoryId"]', this).val();
+        var price = $('input[name="price"]', this).val();
+        var mainImage = $('input[name="mainImage"]', this).val().trim();
+        
+        // 显示验证错误
+        var errors = [];
+        
+        if (!productName) {
+            errors.push('请输入商品名称');
+        }
+        
+        if (!productCode) {
+            errors.push('请输入商品编码');
+        }
+        
+        if (!categoryId) {
+            errors.push('请选择商品分类');
+        }
+        
+        if (!price || parseFloat(price) <= 0) {
+            errors.push('请输入有效的商品价格');
+        }
+        
+        if (!mainImage) {
+            errors.push('请上传商品主图或输入图片URL');
+        }
+        
+        if (errors.length > 0) {
+            toastr.error(errors.join('<br>'));
+            return false;
+        }
+        
+        var productId = $('#productModal').data('id');
+        var formData = {
+            productName: productName,
+            productCode: productCode,
+            categoryId: parseInt(categoryId),
+            mainImage: mainImage,
+            price: parseFloat(price),
+            originalPrice: $('input[name="originalPrice"]', this).val() ? parseFloat($('input[name="originalPrice"]', this).val()) : null,
+            memberPrice: $('input[name="memberPrice"]', this).val() ? parseFloat($('input[name="memberPrice"]', this).val()) : null,
+            stock: parseInt($('input[name="stock"]', this).val()) || 0,
+            sales: parseInt($('input[name="sales"]', this).val()) || 0,
+            sort: parseInt($('input[name="sort"]', this).val()) || 0,
+            brief: $('textarea[name="brief"]', this).val(),
+            description: $('textarea[name="description"]', this).val(),
+            status: parseInt($('select[name="status"]', this).val()),
+            isHot: $('#isHot', this).is(':checked') ? 1 : 0,
+            isNew: $('#isNew', this).is(':checked') ? 1 : 0,
+            isRecommend: $('#isRecommend', this).is(':checked') ? 1 : 0
+        };
+        
+        var url = productId ? '/admin/sp/product/' + productId : '/admin/sp/product/add';
+        var method = productId ? 'PUT' : 'POST';
+        
+        $.ajax({
+            url: url,
+            type: method,
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(res) {
+                if (res.code === 200) {
+                    $('#productModal').modal('hide');
+                    toastr.success(productId ? '更新成功' : '添加成功');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 500);
+                } else {
+                    toastr.error(res.message);
+                }
+            },
+            error: function() {
+                toastr.error('请求失败');
+            }
+        });
+    });
+});
+
+function addProduct() {
+    $('#productModal').data('id', '');
+    $('#productModalTitle').text('添加商品');
+    $('#productForm')[0].reset();
+    resetImageUpload();
+    $('#imageHint').html('请上传商品主图或输入图片URL地址');
+    $('#productModal').modal('show');
+}
+
+function editProduct(id) {
+    $.ajax({
+        url: '/admin/sp/product/' + id,
+        type: 'GET',
+        success: function(res) {
+            if (res.code === 200) {
+                var data = res.data;
+                $('#productModal').data('id', id);
+                $('#productModalTitle').text('编辑商品');
+                
+                $('input[name="productName"]').val(data.productName);
+                $('input[name="productCode"]').val(data.productCode);
+                $('select[name="categoryId"]').val(data.categoryId);
+                $('input[name="mainImage"]').val(data.mainImage);
+                
+                if (data.mainImage) {
+                    $('#previewImg').attr('src', data.mainImage);
+                    $('#uploadPlaceholder').hide();
+                    $('#uploadPreview').show();
+                    $('#imageHint').html('<span class="text-success"><i class="feather icon-check-circle"></i> 当前已有商品图片，可以更换</span>');
+                } else {
+                    resetImageUpload();
+                    $('#imageHint').html('请上传商品主图或输入图片URL地址');
+                }
+                
+                $('input[name="price"]').val(data.price);
+                $('input[name="originalPrice"]').val(data.originalPrice || '');
+                $('input[name="memberPrice"]').val(data.memberPrice || '');
+                $('input[name="stock"]').val(data.stock);
+                $('input[name="sales"]').val(data.sales);
+                $('input[name="sort"]').val(data.sort || 0);
+                $('textarea[name="brief"]').val(data.brief || '');
+                $('textarea[name="description"]').val(data.description || '');
+                $('select[name="status"]').val(data.status);
+                $('#isHot').prop('checked', data.isHot);
+                $('#isNew').prop('checked', data.isNew);
+                $('#isRecommend').prop('checked', data.isRecommend);
+                
+                $('#productModal').modal('show');
+            } else {
+                toastr.error(res.message);
+            }
+        },
+        error: function() {
+            toastr.error('获取商品信息失败');
+        }
+    });
+}
+
+function toggleStatus(id) {
+    $.ajax({
+        url: '/admin/sp/product/toggle-status/' + id,
+        type: 'POST',
+        success: function(res) {
+            if (res.code === 200) {
+                toastr.success('状态更新成功');
+                setTimeout(function() {
+                    location.reload();
+                }, 500);
+            } else {
+                toastr.error(res.message);
+            }
+        },
+        error: function() {
+            toastr.error('请求失败');
+        }
+    });
+}
+
+function handleFile(file) {
+    // 验证文件类型
+    var allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedTypes.indexOf(file.type) === -1) {
+        toastr.error('只支持 JPG、PNG、GIF、WebP 格式的图片');
+        return;
+    }
+    
+    // 验证文件大小
+    if (file.size > 16 * 1024 * 1024) {
+        toastr.error('图片大小不能超过16MB');
+        return;
+    }
+    
+    uploadImageFile(file);
+}
+
+function uploadImage(input) {
+    var file = input.files[0];
+    if (!file) return;
+    handleFile(file);
+}
+
+function uploadImageFile(file) {
+    $('#uploadProgress').show();
+    
+    var formData = new FormData();
+    formData.append('file', file);
+    
+    $.ajax({
+        url: '/admin/sp/upload/image',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(res) {
+            $('#uploadProgress').hide();
+            
+            if (res.code === 200) {
+                var imageUrl = res.data.url;
+                $('#mainImageInput').val(imageUrl);
+                $('#previewImg').attr('src', imageUrl);
+                $('#uploadPlaceholder').hide();
+                $('#uploadPreview').show();
+                
+                // 更新提示文字
+                $('#imageHint').html('<span class="text-success"><i class="feather icon-check-circle"></i> 图片已上传成功，URL已自动填入</span>');
+                
+                toastr.success('图片上传成功！可以继续填写其他信息了');
+            } else {
+                toastr.error(res.message || '上传失败，请重试');
+            }
+        },
+        error: function(xhr, status, error) {
+            $('#uploadProgress').hide();
+            toastr.error('上传请求失败: ' + error);
+        }
+    });
+}
+
+function changeImage() {
+    document.getElementById('imageUpload').click();
+}
+
+function removeImage() {
+    if (!confirm('确定要删除当前图片吗？')) {
+        return;
+    }
+    
+    $('#mainImageInput').val('');
+    $('#uploadPreview').hide();
+    $('#uploadPlaceholder').show();
+    $('#imageUpload').val('');
+    $('#imageHint').html('<span class="text-warning"><i class="feather icon-alert-circle"></i> 图片已删除，请重新上传</span>');
+    toastr.warning('图片已删除');
+}
+
+function resetImageUpload() {
+    $('#mainImageInput').val('');
+    $('#previewImg').attr('src', '');
+    $('#uploadPreview').hide();
+    $('#uploadPlaceholder').show();
+    $('#imageUpload').val('');
+}
+
+function deleteProduct(id) {
+    if (!confirm('确定要删除该商品吗？')) {
+        return;
+    }
+    
+    $.ajax({
+        url: '/admin/sp/product/' + id,
+        type: 'DELETE',
+        success: function(res) {
+            if (res.code === 200) {
+                toastr.success('删除成功');
+                setTimeout(function() {
+                    location.reload();
+                }, 500);
+            } else {
+                toastr.error(res.message);
+            }
+        },
+        error: function() {
+            toastr.error('请求失败');
+        }
+    });
+}
+
+function filterProducts() {
+    var categoryId = $('#categoryFilter').val();
+    var status = $('#statusFilter').val();
+    var keyword = $('#keywordInput').val();
+    
+    var params = [];
+    if (categoryId) params.push('categoryId=' + categoryId);
+    if (status) params.push('status=' + status);
+    if (keyword) params.push('keyword=' + encodeURIComponent(keyword));
+    
+    var url = '/admin/sp/product';
+    if (params.length > 0) {
+        url += '?' + params.join('&');
+    }
+    
+    location.href = url;
+}
+
+function resetFilter() {
+    location.href = '/admin/sp/product';
+}
+
+$('#keywordInput').on('keypress', function(e) {
+    if (e.which === 13) {
+        filterProducts();
+    }
+});
+</script>
+{% endblock %}

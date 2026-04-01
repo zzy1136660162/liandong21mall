@@ -13,6 +13,50 @@ from apps.member.models import UserMember, MemberLevel
 from datetime import datetime, timedelta
 import random
 import string
+from flask import request
+
+
+def get_base_url():
+    """获取当前请求的基础URL"""
+    if request:
+        return f'{request.scheme}://{request.host}'
+    return 'http://localhost:5000'
+
+
+def fix_image_url(image_url):
+    """修复图片URL，确保是完整的URL"""
+    if not image_url:
+        return None
+    
+    # 如果已经是完整URL，直接返回
+    if image_url.startswith('http://') or image_url.startswith('https://'):
+        return image_url
+    
+    # 如果是相对路径，添加基础URL
+    base_url = get_base_url()
+    if image_url.startswith('/'):
+        return f'{base_url}{image_url}'
+    else:
+        return f'{base_url}/{image_url}'
+
+
+def fix_images_list(images):
+    """修复图片列表，确保所有图片都是完整URL"""
+    if not images:
+        return []
+    
+    if isinstance(images, str):
+        # 如果是JSON字符串，解析后处理
+        import json
+        try:
+            images = json.loads(images)
+        except:
+            return [fix_image_url(images)]
+    
+    if isinstance(images, list):
+        return [fix_image_url(img) for img in images if img]
+    
+    return [fix_image_url(images)]
 
 
 class SpProductService:
@@ -45,8 +89,16 @@ class SpProductService:
             page=page, per_page=page_size, error_out=False
         )
         
+        # 处理商品列表，修复图片URL
+        products_list = []
+        for product in pagination.items:
+            product_dict = product.to_dict()
+            product_dict['mainImage'] = fix_image_url(product_dict.get('mainImage'))
+            product_dict['image'] = fix_image_url(product_dict.get('mainImage'))
+            products_list.append(product_dict)
+        
         return {
-            'list': [product.to_dict() for product in pagination.items],
+            'list': products_list,
             'total': pagination.total,
             'page': page,
             'pageSize': page_size,
@@ -61,6 +113,10 @@ class SpProductService:
             return None
         
         product_dict = product.to_dict(include_detail=True)
+        
+        # 修复图片URL
+        product_dict['mainImage'] = fix_image_url(product_dict.get('mainImage'))
+        product_dict['images'] = fix_images_list(product_dict.get('images'))
         
         product_dict['id'] = product_dict['productId']
         product_dict['name'] = product_dict['productName']
@@ -146,6 +202,7 @@ class SpProductService:
         
         product_dict['reviewList'] = []
         
+        # 获取推荐商品并修复图片URL
         recommendations = SpProductService.get_recommend_products(6)
         product_dict['recommendations'] = recommendations
         
@@ -162,8 +219,8 @@ class SpProductService:
                 'id': product.id,
                 'productName': product.product_name,
                 'name': product.product_name,
-                'mainImage': product.main_image,
-                'image': product.main_image,
+                'mainImage': fix_image_url(product.main_image),
+                'image': fix_image_url(product.main_image),
                 'price': float(product.price),
                 'originalPrice': float(product.original_price) if product.original_price else None,
                 'memberPrice': float(product.member_price) if product.member_price else float(product.price),
@@ -185,8 +242,8 @@ class SpProductService:
                 'id': product.id,
                 'productName': product.product_name,
                 'name': product.product_name,
-                'mainImage': product.main_image,
-                'image': product.main_image,
+                'mainImage': fix_image_url(product.main_image),
+                'image': fix_image_url(product.main_image),
                 'price': float(product.price),
                 'originalPrice': float(product.original_price) if product.original_price else None,
                 'memberPrice': float(product.member_price) if product.member_price else float(product.price),
@@ -208,8 +265,8 @@ class SpProductService:
                 'id': product.id,
                 'productName': product.product_name,
                 'name': product.product_name,
-                'mainImage': product.main_image,
-                'image': product.main_image,
+                'mainImage': fix_image_url(product.main_image),
+                'image': fix_image_url(product.main_image),
                 'price': float(product.price),
                 'originalPrice': float(product.original_price) if product.original_price else None,
                 'memberPrice': float(product.member_price) if product.member_price else float(product.price),
@@ -232,8 +289,16 @@ class SpProductService:
             page=page, per_page=page_size, error_out=False
         )
         
+        # 处理搜索结果，修复图片URL
+        products_list = []
+        for product in pagination.items:
+            product_dict = product.to_dict()
+            product_dict['mainImage'] = fix_image_url(product_dict.get('mainImage'))
+            product_dict['image'] = fix_image_url(product_dict.get('mainImage'))
+            products_list.append(product_dict)
+        
         return {
-            'list': [product.to_dict() for product in pagination.items],
+            'list': products_list,
             'total': pagination.total,
             'page': page,
             'pageSize': page_size,

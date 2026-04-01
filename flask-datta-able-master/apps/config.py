@@ -16,6 +16,11 @@ class Config(object):
     # Assets Management
     ASSETS_ROOT = os.getenv('ASSETS_ROOT', '/static/assets')  
     
+    # Upload configuration
+    UPLOAD_FOLDER = os.path.join(basedir, 'static', 'uploads')
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
+    
     # Set up the App SECRET_KEY
     SECRET_KEY  = os.getenv('SECRET_KEY', None)
     if not SECRET_KEY:

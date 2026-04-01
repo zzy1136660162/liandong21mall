@@ -1,0 +1,400 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 订单详情 {% endblock %}
+
+{% block stylesheets %}
+{{ super() }}
+<style>
+    .pcoded-content {
+        margin-left: 260px;
+        padding: 20px;
+    }
+    @media (max-width: 992px) {
+        .pcoded-content {
+            margin-left: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <div class="main-body">
+            <div class="page-wrapper">
+                <div class="page-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>订单详情</h5>
+                                    <div class="card-header-right">
+                                        <a href="/admin/sp/order" class="btn btn-secondary">
+                                            <i class="feather icon-arrow-left"></i> 返回列表
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-block">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h6>基本信息</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <table class="table table-borderless">
+                                                        <tr>
+                                                            <td width="40%"><strong>订单编号：</strong></td>
+                                                            <td>{{ order.order_no }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>订单状态：</strong></td>
+                                                            <td>
+                                                                {% if order.status == 'PENDING_PAY' %}
+                                                                <span class="badge badge-pill badge-warning">待支付</span>
+                                                                {% elif order.status == 'PAID' %}
+                                                                <span class="badge badge-pill badge-info">待发货</span>
+                                                                {% elif order.status == 'SHIPPED' %}
+                                                                <span class="badge badge-pill badge-primary">已发货</span>
+                                                                {% elif order.status == 'FINISHED' %}
+                                                                <span class="badge badge-pill badge-success">已完成</span>
+                                                                {% elif order.status == 'CANCELLED' %}
+                                                                <span class="badge badge-pill badge-secondary">已取消</span>
+                                                                {% else %}
+                                                                <span class="badge badge-pill badge-light">{{ order.status }}</span>
+                                                                {% endif %}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>下单时间：</strong></td>
+                                                            <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                                        </tr>
+                                                        {% if order.pay_time %}
+                                                        <tr>
+                                                            <td><strong>支付时间：</strong></td>
+                                                            <td>{{ order.pay_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                                        </tr>
+                                                        {% endif %}
+                                                        {% if order.ship_time %}
+                                                        <tr>
+                                                            <td><strong>发货时间：</strong></td>
+                                                            <td>{{ order.ship_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                                        </tr>
+                                                        {% endif %}
+                                                        {% if order.finish_time %}
+                                                        <tr>
+                                                            <td><strong>完成时间：</strong></td>
+                                                            <td>{{ order.finish_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                                        </tr>
+                                                        {% endif %}
+                                                        {% if order.cancel_time %}
+                                                        <tr>
+                                                            <td><strong>取消时间：</strong></td>
+                                                            <td>{{ order.cancel_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                                        </tr>
+                                                        {% endif %}
+                                                        {% if order.cancel_reason %}
+                                                        <tr>
+                                                            <td><strong>取消原因：</strong></td>
+                                                            <td>{{ order.cancel_reason }}</td>
+                                                        </tr>
+                                                        {% endif %}
+                                                        <tr>
+                                                            <td><strong>订单来源：</strong></td>
+                                                            <td>{{ order.order_source or '小程序' }}</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h6>收货信息</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <table class="table table-borderless">
+                                                        <tr>
+                                                            <td width="40%"><strong>收货人：</strong></td>
+                                                            <td>{{ order.receiver_name }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>手机号：</strong></td>
+                                                            <td>{{ order.receiver_phone }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>收货地址：</strong></td>
+                                                            <td>{{ order.receiver_province or '' }}{{ order.receiver_city or '' }}{{ order.receiver_district or '' }}{{ order.receiver_address }}</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            
+                                            {% if order.logistics_company %}
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h6>物流信息</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <table class="table table-borderless">
+                                                        <tr>
+                                                            <td width="40%"><strong>物流公司：</strong></td>
+                                                            <td>{{ order.logistics_company }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><strong>物流单号：</strong></td>
+                                                            <td>{{ order.logistics_no }}</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h6>商品信息</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="text-center" style="width: 100px;">商品图片</th>
+                                                                <th>商品名称</th>
+                                                                <th class="text-center">规格</th>
+                                                                <th class="text-right">单价</th>
+                                                                <th class="text-center">数量</th>
+                                                                <th class="text-right">小计</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for item in items %}
+                                                            <tr>
+                                                                <td class="text-center">
+                                                                    <img src="{{ item.product_image }}" alt="" 
+                                                                         style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"
+                                                                         onerror="this.src='/static/assets/images/no-image.png'">
+                                                                </td>
+                                                                <td>{{ item.product_name }}</td>
+                                                                <td class="text-center">{{ item.sku_name or '-' }}</td>
+                                                                <td class="text-right">¥{{ "%.2f"|format(item.price) }}</td>
+                                                                <td class="text-center">x{{ item.quantity }}</td>
+                                                                <td class="text-right text-danger">¥{{ "%.2f"|format(item.total_amount) }}</td>
+                                                            </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                        <tfoot>
+                                                            <tr>
+                                                                <td colspan="5" class="text-right"><strong>商品总额：</strong></td>
+                                                                <td class="text-right">¥{{ "%.2f"|format(order.total_amount) }}</td>
+                                                            </tr>
+                                                            {% if order.discount_amount and order.discount_amount > 0 %}
+                                                            <tr>
+                                                                <td colspan="5" class="text-right"><strong>优惠金额：</strong></td>
+                                                                <td class="text-right text-success">-¥{{ "%.2f"|format(order.discount_amount) }}</td>
+                                                            </tr>
+                                                            {% endif %}
+                                                            {% if order.freight_amount and order.freight_amount > 0 %}
+                                                            <tr>
+                                                                <td colspan="5" class="text-right"><strong>运费：</strong></td>
+                                                                <td class="text-right">¥{{ "%.2f"|format(order.freight_amount) }}</td>
+                                                            </tr>
+                                                            {% endif %}
+                                                            <tr class="table-active">
+                                                                <td colspan="5" class="text-right"><strong>实付金额：</strong></td>
+                                                                <td class="text-right text-danger font-weight-bold" style="font-size: 1.2em;">
+                                                                    ¥{{ "%.2f"|format(order.pay_amount) }}
+                                                                </td>
+                                                            </tr>
+                                                        </tfoot>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if order.remark %}
+                                    <div class="row mt-3">
+                                        <div class="col-12">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    <h6>订单备注</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p>{{ order.remark }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div class="row mt-3">
+                                        <div class="col-12 text-center">
+                                            {% if order.status == 'PAID' %}
+                                            <button class="btn btn-success btn-lg" onclick="shipOrder({{ order.id }})">
+                                                <i class="feather icon-package"></i> 发货
+                                            </button>
+                                            {% endif %}
+                                            {% if order.status == 'PENDING_PAY' %}
+                                            <button class="btn btn-danger btn-lg" onclick="cancelOrder({{ order.id }})">
+                                                <i class="feather icon-x-circle"></i> 取消订单
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="shipModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">订单发货</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <form id="shipForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>物流公司 <span class="text-danger">*</span></label>
+                        <select class="form-control" name="logisticsCompany" required>
+                            <option value="">请选择物流公司</option>
+                            <option value="顺丰速运">顺丰速运</option>
+                            <option value="圆通速递">圆通速递</option>
+                            <option value="中通快递">中通快递</option>
+                            <option value="韵达快递">韵达快递</option>
+                            <option value="申通快递">申通快递</option>
+                            <option value="百世快递">百世快递</option>
+                            <option value="京东物流">京东物流</option>
+                            <option value="邮政EMS">邮政EMS</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>物流单号 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="logisticsNo" required placeholder="请输入物流单号">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">确认发货</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="cancelModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">取消订单</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <form id="cancelForm">
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="feather icon-alert-triangle"></i>
+                        取消订单后，系统将自动退还库存
+                    </div>
+                    <div class="form-group">
+                        <label>取消原因</label>
+                        <textarea class="form-control" name="reason" rows="3" placeholder="请输入取消原因"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-danger">确认取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+var currentOrderId = {{ order.id }};
+
+$(document).ready(function() {
+    $('#shipForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = {
+            logisticsCompany: $('select[name="logisticsCompany"]', this).val(),
+            logisticsNo: $('input[name="logisticsNo"]', this).val()
+        };
+        
+        $.ajax({
+            url: '/admin/sp/order/' + currentOrderId + '/ship',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(res) {
+                if (res.code === 200) {
+                    $('#shipModal').modal('hide');
+                    toastr.success('发货成功');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 500);
+                } else {
+                    toastr.error(res.message);
+                }
+            },
+            error: function() {
+                toastr.error('请求失败');
+            }
+        });
+    });
+    
+    $('#cancelForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = {
+            reason: $('textarea[name="reason"]', this).val()
+        };
+        
+        $.ajax({
+            url: '/admin/sp/order/' + currentOrderId + '/cancel',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(res) {
+                if (res.code === 200) {
+                    $('#cancelModal').modal('hide');
+                    toastr.success('订单已取消');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 500);
+                } else {
+                    toastr.error(res.message);
+                }
+            },
+            error: function() {
+                toastr.error('请求失败');
+            }
+        });
+    });
+});
+
+function shipOrder(id) {
+    $('#shipForm')[0].reset();
+    $('#shipModal').modal('show');
+}
+
+function cancelOrder(id) {
+    $('#cancelForm')[0].reset();
+    $('#cancelModal').modal('show');
+}
+</script>
+{% endblock %}
