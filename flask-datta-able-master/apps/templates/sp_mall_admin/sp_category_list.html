@@ -1,0 +1,453 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 商品分类管理 {% endblock %}
+
+{% block stylesheets %}
+{{ super() }}
+<style>
+    .pcoded-content {
+        margin-left: 260px;
+        padding: 20px;
+    }
+    @media (max-width: 992px) {
+        .pcoded-content {
+            margin-left: 0;
+        }
+    }
+    .category-tree {
+        padding-left: 20px;
+    }
+    .parent-category {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+    .child-category {
+        background-color: #ffffff;
+    }
+    .category-level {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        margin-right: 8px;
+    }
+    .level-1 {
+        background-color: #007bff;
+        color: white;
+    }
+    .level-2 {
+        background-color: #28a745;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <div class="main-body">
+            <div class="page-wrapper">
+                <div class="page-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>商品分类管理</h5>
+                                    <div class="card-header-right">
+                                        <button class="btn btn-primary" data-toggle="modal" data-target="#addCategoryModal">
+                                            <i class="feather icon-plus"></i> 添加分类
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-block">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center" style="width: 80px;">排序</th>
+                                                    <th class="text-center" style="width: 120px;">层级</th>
+                                                    <th class="text-center" style="width: 100px;">分类图标</th>
+                                                    <th>分类名称</th>
+                                                    <th>分类编码</th>
+                                                    <th class="text-center">商品数量</th>
+                                                    <th class="text-center">状态</th>
+                                                    <th class="text-center" style="width: 180px;">操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for parent_id, parent in category_tree.items() %}
+                                                <tr class="parent-category" data-id="{{ parent.id }}">
+                                                    <td class="text-center">{{ parent.sort }}</td>
+                                                    <td class="text-center">
+                                                        <span class="category-level level-1">一级</span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        {% if parent.icon %}
+                                                        <img src="{{ parent.icon }}" alt="" style="width: 40px; height: 40px; object-fit: cover;">
+                                                        {% else %}
+                                                        <span class="text-muted">无</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ parent.category_name }}</td>
+                                                    <td>{{ parent.category_code }}</td>
+                                                    <td class="text-center">{{ parent.children|length }}</td>
+                                                    <td class="text-center">
+                                                        {% if parent.status == 1 %}
+                                                        <span class="badge badge-pill badge-success">启用</span>
+                                                        {% else %}
+                                                        <span class="badge badge-pill badge-secondary">禁用</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button class="btn btn-sm btn-primary" onclick="editCategory({{ parent.id }})">
+                                                            <i class="feather icon-edit-2"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-{% if parent.status == 1 %}warning{% else %}success{% endif %}" onclick="toggleStatus({{ parent.id }})">
+                                                            <i class="feather icon-{% if parent.status == 1 %}toggle-right{% else %}toggle-left{% endif %}"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-info" onclick="addSubCategory({{ parent.id }}, '{{ parent.category_name }}')">
+                                                            <i class="feather icon-plus"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger" onclick="deleteCategory({{ parent.id }})">
+                                                            <i class="feather icon-trash-2"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {% for child in parent.children %}
+                                                <tr class="child-category" data-id="{{ child.id }}" data-parent="{{ parent.id }}">
+                                                    <td class="text-center">{{ child.sort }}</td>
+                                                    <td class="text-center">
+                                                        <span class="category-level level-2">二级</span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        {% if child.icon %}
+                                                        <img src="{{ child.icon }}" alt="" style="width: 40px; height: 40px; object-fit: cover;">
+                                                        {% else %}
+                                                        <span class="text-muted">无</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td style="padding-left: 40px;">
+                                                        <i class="feather icon-minus" style="margin-right: 8px; color: #28a745;"></i>
+                                                        {{ child.category_name }}
+                                                    </td>
+                                                    <td>{{ child.category_code }}</td>
+                                                    <td class="text-center">-</td>
+                                                    <td class="text-center">
+                                                        {% if child.status == 1 %}
+                                                        <span class="badge badge-pill badge-success">启用</span>
+                                                        {% else %}
+                                                        <span class="badge badge-pill badge-secondary">禁用</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button class="btn btn-sm btn-primary" onclick="editCategory({{ child.id }})">
+                                                            <i class="feather icon-edit-2"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-{% if child.status == 1 %}warning{% else %}success{% endif %}" onclick="toggleStatus({{ child.id }})">
+                                                            <i class="feather icon-{% if child.status == 1 %}toggle-right{% else %}toggle-left{% endif %}"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger" onclick="deleteCategory({{ child.id }})">
+                                                            <i class="feather icon-trash-2"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                                {% endfor %}
+                                                {% if not category_tree %}
+                                                <tr>
+                                                    <td colspan="8" class="text-center text-muted">暂无分类数据，请添加分类</td>
+                                                </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加分类</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <form id="addCategoryForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>上级分类</label>
+                        <select class="form-control" name="parentId" id="addParentId">
+                            <option value="0">一级分类（顶级）</option>
+                            {% for parent_id, parent in category_tree.items() %}
+                            <option value="{{ parent.id }}">{{ parent.category_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>分类名称 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="categoryName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>分类编码 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="categoryCode" required>
+                    </div>
+                    <div class="form-group">
+                        <label>分类图标URL</label>
+                        <input type="url" class="form-control" name="icon" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>排序</label>
+                        <input type="number" class="form-control" name="sort" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select class="form-control" name="status">
+                            <option value="1">启用</option>
+                            <option value="0">禁用</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editCategoryModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑分类</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <form id="editCategoryForm">
+                <input type="hidden" name="id" id="editCategoryId">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>上级分类</label>
+                        <select class="form-control" name="parentId" id="editParentId" disabled>
+                            <option value="0">一级分类（顶级）</option>
+                            {% for parent_id, parent in category_tree.items() %}
+                            <option value="{{ parent.id }}">{{ parent.category_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>分类名称 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="categoryName" id="editCategoryName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>分类编码 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="categoryCode" id="editCategoryCode" required>
+                    </div>
+                    <div class="form-group">
+                        <label>分类图标URL</label>
+                        <input type="url" class="form-control" name="icon" id="editIcon" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>排序</label>
+                        <input type="number" class="form-control" name="sort" id="editSort" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select class="form-control" name="status" id="editStatus">
+                            <option value="1">启用</option>
+                            <option value="0">禁用</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ super() }}
+<script>
+$(document).ready(function() {
+    $('#addCategoryForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = {
+            parentId: parseInt($('#addParentId').val()) || 0,
+            categoryName: $('input[name="categoryName"]', this).val(),
+            categoryCode: $('input[name="categoryCode"]', this).val(),
+            icon: $('input[name="icon"]', this).val(),
+            sort: parseInt($('input[name="sort"]', this).val()) || 0,
+            status: parseInt($('select[name="status"]', this).val())
+        };
+        
+        $.ajax({
+            url: '/admin/sp/category/add',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(res) {
+                if (res.code === 200) {
+                    $('#addCategoryModal').modal('hide');
+                    toastr.success('添加成功');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 500);
+                } else {
+                    toastr.error(res.message);
+                }
+            },
+            error: function() {
+                toastr.error('请求失败');
+            }
+        });
+    });
+    
+    $('#editCategoryForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        var categoryId = $('#editCategoryId').val();
+        var formData = {
+            categoryName: $('#editCategoryName').val(),
+            categoryCode: $('#editCategoryCode').val(),
+            parentId: parseInt($('#editParentId').val()) || 0,
+            icon: $('#editIcon').val(),
+            sort: parseInt($('#editSort').val()) || 0,
+            status: parseInt($('#editStatus').val())
+        };
+        
+        $.ajax({
+            url: '/admin/sp/category/' + categoryId,
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(res) {
+                if (res.code === 200) {
+                    $('#editCategoryModal').modal('hide');
+                    toastr.success('更新成功');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 500);
+                } else {
+                    toastr.error(res.message);
+                }
+            },
+            error: function() {
+                toastr.error('请求失败');
+            }
+        });
+    });
+});
+
+function addSubCategory(parentId, parentName) {
+    $('#addCategoryModal').modal('show');
+    $('#addParentId').val(parentId);
+    $('#addCategoryForm')[0].reset();
+    $('#addParentId').val(parentId);
+}
+
+function editCategory(id) {
+    $.ajax({
+        url: '/admin/sp/category/' + id,
+        type: 'GET',
+        success: function(res) {
+            if (res.code === 200) {
+                var data = res.data;
+                $('#editCategoryId').val(data.id);
+                $('#editCategoryName').val(data.categoryName);
+                $('#editCategoryCode').val(data.categoryCode);
+                $('#editParentId').val(data.parentId || 0);
+                $('#editIcon').val(data.icon || '');
+                $('#editSort').val(data.sort);
+                $('#editStatus').val(data.status);
+                $('#editCategoryModal').modal('show');
+            } else {
+                toastr.error(res.message);
+            }
+        },
+        error: function() {
+            toastr.error('获取分类信息失败');
+        }
+    });
+}
+
+function toggleStatus(id) {
+    $.ajax({
+        url: '/admin/sp/category/' + id,
+        type: 'GET',
+        success: function(res) {
+            if (res.code === 200) {
+                var data = res.data;
+                var newStatus = data.status === 1 ? 0 : 1;
+                
+                $.ajax({
+                    url: '/admin/sp/category/' + id,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        categoryName: data.categoryName,
+                        categoryCode: data.categoryCode,
+                        parentId: data.parentId,
+                        icon: data.icon,
+                        sort: data.sort,
+                        status: newStatus
+                    }),
+                    success: function(res) {
+                        if (res.code === 200) {
+                            toastr.success('状态更新成功');
+                            setTimeout(function() {
+                                location.reload();
+                            }, 500);
+                        } else {
+                            toastr.error(res.message);
+                        }
+                    },
+                    error: function() {
+                        toastr.error('请求失败');
+                    }
+                });
+            } else {
+                toastr.error(res.message);
+            }
+        },
+        error: function() {
+            toastr.error('获取分类信息失败');
+        }
+    });
+}
+
+function deleteCategory(id) {
+    if (!confirm('确定要删除该分类吗？')) {
+        return;
+    }
+    
+    $.ajax({
+        url: '/admin/sp/category/' + id,
+        type: 'DELETE',
+        success: function(res) {
+            if (res.code === 200) {
+                toastr.success('删除成功');
+                setTimeout(function() {
+                    location.reload();
+                }, 500);
+            } else {
+                toastr.error(res.message);
+            }
+        },
+        error: function() {
+            toastr.error('请求失败');
+        }
+    });
+}
+</script>
+{% endblock %}

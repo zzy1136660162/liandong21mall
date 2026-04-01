@@ -100,8 +100,8 @@
                 <li class="nav-item pcoded-menu-caption">
                     <label>选品管理</label>
                 </li>
-                <li data-username="选品管理 商品管理 分类管理 店铺管理 佣金管理" 
-                    class="nav-item pcoded-hasmenu {% if 'product' in segment %} active {% endif %}">
+                <li data-username="选品管理 商品管理 分类管理 店铺管理 佣金管理"
+                    class="nav-item pcoded-hasmenu {% if 'product' in segment and 'sp' not in segment %} active {% endif %}">
                     <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-shopping-cart"></i></span><span
                             class="pcoded-mtext">商品管理</span></a>
                     <ul class="pcoded-submenu">
@@ -113,6 +113,25 @@
                         </li>
                         <li class="{% if 'product/commission' in segment %}active{% endif %}">
                             <a href="/admin/product/commission" class="">佣金管理</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item pcoded-menu-caption">
+                    <label>商品订单管理</label>
+                </li>
+                <li data-username="商品订单管理 商品分类 商品管理 订单管理"
+                    class="nav-item pcoded-hasmenu {% if 'sp' in segment %} active {% endif %}">
+                    <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-shopping-bag"></i></span><span
+                            class="pcoded-mtext">商品订单管理</span></a>
+                    <ul class="pcoded-submenu">
+                        <li class="{% if 'sp/category' in segment %}active{% endif %}">
+                            <a href="/admin/sp/category" class="">商品分类</a>
+                        </li>
+                        <li class="{% if 'sp/product' in segment %}active{% endif %}">
+                            <a href="/admin/sp/product" class="">商品管理</a>
+                        </li>
+                        <li class="{% if 'sp/order' in segment %}active{% endif %}">
+                            <a href="/admin/sp/order" class="">订单管理</a>
                         </li>
                     </ul>
                 </li>
