@@ -239,6 +239,62 @@ class SpProductService:
             'pageSize': page_size,
             'totalPages': (pagination.total + page_size - 1) // page_size
         }
+    
+    @staticmethod
+    def get_category_products(category_id, keyword=None, sort_type=None, sort_order='desc', page=1, page_size=10):
+        """获取分类商品列表（支持搜索和排序）"""
+        if isinstance(category_id, str):
+            try:
+                category_id = int(category_id)
+            except ValueError:
+                category_id = category_id
+        
+        query = SpProduct.query.filter_by(status=1, category_id=category_id)
+        
+        if keyword:
+            query = query.filter(SpProduct.product_name.like(f'%{keyword}%'))
+        
+        order_column = SpProduct.sort
+        if sort_type == 'rating':
+            order_column = SpProduct.score if hasattr(SpProduct, 'score') else SpProduct.sort
+        elif sort_type == 'sales':
+            order_column = SpProduct.sales
+        elif sort_type == 'price':
+            order_column = SpProduct.price
+        else:
+            order_column = SpProduct.sort
+        
+        if sort_order == 'asc':
+            query = query.order_by(order_column.asc())
+        else:
+            query = query.order_by(order_column.desc())
+        
+        pagination = query.paginate(page=page, per_page=page_size, error_out=False)
+        
+        products = []
+        for product in pagination.items:
+            products.append({
+                'id': product.id,
+                'productId': product.id,
+                'name': product.product_name,
+                'productName': product.product_name,
+                'image': product.main_image,
+                'mainImage': product.main_image,
+                'price': str(product.price),
+                'originalPrice': str(product.original_price) if product.original_price else None,
+                'sales': product.sales if product.sales else 0,
+                'stock': product.stock if product.stock else 0,
+                'isHot': product.is_hot == 1,
+                'isNew': product.is_new == 1
+            })
+        
+        return {
+            'products': products,
+            'total': pagination.total,
+            'page': page,
+            'pageSize': page_size,
+            'totalPages': (pagination.total + page_size - 1) // page_size
+        }
 
 
 class SpCartService:
