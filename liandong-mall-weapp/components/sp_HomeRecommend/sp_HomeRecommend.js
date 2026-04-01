@@ -87,7 +87,7 @@ Component({
         hot: '/pages/Product_list_page/Product_list_page?type=hot',
         new: '/pages/Product_list_page/Product_list_page?type=new'
       }
-      wx.navigateTo({
+      wx.switchTab({
         url: urlMap[this.data.productType] || '/pages/Product_list_page/Product_list_page'
       })
     },

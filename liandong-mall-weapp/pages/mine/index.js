@@ -67,23 +67,15 @@ Page({
 
   async loadUserInfo() {
     try {
-      const res = await api.get('/api/user/info');
-      if (res.code === 200) {
-        const userInfo = res.data;
-        const memberLevelMap = {
-          0: '普通用户',
-          1: 'VIP会员',
-          2: 'SVIP会员'
-        };
-        this.setData({
-          userInfo: {
-            ...userInfo,
-            nickname: userInfo.nickname || '微信用户',
-            memberLevelName: memberLevelMap[userInfo.memberLevel] || '普通用户'
-          }
-        });
-        user.setUserInfo(userInfo);
-      }
+      const userInfo = await api.get('/api/user/info');
+      this.setData({
+        userInfo: {
+          ...userInfo,
+          nickname: userInfo.nickname || '微信用户',
+          memberLevelName: userInfo.memberLevel?.levelName || (userInfo.isMember ? 'VIP会员' : '普通用户')
+        }
+      });
+      user.setUserInfo(userInfo);
     } catch (error) {
       console.error('加载用户信息失败:', error);
       if (error.message === '登录已过期') {

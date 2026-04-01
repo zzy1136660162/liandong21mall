@@ -1,24 +1,6 @@
 <view class="sp-details-page">
   <view class="page-background"></view>
 
-  <view class="page-header">
-    <view class="header-content">
-      <view class="header-top">
-        <view class="back-btn" bindtap="goBack">
-          <text class="back-icon">←</text>
-        </view>
-        <view class="header-actions">
-          <view class="action-btn" bindtap="toggleFavorite">
-            <text class="action-icon">{{isFavorite ? '♥' : '♡'}}</text>
-          </view>
-          <view class="action-btn" bindtap="shareProduct">
-            <text class="action-icon">📤</text>
-          </view>
-        </view>
-      </view>
-    </view>
-  </view>
-
   <scroll-view class="page-content" scroll-y="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
     <view class="product-gallery">
       <swiper class="gallery-swiper" indicator-dots autoplay circular interval="4000" duration="500" indicator-color="rgba(255, 193, 7, 0.3)" indicator-active-color="#FFC107">

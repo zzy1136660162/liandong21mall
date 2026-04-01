@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
 """
-<<<<<<< HEAD
 商品商城模块 - 后台管理路由
 """
 
@@ -8,17 +7,10 @@ from flask import Blueprint, render_template, request, jsonify
 from apps.product.services import ProductService, CartService, OrderService
 from apps.product.models import ProductCategory, Product, Order
 from apps import db
-=======
-商品选品模块 - 路由
-"""
-
-from flask import Blueprint, render_template
->>>>>>> origin/master
 
 blueprint = Blueprint('product', __name__, url_prefix='/admin/product')
 
 
-<<<<<<< HEAD
 @blueprint.route('/category')
 def category_list():
     """商品分类列表页"""
@@ -226,23 +218,3 @@ def order_cancel(order_id):
         return jsonify({'code': 200, 'message': '订单已取消', 'data': order})
     else:
         return jsonify({'code': 500, 'message': message, 'data': None})
-=======
-@blueprint.route('/')
-def index():
-    return render_template('product/index.html')
-
-
-@blueprint.route('/list')
-def list():
-    return render_template('product/list.html')
-
-
-@blueprint.route('/category')
-def category():
-    return render_template('product/category.html')
-
-
-@blueprint.route('/commission')
-def commission():
-    return render_template('product/commission.html')
->>>>>>> origin/master

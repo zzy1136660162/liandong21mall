@@ -1,5 +1,6 @@
 const productService = require('../../services/productService');
 const sampleService = require('../../services/sampleService');
+const { checkLogin, isLogin } = require('../../utils/user');
 
 Page({
   data: {
@@ -23,6 +24,23 @@ Page({
   },
 
   onLoad(options) {
+    // 检查登录状态，未登录则跳转登录页
+    if (!isLogin()) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再申请样品',
+        confirmText: '去登录',
+        success: (res) => {
+          if (res.confirm) {
+            wx.redirectTo({
+              url: '/pages/login/index?redirect=/pages/sample-apply/sample-apply'
+            });
+          }
+        }
+      });
+      return;
+    }
+    
     // 获取传入的商品ID
     const productId = options.productId;
     if (productId) {

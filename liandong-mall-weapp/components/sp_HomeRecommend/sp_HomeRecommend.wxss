@@ -18,11 +18,11 @@
 }
 
 .section-icon {
-  font-size: 36rpx;
+  font-size: 44rpx;
 }
 
 .section-title {
-  font-size: 32rpx;
+  font-size: 34rpx;
   font-weight: 600;
   color: #333333;
 }
@@ -31,47 +31,44 @@
   display: flex;
   align-items: center;
   gap: 8rpx;
-  padding: 8rpx 16rpx;
+  padding: 10rpx 18rpx;
   background: #f5f5f5;
   border-radius: 20rpx;
 }
 
 .more-text {
-  font-size: 24rpx;
+  font-size: 28rpx;
   color: #666666;
 }
 
 .arrow {
-  font-size: 24rpx;
+  font-size: 28rpx;
   color: #999999;
 }
 
-.product-list {
-  width: 100%;
-}
-
-.product-scroll {
+.product-grid {
   display: flex;
-  gap: 20rpx;
-  padding-bottom: 10rpx;
+  flex-wrap: wrap;
+  gap: 16rpx;
 }
 
 .product-card {
-  flex-shrink: 0;
-  width: 220rpx;
+  width: calc((100% - 16rpx) / 2);
   background: #ffffff;
-  border-radius: 16rpx;
+  border-radius: 12rpx;
   overflow: hidden;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
 }
 
 .product-image-wrapper {
   position: relative;
-  width: 220rpx;
-  height: 220rpx;
+  width: 100%;
+  height: 0;
+  padding-bottom: 100%;
 }
 
 .product-image {
+  position: absolute;
   width: 100%;
   height: 100%;
   background: #f5f5f5;
@@ -79,27 +76,27 @@
 
 .product-tag {
   position: absolute;
-  top: 12rpx;
-  left: 12rpx;
+  top: 8rpx;
+  left: 8rpx;
   display: flex;
-  gap: 8rpx;
+  gap: 4rpx;
 }
 
 .product-tag text {
-  padding: 4rpx 12rpx;
-  font-size: 20rpx;
+  padding: 2rpx 8rpx;
+  font-size: 18rpx;
   color: #ffffff;
   background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
-  border-radius: 8rpx;
+  border-radius: 6rpx;
 }
 
 .product-info {
-  padding: 16rpx;
+  padding: 12rpx;
 }
 
 .product-name {
   display: block;
-  font-size: 26rpx;
+  font-size: 28rpx;
   color: #333333;
   line-height: 1.4;
   overflow: hidden;
@@ -107,7 +104,8 @@
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  margin-bottom: 12rpx;
+  margin-bottom: 8rpx;
+  height: 78rpx;
 }
 
 .product-price-row {
@@ -117,7 +115,7 @@
 }
 
 .product-price {
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 600;
   color: #ff4757;
 }

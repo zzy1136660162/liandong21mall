@@ -36,7 +36,15 @@ class ProductListAPI(Resource):
         query = Product.query.filter_by(status=1)
 
         if category:
-            query = query.filter(Product.category_id == category)
+            # 支持数字ID或分类名称查询
+            try:
+                cat_id = int(category)
+                query = query.filter(Product.category_id == cat_id)
+            except ValueError:
+                # 按分类名称查询
+                cat = Category.query.filter_by(name=category).first()
+                if cat:
+                    query = query.filter(Product.category_id == cat.id)
         if keyword:
             query = query.filter(Product.name.like(f'%{keyword}%'))
         if min_commission:

@@ -28,52 +28,32 @@ Page({
   async loadMemberInfo() {
     try {
       wx.showLoading({ title: '加载中' });
-      
-      const res = await api.get('/api/user/member');
-      
+
+      const userInfo = await api.get('/api/user/info');
+
       wx.hideLoading();
-      
-      if (res.code === 200) {
-        const data = res.data;
-        this.setData({
-          memberInfo: {
-            isMember: data.isMember,
-            levelCode: data.levelCode,
-            levelName: data.levelName,
-            discount: data.discount,
-            benefits: data.benefits || [],
-            upgradeCondition: data.upgradeCondition,
-            validStart: data.validStart,
-            validEnd: data.validEnd
-          },
-          currentLevel: data.levelCode || 'normal'
-        });
-      } else {
-        wx.showToast({
-          title: res.message || '加载失败',
-          icon: 'none'
-        });
-      }
+
+      const memberLevel = userInfo.memberLevel || {};
+
+      this.setData({
+        memberInfo: {
+          isMember: userInfo.isMember || false,
+          levelCode: memberLevel.levelCode || 'normal',
+          levelName: memberLevel.levelName || '普通用户',
+          discount: memberLevel.discount || 1.0,
+          benefits: memberLevel.benefits || [],
+          upgradeCondition: memberLevel.upgradeCondition || '完成首单购买自动升级为VIP',
+          validStart: memberLevel.validStart || '',
+          validEnd: memberLevel.validEnd || ''
+        },
+        currentLevel: memberLevel.levelCode || 'normal'
+      });
     } catch (error) {
       wx.hideLoading();
       console.error('加载会员信息失败:', error);
-      
-      // 使用模拟数据（开发阶段）
-      this.setData({
-        memberInfo: {
-          isMember: true,
-          levelCode: 'vip',
-          levelName: 'VIP会员',
-          discount: 0.95,
-          benefits: [
-            { type: 'discount', name: '全场95折' },
-            { type: 'points', name: '积分翻倍' }
-          ],
-          upgradeCondition: '完成首单购买自动升级为VIP，享受全场95折优惠',
-          validStart: '2024-01-15 10:30:00',
-          validEnd: null
-        },
-        currentLevel: 'vip'
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none'
       });
     }
   }

@@ -211,21 +211,30 @@ Page({
 
   createOrder(orderData) {
     return new Promise((resolve, reject) => {
+      const userId = wx.getStorageSync('userId') || 1
+      
+      console.log('创建订单 - 用户ID:', userId)
+      console.log('创建订单 - 数据:', JSON.stringify(orderData, null, 2))
+      
       wx.request({
         url: 'http://localhost:5000/api/sp/order/create',
         method: 'POST',
         data: orderData,
         header: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-User-Id': userId
         },
         success: (res) => {
+          console.log('创建订单 - 响应:', JSON.stringify(res.data, null, 2))
+          
           if (res.data.code === 200) {
             resolve(res.data.data)
           } else {
-            reject(new Error(res.data.message))
+            reject(new Error(res.data.message || '创建订单失败'))
           }
         },
         fail: (err) => {
+          console.error('创建订单 - 请求失败:', err)
           reject(err)
         }
       })

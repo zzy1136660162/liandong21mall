@@ -70,122 +70,36 @@
   margin-left: 20rpx;
 }
 
-/* 主分类标签 */
-.main-category-scroll {
+/* 分类标签 */
+.category-scroll {
   background: #fff;
   white-space: nowrap;
 }
 
-.main-category-list {
+.category-list {
   display: flex;
   padding: 0 20rpx;
 }
 
-.main-category-item {
-  padding: 24rpx 20rpx;
-  position: relative;
+.category-item {
+  display: inline-flex;
+  padding: 16rpx 24rpx;
+  margin: 0 8rpx;
+  border-radius: 24rpx;
+  transition: all 0.3s;
 }
 
-.main-category-item .category-text {
-  font-size: 30rpx;
+.category-item .category-text {
+  font-size: 28rpx;
   color: #666;
 }
 
-.main-category-item.active .category-text {
-  font-size: 32rpx;
-  color: #ff4757;
-  font-weight: 600;
+.category-item.active {
+  background-color: #ff5000;
 }
 
-.main-category-item.active::after {
-  content: '';
-  position: absolute;
-  bottom: 16rpx;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40rpx;
-  height: 4rpx;
-  background: #ff4757;
-  border-radius: 2rpx;
-}
-
-.main-category-item.more {
-  padding-left: 30rpx;
-  border-left: 1rpx solid #f0f0f0;
-}
-
-/* 二级分类 */
-.sub-category-section {
-  background: #fff;
-  padding: 20rpx;
-  border-bottom: 1rpx solid #f0f0f0;
-}
-
-.sub-category-list {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.sub-category-item {
-  width: 20%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16rpx 0;
-}
-
-.sub-category-icon {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 16rpx;
-  margin-bottom: 12rpx;
-}
-
-.sub-category-name {
-  font-size: 24rpx;
-  color: #333;
-}
-
-/* 筛选标签 */
-.filter-tags-section {
-  background: #fff;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
-}
-
-.filter-scroll {
-  white-space: nowrap;
-}
-
-.filter-tags {
-  display: flex;
-  padding: 0 20rpx;
-}
-
-.filter-tag {
-  padding: 12rpx 24rpx;
-  background: #f5f5f5;
-  border-radius: 28rpx;
-  font-size: 26rpx;
-  color: #666;
-  margin-right: 16rpx;
-}
-
-.filter-tag.active {
-  background: #fff0f0;
-  color: #ff4757;
-}
-
-.filter-btn {
-  display: flex;
-  align-items: center;
-  background: #fff;
-  border: 1rpx solid #e0e0e0;
-}
-
-.filter-icon {
-  font-size: 20rpx;
-  margin-left: 8rpx;
+.category-item.active .category-text {
+  color: #fff;
 }
 
 /* 商品列表 */

@@ -1,3 +1,5 @@
+const { isLogin } = require('../../utils/user');
+
 Page({
   data: {
     currentFilter: 'all',
@@ -18,6 +20,22 @@ Page({
   },
 
   onLoad() {
+    // 检查登录状态
+    if (!isLogin()) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录',
+        confirmText: '去登录',
+        success: (res) => {
+          if (res.confirm) {
+            wx.redirectTo({
+              url: '/pages/login/index?redirect=/pages/my-samples/my-samples'
+            });
+          }
+        }
+      });
+      return;
+    }
     this.loadSampleList();
   },
 

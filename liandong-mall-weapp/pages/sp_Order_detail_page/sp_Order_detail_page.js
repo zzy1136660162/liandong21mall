@@ -1,5 +1,8 @@
 const orderApi = require('../../utils/sp_api.js').orderApi
 
+// 默认图片
+const DEFAULT_PRODUCT_IMAGE = '/static/images/products/product_1_main.jpg'
+
 Page({
   data: {
     orderId: '',
@@ -29,13 +32,30 @@ Page({
     remainingSeconds: 0,  // 剩余支付时间（秒）
     countdownText: ''     // 倒计时文本
   },
-
+  
+  // 图片加载失败处理
+  handleImageError(e) {
+    const { index } = e.currentTarget.dataset
+    const { orderDetail } = this.data
+    
+    if (orderDetail.products && orderDetail.products[index]) {
+      orderDetail.products[index].productImage = DEFAULT_PRODUCT_IMAGE
+      this.setData({ orderDetail })
+    }
+  },
+  
   onLoad(options) {
+    console.log('订单详情页 - onLoad options:', options)
+    console.log('订单详情页 - options.orderId:', options.orderId)
+    
     const { orderId } = options
+    
     if (orderId) {
+      console.log('订单详情页 - 有效orderId:', orderId)
       this.setData({ orderId: orderId })
       this.loadOrderDetail()
     } else {
+      console.error('订单详情页 - orderId无效或为空!')
       wx.showToast({
         title: '订单ID不存在',
         icon: 'none'
@@ -60,8 +80,16 @@ Page({
 
   async loadOrderDetail() {
     try {
+      console.log('开始加载订单详情, orderId:', this.data.orderId)
+      
       const { orderId } = this.data
+      console.log('调用API: orderApi.getOrderDetail(', orderId, ')')
+      
       const res = await orderApi.getOrderDetail(orderId)
+      
+      console.log('API返回结果:', res)
+      console.log('API返回类型:', typeof res)
+      console.log('API返回是否为空:', res === null, res === undefined)
       
       if (res) {
         const orderDetail = {
@@ -212,7 +240,7 @@ Page({
         {
           productId: 42,
           productName: '焕颜修护精华液',
-          mainImage: 'https://images.unsplash.com/photo-1522335789203-aabd016d8d3?w=400&h=400&fit=crop',
+          productImage: DEFAULT_PRODUCT_IMAGE,
           specs: '30ml',
           price: 299.00,
           quantity: 2
@@ -220,7 +248,7 @@ Page({
         {
           productId: 43,
           productName: '深层清洁洁面乳',
-          mainImage: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&h=400&fit=crop',
+          productImage: DEFAULT_PRODUCT_IMAGE,
           specs: '100ml',
           price: 158.00,
           quantity: 1
@@ -332,31 +360,48 @@ Page({
     const { orderId, orderDetail } = this.data
     
     try {
-      // 模拟微信支付调用
       wx.showLoading({
         title: '正在发起支付...',
         mask: true
       })
       
-      // 这里应该调用微信支付API，现在使用模拟数据
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // 调用后端支付API
+      const userId = wx.getStorageSync('userId') || 1
       
-      // 支付成功
+      const payResult = await new Promise((resolve, reject) => {
+        wx.request({
+          url: `http://localhost:5000/api/sp/order/pay/${orderId}`,
+          method: 'POST',
+          data: {
+            paymentMethod: 'WECHAT_PAY'
+          },
+          header: {
+            'Content-Type': 'application/json',
+            'X-User-Id': userId
+          },
+          success: (res) => {
+            if (res.data.code === 200) {
+              resolve(res.data.data)
+            } else {
+              reject(new Error(res.data.message || '支付失败'))
+            }
+          },
+          fail: (err) => {
+            reject(err)
+          }
+        })
+      })
+      
       wx.hideLoading()
+      
+      console.log('支付成功，返回数据:', payResult)
       
       // 显示支付成功弹窗
       this.showPaySuccessModal()
       
-      // 更新订单状态为已支付
-      orderDetail.status = 'PAID'
-      orderDetail.statusText = '待发货'
-      orderDetail.statusDesc = '商家正在准备发货'
-      orderDetail.payTime = new Date().toISOString().slice(0, 19).replace('T', ' ')
+      // 重新加载订单详情，获取最新状态
+      await this.loadOrderDetail()
       
-      this.setData({
-        orderDetail,
-        statusIcon: this.getStatusIcon('PAID')
-      })
     } catch (error) {
       console.error('支付失败:', error)
       wx.hideLoading()
@@ -369,7 +414,7 @@ Page({
         })
       } else {
         wx.showToast({
-          title: '支付失败，请重试',
+          title: error.message || '支付失败，请重试',
           icon: 'none'
         })
       }

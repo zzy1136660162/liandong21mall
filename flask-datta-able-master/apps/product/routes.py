@@ -5,7 +5,8 @@
 
 from flask import Blueprint, render_template, request, jsonify
 from apps.product.services import ProductService, CartService, OrderService
-from apps.product.models import ProductCategory, Product, Order
+from apps.product.models import Order
+from apps.xp_product.models import Category as XPCategory, Product as XPProduct
 from apps import db
 
 blueprint = Blueprint('product', __name__, url_prefix='/admin/product')
@@ -14,7 +15,7 @@ blueprint = Blueprint('product', __name__, url_prefix='/admin/product')
 @blueprint.route('/category')
 def category_list():
     """商品分类列表页"""
-    categories = ProductCategory.query.order_by(ProductCategory.sort).all()
+    categories = XPCategory.query.order_by(XPCategory.sort).all()
     return render_template('product/category_list.html', categories=categories)
 
 
@@ -23,9 +24,10 @@ def category_add():
     """添加商品分类"""
     data = request.get_json()
     
-    category = ProductCategory(
-        category_name=data.get('categoryName'),
-        category_code=data.get('categoryCode'),
+    category = XPCategory(
+        name=data.get('categoryName'),
+        parent_id=data.get('parentId', 0),
+        level=data.get('level', 1),
         icon=data.get('icon'),
         sort=data.get('sort', 0),
         status=data.get('status', 1)
@@ -43,7 +45,7 @@ def category_add():
 @blueprint.route('/category/<int:category_id>')
 def category_detail(category_id):
     """获取单个分类详情"""
-    category = ProductCategory.query.get(category_id)
+    category = XPCategory.query.get(category_id)
     
     if not category:
         return jsonify({'code': 404, 'message': '分类不存在', 'data': None})
@@ -53,8 +55,8 @@ def category_detail(category_id):
         'message': 'success',
         'data': {
             'id': category.id,
-            'categoryName': category.category_name,
-            'categoryCode': category.category_code,
+            'categoryName': category.name,
+            'categoryCode': '',
             'parentId': category.parent_id,
             'icon': category.icon,
             'sort': category.sort,
@@ -66,7 +68,7 @@ def category_detail(category_id):
 @blueprint.route('/category/delete/<int:category_id>', methods=['DELETE'])
 def category_delete(category_id):
     """删除商品分类"""
-    category = ProductCategory.query.get(category_id)
+    category = XPCategory.query.get(category_id)
     
     if not category:
         return jsonify({'code': 404, 'message': '分类不存在', 'data': None})
@@ -90,7 +92,7 @@ def product_list():
     status = request.args.get('status', type=int)
     keyword = request.args.get('keyword')
     
-    query = Product.query
+    query = XPProduct.query
     
     if category_id:
         query = query.filter_by(category_id=category_id)
@@ -99,13 +101,13 @@ def product_list():
         query = query.filter_by(status=status)
     
     if keyword:
-        query = query.filter(Product.product_name.like(f'%{keyword}%'))
+        query = query.filter(XPProduct.name.like(f'%{keyword}%'))
     
-    pagination = query.order_by(Product.sort.desc(), Product.created_at.desc()).paginate(
+    pagination = query.order_by(XPProduct.id.desc()).paginate(
         page=page, per_page=page_size, error_out=False
     )
     
-    categories = ProductCategory.query.filter_by(status=1).order_by(ProductCategory.sort).all()
+    categories = XPCategory.query.filter_by(status=1).order_by(XPCategory.sort).all()
     
     return render_template('product/product_list.html', 
                           products=pagination.items,

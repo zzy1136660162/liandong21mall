@@ -19,47 +19,50 @@
         <view class="category-item {{currentCategory === 'all' ? 'active' : ''}}" bindtap="switchCategory" data-category="all">
           <text class="category-text">首页</text>
         </view>
-        <view class="category-item spring {{currentCategory === 'spring' ? 'active' : ''}}" bindtap="switchCategory" data-category="spring">
-          <text class="category-text">春焕新</text>
+        <view class="category-item {{currentCategory === 'nasal_care' ? 'active' : ''}}" bindtap="goToCategory" data-category="nasal_care">
+          <text class="category-text">鼻部护理</text>
         </view>
-        <view class="category-item {{currentCategory === 'food' ? 'active' : ''}}" bindtap="goToCategory" data-category="food">
-          <text class="category-text">零食饮料</text>
+        <view class="category-item {{currentCategory === 'pain_relief' ? 'active' : ''}}" bindtap="goToCategory" data-category="pain_relief">
+          <text class="category-text">缓解疼痛</text>
         </view>
-        <view class="category-item {{currentCategory === 'home' ? 'active' : ''}}" bindtap="goToCategory" data-category="home">
-          <text class="category-text">家居百货</text>
+        <view class="category-item {{currentCategory === 'eye_care' ? 'active' : ''}}" bindtap="goToCategory" data-category="eye_care">
+          <text class="category-text">护眼</text>
         </view>
-        <view class="category-item {{currentCategory === 'clothing' ? 'active' : ''}}" bindtap="goToCategory" data-category="clothing">
-          <text class="category-text">女装女鞋</text>
+        <view class="category-item {{currentCategory === 'sub_health' ? 'active' : ''}}" bindtap="goToCategory" data-category="sub_health">
+          <text class="category-text">调理亚健康</text>
         </view>
-        <view class="category-item {{currentCategory === 'beauty' ? 'active' : ''}}" bindtap="goToCategory" data-category="beauty">
-          <text class="category-text">美妆护肤</text>
+        <view class="category-item {{currentCategory === 'kidney_care' ? 'active' : ''}}" bindtap="goToCategory" data-category="kidney_care">
+          <text class="category-text">固肾养肾</text>
         </view>
-        <view class="category-item {{currentCategory === 'personal' ? 'active' : ''}}" bindtap="goToCategory" data-category="personal">
-          <text class="category-text">个护</text>
+        <view class="category-item {{currentCategory === 'body_odor' ? 'active' : ''}}" bindtap="goToCategory" data-category="body_odor">
+          <text class="category-text">狐臭护理</text>
         </view>
-        <view class="category-item {{currentCategory === 'health' ? 'active' : ''}}" bindtap="switchCategory" data-category="health">
-          <text class="category-text">医疗健康</text>
+        <view class="category-item {{currentCategory === 'skin_care' ? 'active' : ''}}" bindtap="goToCategory" data-category="skin_care">
+          <text class="category-text">美肤护肤</text>
         </view>
-        <view class="category-item {{currentCategory === 'baby' ? 'active' : ''}}" bindtap="switchCategory" data-category="baby">
-          <text class="category-text">母婴玩具</text>
+        <view class="category-item {{currentCategory === 'facial_rehab' ? 'active' : ''}}" bindtap="goToCategory" data-category="facial_rehab">
+          <text class="category-text">面瘫康复</text>
         </view>
-        <view class="category-item {{currentCategory === 'fresh' ? 'active' : ''}}" bindtap="switchCategory" data-category="fresh">
-          <text class="category-text">生鲜食品</text>
+        <view class="category-item {{currentCategory === 'women_health' ? 'active' : ''}}" bindtap="goToCategory" data-category="women_health">
+          <text class="category-text">女性调理</text>
         </view>
-        <view class="category-item {{currentCategory === 'men' ? 'active' : ''}}" bindtap="switchCategory" data-category="men">
-          <text class="category-text">男装男鞋</text>
+        <view class="category-item {{currentCategory === 'solid_drink' ? 'active' : ''}}" bindtap="goToCategory" data-category="solid_drink">
+          <text class="category-text">固体饮料</text>
         </view>
-        <view class="category-item {{currentCategory === 'sports' ? 'active' : ''}}" bindtap="switchCategory" data-category="sports">
-          <text class="category-text">运动户外</text>
+        <view class="category-item {{currentCategory === 'tablet_candy' ? 'active' : ''}}" bindtap="goToCategory" data-category="tablet_candy">
+          <text class="category-text">压片糖果</text>
         </view>
-        <view class="category-item {{currentCategory === 'digital' ? 'active' : ''}}" bindtap="switchCategory" data-category="digital">
-          <text class="category-text">数码家电</text>
+        <view class="category-item {{currentCategory === 'herbal_paste' ? 'active' : ''}}" bindtap="goToCategory" data-category="herbal_paste">
+          <text class="category-text">膏滋</text>
         </view>
-        <view class="category-item {{currentCategory === 'luxury' ? 'active' : ''}}" bindtap="switchCategory" data-category="luxury">
-          <text class="category-text">珠宝奢品</text>
+        <view class="category-item {{currentCategory === 'herbal_drink' ? 'active' : ''}}" bindtap="goToCategory" data-category="herbal_drink">
+          <text class="category-text">植物饮品</text>
         </view>
-        <view class="category-item {{currentCategory === 'tea' ? 'active' : ''}}" bindtap="switchCategory" data-category="tea">
-          <text class="category-text">茶叶酒水</text>
+        <view class="category-item {{currentCategory === 'prepared_wine' ? 'active' : ''}}" bindtap="goToCategory" data-category="prepared_wine">
+          <text class="category-text">配制酒</text>
+        </view>
+        <view class="category-item {{currentCategory === 'tea_substitute' ? 'active' : ''}}" bindtap="goToCategory" data-category="tea_substitute">
+          <text class="category-text">代用茶</text>
         </view>
       </view>
     </scroll-view>

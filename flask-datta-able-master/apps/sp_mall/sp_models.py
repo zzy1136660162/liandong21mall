@@ -160,7 +160,7 @@ class SpOrder(db.Model):
     
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True, comment='订单ID')
     order_no = db.Column(db.String(50), nullable=False, unique=True, comment='订单编号')
-    user_id = db.Column(db.BigInteger, nullable=False, comment='用户ID')
+    user_id = db.Column(db.BigInteger, nullable=False, index=True, comment='用户ID')
     total_amount = db.Column(db.Numeric(10, 2), nullable=False, comment='订单总金额')
     discount_amount = db.Column(db.Numeric(10, 2), nullable=False, default=0.00, comment='优惠金额')
     pay_amount = db.Column(db.Numeric(10, 2), nullable=False, comment='实付金额')
@@ -172,7 +172,7 @@ class SpOrder(db.Model):
     receiver_city = db.Column(db.String(50), nullable=True, comment='市')
     receiver_district = db.Column(db.String(50), nullable=True, comment='区')
     receiver_address = db.Column(db.String(500), nullable=False, comment='收货地址')
-    status = db.Column(db.String(20), nullable=False, default='PENDING_PAY', comment='订单状态')
+    status = db.Column(db.String(20), nullable=False, default='PENDING_PAY', index=True, comment='订单状态')
     pay_time = db.Column(db.DateTime, nullable=True, comment='支付时间')
     ship_time = db.Column(db.DateTime, nullable=True, comment='发货时间')
     finish_time = db.Column(db.DateTime, nullable=True, comment='完成时间')
@@ -180,8 +180,21 @@ class SpOrder(db.Model):
     cancel_reason = db.Column(db.String(500), nullable=True, comment='取消原因')
     remark = db.Column(db.String(500), nullable=True, comment='订单备注')
     remaining_seconds = db.Column(db.Integer, nullable=True, comment='剩余支付秒数')
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now, comment='创建时间')
+    payment_method = db.Column(db.String(20), nullable=True, comment='支付方式')
+    logistics_company = db.Column(db.String(50), nullable=True, comment='物流公司')
+    logistics_no = db.Column(db.String(50), nullable=True, comment='物流单号')
+    invoice_type = db.Column(db.String(20), nullable=True, comment='发票类型')
+    invoice_title = db.Column(db.String(100), nullable=True, comment='发票抬头')
+    order_source = db.Column(db.String(20), nullable=True, default='MINI_APP', comment='订单来源')
+    coupon_id = db.Column(db.BigInteger, nullable=True, comment='使用的优惠券ID')
+    coupon_amount = db.Column(db.Numeric(10, 2), nullable=True, default=0.00, comment='优惠券金额')
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now, index=True, comment='创建时间')
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now, comment='更新时间')
+    
+    __table_args__ = (
+        db.Index('idx_user_status', 'user_id', 'status'),
+        db.Index('idx_user_created', 'user_id', 'created_at'),
+    )
     
     items = db.relationship('SpOrderItem', backref='order', lazy='dynamic', cascade='all, delete-orphan')
     
@@ -195,6 +208,17 @@ class SpOrder(db.Model):
             'CANCELLED': '已取消'
         }
         return status_map.get(self.status, '未知')
+    
+    @property
+    def status_desc(self):
+        status_desc_map = {
+            'PENDING_PAY': '请在30分钟内完成支付，超时将自动取消',
+            'PAID': '商家正在准备商品，预计24小时内发货',
+            'SHIPPED': '商品已发货，正在配送途中',
+            'FINISHED': '订单已完成，感谢您的购买',
+            'CANCELLED': '订单已取消'
+        }
+        return status_desc_map.get(self.status, '')
     
     def to_dict(self, include_items=False):
         data = {
@@ -214,6 +238,7 @@ class SpOrder(db.Model):
             'receiverAddress': self.receiver_address,
             'status': self.status,
             'statusText': self.status_text,
+            'statusDesc': self.status_desc,
             'payTime': self.pay_time.strftime('%Y-%m-%d %H:%M:%S') if self.pay_time else None,
             'shipTime': self.ship_time.strftime('%Y-%m-%d %H:%M:%S') if self.ship_time else None,
             'finishTime': self.finish_time.strftime('%Y-%m-%d %H:%M:%S') if self.finish_time else None,
@@ -221,11 +246,30 @@ class SpOrder(db.Model):
             'cancelReason': self.cancel_reason,
             'remark': self.remark,
             'remainingSeconds': self.remaining_seconds,
-            'createdAt': self.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            'paymentMethod': self.payment_method,
+            'logisticsCompany': self.logistics_company,
+            'logisticsNo': self.logistics_no,
+            'invoiceType': self.invoice_type,
+            'invoiceTitle': self.invoice_title,
+            'orderSource': self.order_source,
+            'couponId': self.coupon_id,
+            'couponAmount': float(self.coupon_amount) if self.coupon_amount else 0,
+            'createdAt': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'createdTime': self.created_at.strftime('%Y-%m-%d %H:%M:%S')
         }
         
         if include_items:
             data['items'] = [item.to_dict() for item in self.items.all()]
+            data['products'] = [{
+                'productId': item.product_id,
+                'productName': item.product_name,
+                'productImage': item.product_image,
+                'price': float(item.price),
+                'memberPrice': float(item.member_price) if item.member_price else None,
+                'quantity': item.quantity,
+                'skuName': item.sku_name,
+                'specs': item.specs
+            } for item in self.items.all()]
         
         return data
 
