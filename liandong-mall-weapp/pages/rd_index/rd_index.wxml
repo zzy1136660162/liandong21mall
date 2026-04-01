@@ -17,6 +17,10 @@
         <image class="action-icon-img" src="/images/我的需求 (2).png" mode="aspectFit"></image>
         <text class="action-text">我的需求</text>
       </view>
+      <view class="action-item" bindtap="goToTalentPool">
+        <view class="action-icon submit-icon">🎯</view>
+        <text class="action-text">人才库</text>
+      </view>
     </view>
   </view>
 

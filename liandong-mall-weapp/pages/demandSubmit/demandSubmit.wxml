@@ -138,6 +138,11 @@
     </view>
   </view>
 
+  <!-- 人才库入口 -->
+  <view class="talent-pool-section">
+    <button class="talent-pool-btn" bindtap="goToTalentPool">🎯 人才库</button>
+  </view>
+
   <!-- 提交按钮 -->
   <view class="submit-section">
     <button class="submit-btn" bindtap="submitForm">✅ 提交需求</button>

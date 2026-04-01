@@ -51,6 +51,18 @@ Page({
       url: '/pages/demandList/demandList'
     })
   },
+  goToTalentPool() {
+    const token = wx.getStorageSync('token')
+    if (!token) {
+      wx.navigateTo({
+        url: '/pages/login/index'
+      })
+      return
+    }
+    wx.navigateTo({
+      url: '/pages/talent_pool/index/index'
+    })
+  },
   goToDetail(e) {
     const { id } = e.currentTarget.dataset
     wx.navigateTo({
