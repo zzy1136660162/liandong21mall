@@ -1,0 +1,106 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.venv/
+.idea/
+
+# Database
+*.db
+*.sqlite3
+*.sqlite
+
+# Logs
+*.log
+
+# Environment files (包含敏感信息)
+.env
+.env.local
+.env.*.local
+*.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Python
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+*.pyc
+__pycache__/
+
+# Flask
+migrations/
+instance/
+*.log
+
+# WeChat Mini Program (小程序)
+# 编译后的代码
+ liandong-mall-weapp/deploy/
+ liandong-mall-weapp/dist/
+
+# 依赖
+ liandong-mall-weapp/node_modules/
+
+# 微信开发者工具缓存
+ liandong-mall-weapp/.project/
+ liandong-mall-weapp/.project.config.json
+
+# 日志
+ liandong-mall-weapp/logs/
+
+# 本地开发配置
+ liandong-mall-weapp/config.local.js
+ liandong-mall-weapp/.env*
+
+# 上传的文件
+ media/
+ uploads/
+
+# 临时文件
+*.tmp
+*.temp
+.temp/
+
+# 测试覆盖率
+htmlcov/
+.coverage
+
+# Sphinx documentation
+_build/
+docs/_build/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# IDE specific files
+*.iml
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
