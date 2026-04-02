@@ -97,10 +97,10 @@
         <image class="entry-icon" src="https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260313142047334_666195650315.png" mode="aspectFit"/>
         <text class="entry-name">超级爆品</text>
       </view>
-      <view class="entry-item" bindtap="onEntryTap" data-type="follow">
+      <!-- <view class="entry-item" bindtap="onEntryTap" data-type="follow">
         <image class="entry-icon" src="https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260313142240238_666195763220.png" mode="aspectFit"/>
         <text class="entry-name">同行跟选</text>
-      </view>
+      </view> -->
       <view class="entry-item" bindtap="onEntryTap" data-type="video">
         <image class="entry-icon" src="https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260313142605000_666195967983.png" mode="aspectFit"/>
         <text class="entry-name">视频热卖</text>
