@@ -101,6 +101,46 @@
     .upload-progress-animating {
         animation: pulse 1.5s ease-in-out infinite;
     }
+    .description-editor-wrapper {
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    .description-toolbar {
+        display: flex;
+        gap: 8px;
+        padding: 10px 12px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #ced4da;
+    }
+    .description-toolbar .btn {
+        padding: 4px 12px;
+        font-size: 13px;
+    }
+    #descriptionTextarea {
+        border: none;
+        border-radius: 0;
+        resize: vertical;
+        min-height: 200px;
+    }
+    #descriptionTextarea:focus {
+        box-shadow: none;
+        border-color: transparent;
+    }
+    .description-editor-wrapper:focus-within {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    .image-insert-loading {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 4px;
+        margin-top: 8px;
+    }
 </style>
 {% endblock %}
 
@@ -420,7 +460,34 @@
                     
                     <div class="form-group">
                         <label>商品详情</label>
-                        <textarea class="form-control" name="description" rows="5" placeholder="商品详细描述（支持HTML）"></textarea>
+                        <div class="description-editor-wrapper">
+                            <div class="description-toolbar">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="insertDescriptionImage()">
+                                    <i class="feather icon-image"></i> 插入图片
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="previewDescription()">
+                                    <i class="feather icon-eye"></i> 预览
+                                </button>
+                            </div>
+                            <textarea class="form-control" name="description" id="descriptionTextarea" rows="8" placeholder="商品详细描述，支持HTML标签和图片"></textarea>
+                            <input type="file" id="descriptionImageUpload" accept="image/*" style="display: none;" onchange="uploadDescriptionImage(this)">
+                            <small class="form-text text-muted">支持HTML标签，可通过"插入图片"按钮添加图片到详情中</small>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="previewModal" tabindex="-1" role="dialog">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">商品详情预览</h5>
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+                                <div class="modal-body" id="previewContent" style="max-height: 60vh; overflow-y: auto;"></div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="row">
@@ -737,6 +804,79 @@ function resetImageUpload() {
     $('#uploadPreview').hide();
     $('#uploadPlaceholder').show();
     $('#imageUpload').val('');
+}
+
+function insertDescriptionImage() {
+    $('#descriptionImageUpload').click();
+}
+
+function uploadDescriptionImage(input) {
+    var file = input.files[0];
+    if (!file) return;
+
+    var allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedTypes.indexOf(file.type) === -1) {
+        toastr.error('只支持 JPG、PNG、GIF、WebP 格式的图片');
+        return;
+    }
+
+    if (file.size > 16 * 1024 * 1024) {
+        toastr.error('图片大小不能超过16MB');
+        return;
+    }
+
+    var formData = new FormData();
+    formData.append('file', file);
+
+    var loadingHtml = '<div class="image-insert-loading" id="imageInsertLoading"><div class="spinner-border spinner-border-sm text-warning" role="status"></div><span>图片上传中...</span></div>';
+    $('#descriptionTextarea').after(loadingHtml);
+
+    $.ajax({
+        url: '/admin/sp/upload/image',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(res) {
+            $('#imageInsertLoading').remove();
+
+            if (res.code === 200) {
+                var imageUrl = res.data.url;
+                var textarea = document.getElementById('descriptionTextarea');
+                var imgHtml = '<img src="' + imageUrl + '" alt="商品图片" style="max-width: 100%; height: auto; display: block; margin: 10px 0;">';
+
+                if (textarea.selectionStart || textarea.selectionStart === 0) {
+                    var startPos = textarea.selectionStart;
+                    var endPos = textarea.selectionEnd;
+                    var textBefore = textarea.value.substring(0, startPos);
+                    var textAfter = textarea.value.substring(endPos, textarea.value.length);
+                    textarea.value = textBefore + imgHtml + textAfter;
+                } else {
+                    textarea.value += imgHtml;
+                }
+
+                toastr.success('图片插入成功！');
+            } else {
+                toastr.error(res.message || '上传失败，请重试');
+            }
+        },
+        error: function(xhr, status, error) {
+            $('#imageInsertLoading').remove();
+            toastr.error('上传请求失败: ' + error);
+        }
+    });
+
+    input.value = '';
+}
+
+function previewDescription() {
+    var description = $('#descriptionTextarea').val();
+    if (!description.trim()) {
+        toastr.warning('商品详情为空');
+        return;
+    }
+    $('#previewContent').html(description);
+    $('#previewModal').modal('show');
 }
 
 function deleteProduct(id) {

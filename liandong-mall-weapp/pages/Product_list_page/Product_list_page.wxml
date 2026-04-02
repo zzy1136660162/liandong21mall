@@ -29,26 +29,68 @@
   </view>
 
   <view class="banner-section">
-    <swiper
-      class="banner-swiper"
-      indicator-dots
-      autoplay
-      circular
-      interval="4000"
-      duration="500"
-      indicator-color="rgba(255, 255, 255, 0.3)"
-      indicator-active-color="#FFC107"
-    >
-      <swiper-item wx:for="{{banners}}" wx:key="productId">
-        <image
-          class="banner-image"
-          src="{{item.mainImage}}"
-          mode="aspectFill"
-          bindtap="goToDetail"
-          data-id="{{item.productId}}"
-        />
-      </swiper-item>
-    </swiper>
+    <view class="banner-wrapper" wx:if="{{banners.length > 0}}">
+      <swiper
+        class="banner-swiper"
+        indicator-dots="{{bannerIndicatorDots}}"
+        autoplay="{{bannerAutoplay}}"
+        circular="{{bannerCircular}}"
+        interval="{{bannerInterval}}"
+        duration="{{bannerDuration}}"
+        indicator-color="rgba(255, 255, 255, 0.4)"
+        indicator-active-color="#FFFFFF"
+        indicator-dots="{{true}}"
+        bindchange="onBannerChange"
+      >
+        <swiper-item wx:for="{{banners}}" wx:key="id" bindtap="onBannerTap" data-index="{{index}}">
+          <view class="banner-item-wrapper">
+            <image
+              class="banner-image {{item.isLoaded ? 'loaded' : ''}}"
+              src="{{item.image}}"
+              mode="aspectFill"
+              lazy-load="{{true}}"
+              bindload="onBannerImageLoad"
+              binderror="onBannerImageError"
+              data-index="{{index}}"
+
+            />
+            <view class="banner-overlay" wx:if="{{item.title || item.subtitle}}">
+              <view class="banner-content">
+                <text class="banner-title" wx:if="{{item.title}}">{{item.title}}</text>
+                <text class="banner-subtitle" wx:if="{{item.subtitle}}">{{item.subtitle}}</text>
+              </view>
+            </view>
+          </view>
+        </swiper-item>
+      </swiper>
+
+      <view class="banner-indicator" wx:if="{{banners.length > 1}}">
+        <view class="indicator-dots">
+          <view
+            wx:for="{{banners}}"
+            wx:key="index"
+            class="indicator-dot {{bannerCurrent === index ? 'active' : ''}}"
+          ></view>
+        </view>
+        <text class="indicator-text">{{bannerCurrent + 1}} / {{banners.length}}</text>
+      </view>
+
+      <view class="banner-loading" wx:if="{{bannerLoading}}">
+        <view class="loading-spinner"></view>
+        <text class="loading-text">加载中...</text>
+      </view>
+    </view>
+
+    <view class="banner-placeholder" wx:else>
+      <image
+        class="placeholder-image"
+        src="https://picsum.photos/750/400?random=placeholder"
+        mode="aspectFill"
+      />
+      <view class="placeholder-overlay">
+        <text class="placeholder-text">暂无轮播图</text>
+      </view>
+    </view>
   </view>
 
   <view class="filter-section">

@@ -422,42 +422,55 @@ page {
 
 .product-recommendations {
   background: #FFFFFF;
-  padding: 40rpx 32rpx;
+  padding: 32rpx;
   margin-bottom: 16rpx;
-  padding-bottom: calc(40rpx + 120rpx);
+}
+
+.product-recommendations .section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.product-recommendations .section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #2C2C2C;
+}
+
+.product-recommendations .section-subtitle {
+  font-size: 22rpx;
+  color: #999999;
+  font-weight: normal;
 }
 
 .recommendation-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16rpx;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20rpx;
 }
 
 .recommendation-card {
-  display: flex;
-  flex-direction: column;
-  gap: 12rpx;
-  padding: 12rpx;
-  background: #F5F5F5;
+  background: #FAFAFA;
   border-radius: 12rpx;
-  transition: all 0.3s ease;
+  overflow: hidden;
+  transition: all 0.2s ease;
 }
 
 .recommendation-card:active {
+  opacity: 0.8;
   transform: scale(0.98);
 }
 
 .recommendation-image {
   width: 100%;
-  height: 200rpx;
-  border-radius: 8rpx;
+  height: 180rpx;
   background: #E8E8E8;
 }
 
 .recommendation-info {
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
+  padding: 16rpx;
 }
 
 .recommendation-name {
@@ -467,12 +480,25 @@ page {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: 1.4;
+  margin-bottom: 12rpx;
+}
+
+.recommendation-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .recommendation-price {
   font-size: 26rpx;
-  color: #FFC107;
+  color: #FF4757;
   font-weight: 600;
+}
+
+.recommendation-sales {
+  font-size: 20rpx;
+  color: #999999;
 }
 
 .bottom-bar {

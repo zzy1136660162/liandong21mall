@@ -1,0 +1,982 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 筛选类别管理 {% endblock %}
+
+{% block stylesheets %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css">
+<style>
+    .pcoded-content {
+        margin-left: 260px;
+        padding: 20px;
+    }
+
+    .category-card {
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .category-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        transition: all 0.3s;
+        background: #fff;
+    }
+
+    .category-item:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+
+    .category-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+
+    .category-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .category-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .category-meta {
+        font-size: 13px;
+        color: #999;
+        display: flex;
+        gap: 15px;
+    }
+
+    .category-actions {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .btn-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-inactive {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+    }
+
+    .modal-header .close {
+        color: #fff;
+        opacity: 0.8;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .bulk-actions {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+    }
+
+    .bulk-actions.show {
+        display: flex;
+    }
+
+    .log-section {
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .log-item {
+        padding: 12px;
+        border-left: 3px solid #667eea;
+        background: #f8f9fa;
+        margin-bottom: 10px;
+        border-radius: 0 4px 4px 0;
+    }
+
+    .log-time {
+        font-size: 12px;
+        color: #999;
+        margin-bottom: 4px;
+    }
+
+    .log-content {
+        font-size: 14px;
+        color: #333;
+    }
+
+    .import-area {
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .import-area:hover {
+        border-color: #667eea;
+        background: #f8f9ff;
+    }
+
+    .color-picker {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .color-option {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.2s;
+    }
+
+    .color-option:hover,
+    .color-option.selected {
+        transform: scale(1.2);
+        border-color: #333;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <div class="main-body">
+            <div class="page-wrapper">
+                <div class="page-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>筛选类别管理</h5>
+                                    <div class="card-header-right">
+                                        <button class="btn btn-primary" onclick="showAddModal()">
+                                            <i class="feather icon-plus"></i> 添加类别
+                                        </button>
+                                        <button class="btn btn-success" onclick="showImportModal()">
+                                            <i class="feather icon-upload"></i> 导入
+                                        </button>
+                                        <button class="btn btn-info" onclick="exportCategories()">
+                                            <i class="feather icon-download"></i> 导出
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="card-block">
+                                    <div class="row mb-3">
+                                        <div class="col-md-3">
+                                            <select class="form-control" id="statusFilter">
+                                                <option value="">全部状态</option>
+                                                <option value="1">启用</option>
+                                                <option value="0">禁用</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <input type="text" class="form-control" id="searchKeyword"
+                                                   placeholder="搜索类别名称或编码">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button class="btn btn-info" onclick="filterCategories()">
+                                                <i class="feather icon-search"></i> 搜索
+                                            </button>
+                                            <button class="btn btn-secondary" onclick="resetFilter()">
+                                                重置
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="bulk-actions" id="bulkActions">
+                                        <div class="selected-count">
+                                            已选择 <span id="selectedCount">0</span> 项
+                                        </div>
+                                        <button class="btn btn-success btn-sm" onclick="batchEnable()">
+                                            <i class="feather icon-check"></i> 批量启用
+                                        </button>
+                                        <button class="btn btn-warning btn-sm" onclick="batchDisable()">
+                                            <i class="feather icon-x"></i> 批量禁用
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="batchDelete()">
+                                            <i class="feather icon-trash-2"></i> 批量删除
+                                        </button>
+                                        <button class="btn btn-secondary btn-sm" onclick="clearSelection()">
+                                            取消选择
+                                        </button>
+                                    </div>
+
+                                    <div class="category-list" id="categoryList">
+                                        <div class="text-center text-muted py-5">
+                                            <i class="feather icon-loader" style="font-size: 48px;"></i>
+                                            <p class="mt-2">加载中...</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="pagination-wrapper" id="paginationWrapper" style="display:none;">
+                                        <nav aria-label="Category pagination">
+                                            <ul class="pagination justify-content-center" id="pagination"></ul>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card log-section">
+                                <div class="card-header">
+                                    <h5>操作日志</h5>
+                                    <button class="btn btn-sm btn-secondary float-right" onclick="loadLogs()">
+                                        <i class="feather icon-refresh-cw"></i> 刷新
+                                    </button>
+                                </div>
+                                <div class="card-block">
+                                    <div id="logList">
+                                        <div class="text-center text-muted py-3">暂无日志</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">添加类别</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="categoryForm">
+                <div class="modal-body">
+                    <input type="hidden" id="categoryId">
+
+                    <div class="form-group">
+                        <label>类别名称 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="categoryName" required maxlength="50"
+                               placeholder="请输入类别名称">
+                    </div>
+
+                    <div class="form-group">
+                        <label>类别编码 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="categoryCode" required maxlength="50"
+                               placeholder="请输入唯一的类别编码">
+                        <small class="form-text text-muted">编码用于系统标识，建议使用英文或数字</small>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>排序权重</label>
+                                <input type="number" class="form-control" id="categorySort" value="0" min="0"
+                                       placeholder="数字越大排序越靠前">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>状态</label>
+                                <select class="form-control" id="categoryStatus">
+                                    <option value="1">启用</option>
+                                    <option value="0">禁用</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>类别图标</label>
+                        <input type="text" class="form-control" id="categoryIcon" placeholder="图标类名，如: feather icon-grid">
+                        <small class="form-text text-muted">输入 Feather 图标类名</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>主题颜色</label>
+                        <div class="color-picker">
+                            <div class="color-option" data-color="#667eea" style="background: #667eea;"></div>
+                            <div class="color-option" data-color="#764ba2" style="background: #764ba2;"></div>
+                            <div class="color-option" data-color="#f093fb" style="background: #f093fb;"></div>
+                            <div class="color-option" data-color="#f5576c" style="background: #f5576c;"></div>
+                            <div class="color-option" data-color="#4facfe" style="background: #4facfe;"></div>
+                            <div class="color-option" data-color="#43e97b" style="background: #43e97b;"></div>
+                            <div class="color-option" data-color="#fa709a" style="background: #fa709a;"></div>
+                            <div class="color-option" data-color="#fee140" style="background: #fee140;"></div>
+                        </div>
+                        <input type="hidden" id="categoryColor" value="#667eea">
+                    </div>
+
+                    <div class="form-group">
+                        <label>类别描述</label>
+                        <textarea class="form-control" id="categoryDescription" rows="2" maxlength="200"
+                                  placeholder="可选，简要描述该类别"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">导入类别数据</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="import-area" id="importArea">
+                    <i class="feather icon-upload" style="font-size: 48px; color: #667eea;"></i>
+                    <p class="mt-3">点击或拖拽文件到此处上传</p>
+                    <p class="text-muted">支持 JSON 格式文件</p>
+                </div>
+                <input type="file" id="importFile" accept=".json" style="display: none;">
+
+                <div class="mt-3">
+                    <h6>导入说明：</h6>
+                    <ul class="text-muted">
+                        <li>支持 JSON 格式文件</li>
+                        <li>文件应包含 categories 数组</li>
+                        <li>已存在的编码会更新，不存在的新增</li>
+                        <li>建议先导出获取模板</li>
+                    </ul>
+                </div>
+
+                <div class="preview-section mt-3" id="previewSection" style="display: none;">
+                    <h6>导入预览：</h6>
+                    <div id="previewContent" class="bg-light p-3 rounded"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="confirmImport" disabled>确认导入</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">确认删除</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteMessage">确定要删除这个类别吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
+<script>
+let currentPage = 1;
+let pageSize = 20;
+let selectedCategories = [];
+let pendingImportData = null;
+
+$(document).ready(function () {
+    loadCategories();
+    loadLogs();
+    initColorPicker();
+    initImportArea();
+});
+
+function loadCategories() {
+    const status = $('#statusFilter').val();
+    const keyword = $('#searchKeyword').val();
+
+    let url = `/api/sp/filter_category?page=${currentPage}&pageSize=${pageSize}`;
+    if (status !== '') {
+        url += `&status=${status}`;
+    }
+    if (keyword) {
+        url += `&keyword=${encodeURIComponent(keyword)}`;
+    }
+
+    $.get(url, function (res) {
+        if (res.code === 200) {
+            renderCategories(res.data.list);
+            renderPagination(res.data);
+        } else {
+            toastr.error(res.message || '加载失败');
+        }
+    }).fail(function () {
+        toastr.error('网络错误，请稍后重试');
+    });
+}
+
+function renderCategories(categories) {
+    if (!categories || categories.length === 0) {
+        $('#categoryList').html(`
+            <div class="text-center text-muted py-5">
+                <i class="feather icon-inbox" style="font-size: 48px;"></i>
+                <p class="mt-2">暂无类别数据</p>
+                <button class="btn btn-primary btn-sm mt-2" onclick="showAddModal()">添加第一个类别</button>
+            </div>
+        `);
+        $('#paginationWrapper').hide();
+        return;
+    }
+
+    let html = '';
+    categories.forEach(function (cat) {
+        const isSelected = selectedCategories.includes(cat.id);
+        const iconBg = cat.color || '#667eea';
+        const icon = cat.icon || 'feather icon-grid';
+
+        html += `
+            <div class="category-item">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="check-${cat.id}"
+                           ${isSelected ? 'checked' : ''} onchange="toggleSelection(${cat.id})">
+                    <label class="custom-control-label" for="check-${cat.id}"></label>
+                </div>
+                <div class="category-icon" style="background: linear-gradient(135deg, ${iconBg} 0%, ${adjustColor(iconBg, -20)} 100%);">
+                    <i class="${icon}"></i>
+                </div>
+                <div class="category-info">
+                    <div class="category-name">${cat.name}</div>
+                    <div class="category-meta">
+                        <span><i class="feather icon-hash"></i> ${cat.code}</span>
+                        <span><i class="feather icon-list"></i> 排序: ${cat.sort}</span>
+                        <span><i class="feather icon-package"></i> ${cat.productCount || 0} 个商品</span>
+                    </div>
+                    ${cat.description ? `<div class="category-desc text-muted small mt-1">${cat.description}</div>` : ''}
+                </div>
+                <span class="status-badge ${cat.status === 1 ? 'status-active' : 'status-inactive'}">
+                    ${cat.status === 1 ? '启用' : '禁用'}
+                </span>
+                <div class="category-actions">
+                    <button class="btn btn-primary btn-circle btn-sm" onclick="editCategory(${cat.id})" title="编辑">
+                        <i class="feather icon-edit-2"></i>
+                    </button>
+                    <button class="btn btn-${cat.status === 1 ? 'warning' : 'success'} btn-circle btn-sm"
+                            onclick="toggleStatus(${cat.id})" title="${cat.status === 1 ? '禁用' : '启用'}">
+                        <i class="feather icon-${cat.status === 1 ? 'x' : 'check'}"></i>
+                    </button>
+                    <button class="btn btn-danger btn-circle btn-sm" onclick="confirmDelete(${cat.id}, '${cat.name}')" title="删除">
+                        <i class="feather icon-trash-2"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+
+    $('#categoryList').html(html);
+}
+
+function adjustColor(color, amount) {
+    const clamp = (num) => Math.min(255, Math.max(0, num));
+
+    let usePound = false;
+    if (color[0] === "#") {
+        color = color.slice(1);
+        usePound = true;
+    }
+
+    const num = parseInt(color, 16);
+    let r = (num >> 16) + amount;
+    let g = ((num >> 8) & 0x00FF) + amount;
+    let b = (num & 0x0000FF) + amount;
+
+    r = clamp(r);
+    g = clamp(g);
+    b = clamp(b);
+
+    return (usePound ? "#" : "") + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+}
+
+function renderPagination(data) {
+    if (data.totalPages <= 1) {
+        $('#paginationWrapper').hide();
+        return;
+    }
+
+    $('#paginationWrapper').show();
+    let html = '';
+
+    if (currentPage > 1) {
+        html += `<li class="page-item"><a class="page-link" href="javascript:;" onclick="goToPage(${currentPage - 1})">上一页</a></li>`;
+    }
+
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(data.totalPages, startPage + maxVisible - 1);
+
+    if (endPage - startPage + 1 < maxVisible) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="javascript:;" onclick="goToPage(${i})">${i}</a>
+                 </li>`;
+    }
+
+    if (currentPage < data.totalPages) {
+        html += `<li class="page-item"><a class="page-link" href="javascript:;" onclick="goToPage(${currentPage + 1})">下一页</a></li>`;
+    }
+
+    $('#pagination').html(html);
+}
+
+function goToPage(page) {
+    currentPage = page;
+    loadCategories();
+}
+
+function filterCategories() {
+    currentPage = 1;
+    loadCategories();
+}
+
+function resetFilter() {
+    $('#statusFilter').val('');
+    $('#searchKeyword').val('');
+    currentPage = 1;
+    loadCategories();
+}
+
+function toggleSelection(id) {
+    const index = selectedCategories.indexOf(id);
+    if (index === -1) {
+        selectedCategories.push(id);
+    } else {
+        selectedCategories.splice(index, 1);
+    }
+    updateBulkActions();
+}
+
+function updateBulkActions() {
+    if (selectedCategories.length > 0) {
+        $('#bulkActions').addClass('show');
+        $('#selectedCount').text(selectedCategories.length);
+    } else {
+        $('#bulkActions').removeClass('show');
+    }
+}
+
+function clearSelection() {
+    selectedCategories = [];
+    $('.custom-control-input').prop('checked', false);
+    updateBulkActions();
+}
+
+function showAddModal() {
+    $('#modalTitle').text('添加类别');
+    $('#categoryForm')[0].reset();
+    $('#categoryId').val('');
+    $('.color-option').removeClass('selected');
+    $('.color-option[data-color="#667eea"]').addClass('selected');
+    $('#categoryColor').val('#667eea');
+    $('#categoryModal').modal('show');
+}
+
+function editCategory(id) {
+    $.get(`/api/sp/filter_category/${id}`, function (res) {
+        if (res.code === 200) {
+            const cat = res.data;
+            $('#modalTitle').text('编辑类别');
+            $('#categoryId').val(cat.id);
+            $('#categoryName').val(cat.name);
+            $('#categoryCode').val(cat.code);
+            $('#categorySort').val(cat.sort);
+            $('#categoryStatus').val(cat.status);
+            $('#categoryIcon').val(cat.icon || '');
+            $('#categoryColor').val(cat.color || '#667eea');
+            $('#categoryDescription').val(cat.description || '');
+
+            $('.color-option').removeClass('selected');
+            $(`.color-option[data-color="${cat.color || '#667eea'}"]`).addClass('selected');
+
+            $('#categoryModal').modal('show');
+        } else {
+            toastr.error(res.message || '获取详情失败');
+        }
+    });
+}
+
+$('#categoryForm').on('submit', function (e) {
+    e.preventDefault();
+
+    const id = $('#categoryId').val();
+    const data = {
+        name: $('#categoryName').val().trim(),
+        code: $('#categoryCode').val().trim(),
+        sort: parseInt($('#categorySort').val()) || 0,
+        status: parseInt($('#categoryStatus').val()),
+        icon: $('#categoryIcon').val().trim(),
+        color: $('#categoryColor').val(),
+        description: $('#categoryDescription').val().trim()
+    };
+
+    if (!data.name) {
+        toastr.error('请输入类别名称');
+        return;
+    }
+
+    if (!data.code) {
+        toastr.error('请输入类别编码');
+        return;
+    }
+
+    const url = id ? `/api/sp/filter_category/${id}` : '/api/sp/filter_category';
+    const method = id ? 'PUT' : 'POST';
+
+    $.ajax({
+        url: url,
+        type: method,
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function (res) {
+            if (res.code === 200) {
+                toastr.success(id ? '更新成功' : '添加成功');
+                $('#categoryModal').modal('hide');
+                loadCategories();
+            } else {
+                toastr.error(res.message || '操作失败');
+            }
+        },
+        error: function () {
+            toastr.error('网络错误，请稍后重试');
+        }
+    });
+});
+
+function toggleStatus(id) {
+    $.post(`/api/sp/filter_category/toggle-status/${id}`, function (res) {
+        if (res.code === 200) {
+            toastr.success('状态切换成功');
+            loadCategories();
+        } else {
+            toastr.error(res.message || '操作失败');
+        }
+    });
+}
+
+function confirmDelete(id, name) {
+    $('#deleteMessage').text(`确定要删除类别 "${name}" 吗？此操作不可恢复。`);
+    $('#confirmDelete').attr('onclick', `deleteCategory(${id})`);
+    $('#deleteModal').modal('show');
+}
+
+function deleteCategory(id) {
+    $.ajax({
+        url: `/api/sp/filter_category/${id}`,
+        type: 'DELETE',
+        success: function (res) {
+            if (res.code === 200) {
+                toastr.success('删除成功');
+                $('#deleteModal').modal('hide');
+                selectedCategories = selectedCategories.filter(i => i !== id);
+                loadCategories();
+            } else {
+                toastr.error(res.message || '删除失败');
+            }
+        }
+    });
+}
+
+function batchEnable() {
+    if (selectedCategories.length === 0) {
+        toastr.warning('请先选择要启用的类别');
+        return;
+    }
+
+    updateBatchStatus(1);
+}
+
+function batchDisable() {
+    if (selectedCategories.length === 0) {
+        toastr.warning('请先选择要禁用的类别');
+        return;
+    }
+
+    updateBatchStatus(0);
+}
+
+function updateBatchStatus(status) {
+    const categories = selectedCategories.map(id => ({ id, status }));
+    const action = status === 1 ? '启用' : '禁用';
+
+    $.ajax({
+        url: '/api/sp/filter_category/batch-update',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ categories: categories }),
+        success: function (res) {
+            if (res.code === 200) {
+                toastr.success(`成功${action} ${res.data.updatedCount} 个类别`);
+                clearSelection();
+                loadCategories();
+            } else {
+                toastr.error(res.message || '操作失败');
+            }
+        }
+    });
+}
+
+function batchDelete() {
+    if (selectedCategories.length === 0) {
+        toastr.warning('请先选择要删除的类别');
+        return;
+    }
+
+    if (!confirm(`确定要删除选中的 ${selectedCategories.length} 个类别吗？此操作不可恢复。`)) {
+        return;
+    }
+
+    let deleted = 0;
+    const deleteNext = (index) => {
+        if (index >= selectedCategories.length) {
+            toastr.success(`成功删除 ${deleted} 个类别`);
+            selectedCategories = [];
+            updateBulkActions();
+            loadCategories();
+            return;
+        }
+
+        $.ajax({
+            url: `/api/sp/filter_category/${selectedCategories[index]}`,
+            type: 'DELETE',
+            success: function (res) {
+                if (res.code === 200) {
+                    deleted++;
+                }
+                deleteNext(index + 1);
+            },
+            error: function () {
+                deleteNext(index + 1);
+            }
+        });
+    };
+
+    deleteNext(0);
+}
+
+function exportCategories() {
+    $.get('/api/sp/filter_category/export', function (res) {
+        if (res.code === 200) {
+            const dataStr = JSON.stringify(res.data, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `filter_categories_${new Date().getTime()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            toastr.success('导出成功');
+        } else {
+            toastr.error(res.message || '导出失败');
+        }
+    });
+}
+
+function showImportModal() {
+    pendingImportData = null;
+    $('#importFile').val('');
+    $('#previewSection').hide();
+    $('#confirmImport').prop('disabled', true);
+    $('#importModal').modal('show');
+}
+
+function initImportArea() {
+    const importArea = document.getElementById('importArea');
+    const importFile = document.getElementById('importFile');
+
+    importArea.addEventListener('click', function () {
+        importFile.click();
+    });
+
+    importArea.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        importArea.style.borderColor = '#667eea';
+    });
+
+    importArea.addEventListener('dragleave', function () {
+        importArea.style.borderColor = '#ccc';
+    });
+
+    importArea.addEventListener('drop', function (e) {
+        e.preventDefault();
+        importArea.style.borderColor = '#ccc';
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            handleImportFile(file);
+        }
+    });
+
+    importFile.addEventListener('change', function () {
+        if (this.files[0]) {
+            handleImportFile(this.files[0]);
+        }
+    });
+}
+
+function handleImportFile(file) {
+    if (!file.name.endsWith('.json')) {
+        toastr.error('只支持 JSON 格式文件');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (data.categories && Array.isArray(data.categories)) {
+                pendingImportData = data.categories;
+                $('#previewContent').html(`
+                    <p>检测到 ${data.categories.length} 个类别数据：</p>
+                    <ul>
+                        ${data.categories.slice(0, 5).map(c => `<li>${c.name} (${c.code})</li>`).join('')}
+                        ${data.categories.length > 5 ? `<li>...还有 ${data.categories.length - 5} 个</li>` : ''}
+                    </ul>
+                `);
+                $('#previewSection').show();
+                $('#confirmImport').prop('disabled', false);
+            } else {
+                toastr.error('文件格式不正确，缺少 categories 数组');
+            }
+        } catch (err) {
+            toastr.error('JSON 解析失败：' + err.message);
+        }
+    };
+    reader.readAsText(file);
+}
+
+$('#confirmImport').on('click', function () {
+    if (!pendingImportData) {
+        toastr.error('没有要导入的数据');
+        return;
+    }
+
+    $.ajax({
+        url: '/api/sp/filter_category/import',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ categories: pendingImportData }),
+        success: function (res) {
+            if (res.code === 200) {
+                toastr.success(`导入成功：新增 ${res.data.imported} 个，更新 ${res.data.updated} 个`);
+                $('#importModal').modal('hide');
+                loadCategories();
+            } else {
+                toastr.error(res.message || '导入失败');
+            }
+        },
+        error: function () {
+            toastr.error('网络错误，请稍后重试');
+        }
+    });
+});
+
+function initColorPicker() {
+    $('.color-option').on('click', function () {
+        $('.color-option').removeClass('selected');
+        $(this).addClass('selected');
+        $('#categoryColor').val($(this).data('color'));
+    });
+}
+
+function loadLogs() {
+    $.get('/api/sp/filter_category/logs?pageSize=10', function (res) {
+        if (res.code === 200 && res.data.list.length > 0) {
+            let html = '';
+            res.data.list.forEach(function (log) {
+                const typeMap = {
+                    'CREATE': { icon: 'plus-circle', color: 'success' },
+                    'UPDATE': { icon: 'edit-2', color: 'info' },
+                    'DELETE': { icon: 'trash-2', color: 'danger' },
+                    'BATCH_UPDATE': { icon: 'layers', color: 'warning' },
+                    'IMPORT': { icon: 'upload', color: 'primary' },
+                    'EXPORT': { icon: 'download', color: 'secondary' }
+                };
+                const typeInfo = typeMap[log.operationType] || { icon: 'activity', color: 'secondary' };
+
+                html += `
+                    <div class="log-item">
+                        <div class="log-time">${log.createdAt} - ${log.operatorName || '系统'}</div>
+                        <div class="log-content">
+                            <i class="feather icon-${typeInfo.icon} text-${typeInfo.color}"></i>
+                            ${log.description || log.operationType}
+                            ${log.status === 0 ? '<span class="text-danger ml-2">失败</span>' : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            $('#logList').html(html);
+        }
+    });
+}
+</script>
+{% endblock %}

@@ -1,3 +1,5 @@
+const { productApi } = require('../../utils/sp_api.js')
+
 Page({
   data: {
     currentTab: 'tibao',
@@ -21,6 +23,27 @@ Page({
         subtitle: '每天10点准时开抢'
       }
     ]
+  },
+
+  onLoad() {
+    this.loadBanners()
+  },
+
+  async loadBanners() {
+    try {
+      const banners = await productApi.getHomeBanners()
+      if (banners && banners.length > 0) {
+        const formattedBanners = banners.map(banner => ({
+          id: banner.id,
+          image: banner.imageUrl,
+          title: banner.title || '',
+          subtitle: banner.subtitle || ''
+        }))
+        this.setData({ banners: formattedBanners })
+      }
+    } catch (error) {
+      console.error('加载首页轮播图失败:', error)
+    }
   },
 
   onTabChange(e) {

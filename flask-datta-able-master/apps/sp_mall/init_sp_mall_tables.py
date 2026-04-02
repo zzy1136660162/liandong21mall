@@ -9,6 +9,7 @@ from apps.sp_mall.sp_models import (
     SpProductCategory, SpProduct, SpProductSku,
     SpCart, SpOrder, SpOrderItem, SpAddress
 )
+from apps.sp_mall.sp_banner_models import SpBanner
 import sys
 
 def init_database():
@@ -32,7 +33,8 @@ def init_database():
                 'sp_cart',
                 'sp_order',
                 'sp_order_item',
-                'sp_address'
+                'sp_address',
+                'sp_banner'
             ]
             
             existing_tables = inspector.get_table_names()

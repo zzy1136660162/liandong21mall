@@ -10,8 +10,10 @@ from apps.sp_mall.sp_api import (
     sp_category_ns,
     sp_cart_ns,
     sp_order_ns,
-    sp_address_ns
+    sp_address_ns,
+    sp_banner_ns
 )
+from apps.sp_mall.sp_filter_category_api import sp_filter_category_ns
 
 
 def register_sp_mall_api(api):
@@ -21,6 +23,8 @@ def register_sp_mall_api(api):
     api.add_namespace(sp_cart_ns, path='/api/sp/cart')
     api.add_namespace(sp_order_ns, path='/api/sp/order')
     api.add_namespace(sp_address_ns, path='/api/sp/address')
-    
+    api.add_namespace(sp_banner_ns, path='/api/sp/banner')
+    api.add_namespace(sp_filter_category_ns, path='/api/sp/filter_category')
+
     print('> sp_mall API registered successfully')
     return api
