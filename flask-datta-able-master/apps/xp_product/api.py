@@ -7,10 +7,11 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 from apps import db
-from apps.xp_product.models import Product, Category
+from apps.xp_product.models import Product, Category, SampleApply
 from datetime import datetime
 
 api = Namespace('product', description='商品选品模块')
+samples_ns = Namespace('samples', description='样品申请模块')
 
 ProductModel = api.model('Product', {
     'id': fields.Integer,
@@ -297,6 +298,220 @@ class ProductBatchUpdateStatus(Resource):
         db.session.commit()
         
         return {'code': 200, 'message': '批量更新成功'}
+
+
+def get_current_user_id():
+    """获取当前用户ID"""
+    user_id = request.headers.get('X-User-Id')
+    if user_id:
+        try:
+            return int(user_id)
+        except:
+            pass
+    return None
+
+
+def require_login(func):
+    """登录装饰器"""
+    def wrapper(*args, **kwargs):
+        user_id = get_current_user_id()
+        if not user_id:
+            return {'code': 401, 'message': '请先登录', 'data': None}, 401
+        return func(*args, **kwargs)
+    wrapper.__name__ = func.__name__
+    return wrapper
+
+
+@samples_ns.route('')
+class SampleApplyListAPI(Resource):
+    """样品申请列表 - GET /api/samples"""
+
+    def get(self):
+        """获取样品申请列表"""
+        page = request.args.get('page', 1, type=int)
+        page_size = request.args.get('pageSize', 10, type=int)
+        status = request.args.get('status', '')
+        user_id = get_current_user_id()
+
+        query = SampleApply.query
+
+        if user_id:
+            query = query.filter_by(user_id=user_id)
+
+        if status and status != 'all':
+            status_map = {'pending': 0, 'approved': 1, 'rejected': 2, 'shipped': 1, 'received': 2}
+            if status in status_map:
+                if status == 'shipped':
+                    query = query.filter(SampleApply.status == 1, SampleApply.ship_status == 1)
+                elif status == 'received':
+                    query = query.filter(SampleApply.ship_status == 2)
+                else:
+                    query = query.filter(SampleApply.status == status_map[status])
+
+        pagination = query.order_by(SampleApply.created_at.desc()).paginate(
+            page=page, per_page=page_size, error_out=False
+        )
+
+        return {
+            'code': 200,
+            'message': 'success',
+            'data': {
+                'total': pagination.total,
+                'page': page,
+                'pageSize': page_size,
+                'list': [p.to_api_list_dict() for p in pagination.items]
+            }
+        }
+
+
+@samples_ns.route('/apply')
+class SampleApplyAPI(Resource):
+    """提交样品申请 - POST /api/samples/apply"""
+
+    @require_login
+    def post(self):
+        """提交样品申请"""
+        user_id = get_current_user_id()
+        try:
+            data = request.get_json()
+            print(f"[DEBUG] 收到申请数据: {data}")
+
+            product_ids = data.get('productIds', [])
+            recipient_name = data.get('recipientName')
+            phone = data.get('phone')
+            province = data.get('province', '')
+            city = data.get('city', '')
+            district = data.get('district', '')
+            address = data.get('address')
+            remark = data.get('remark', '')
+
+            print(f"[DEBUG] product_ids: {product_ids}, type: {type(product_ids)}")
+
+            if not product_ids:
+                return {'code': 400, 'message': '请选择申请的商品'}, 400
+            if not recipient_name or not phone or not address:
+                return {'code': 400, 'message': '请填写完整的收货信息'}, 400
+
+            full_address = f'{province}{city}{district}{address}'
+
+            apply_list = []
+            for product_id in product_ids[:3]:
+                print(f"[DEBUG] 处理商品ID: {product_id}, type: {type(product_id)}")
+                try:
+                    product_id_int = int(product_id)
+                    product = Product.query.get(product_id_int)
+                    print(f"[DEBUG] 查询商品结果: {product}")
+
+                    if not product:
+                        print(f"[DEBUG] 商品 {product_id} 不存在")
+                        continue
+
+                    import time
+                    apply_no = f'SA{int(time.time() * 1000)}'
+
+                    apply = SampleApply(
+                        apply_no=apply_no,
+                        user_id=user_id,
+                        user_name=recipient_name,
+                        user_phone=phone,
+                        product_id=product.id,
+                        product_name=product.name,
+                        product_image=product.main_image,
+                        quantity=1,
+                        address=full_address,
+                        remark=remark,
+                        status=0,
+                        ship_status=0
+                    )
+                    db.session.add(apply)
+                    apply_list.append(apply_no)
+                    print(f"[DEBUG] 成功添加申请: {apply_no}")
+                except Exception as e:
+                    print(f"[ERROR] 处理商品 {product_id} 时出错: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    continue
+
+            if not apply_list:
+                print("[DEBUG] 没有成功创建任何申请")
+                return {'code': 400, 'message': '所选商品不存在或无法申请'}, 400
+
+            db.session.commit()
+            print(f"[DEBUG] 提交成功，申请单号: {apply_list}")
+
+            return {
+                'code': 200,
+                'message': '申请提交成功',
+                'data': {
+                    'applicationId': apply_list[0] if apply_list else '',
+                    'status': 'pending',
+                    'applyTime': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                }
+            }
+        except Exception as e:
+            print(f"[ERROR] 申请处理异常: {e}")
+            import traceback
+            traceback.print_exc()
+            db.session.rollback()
+            return {'code': 500, 'message': f'服务器错误: {str(e)}'}, 500
+
+
+@samples_ns.route('/<string:apply_no>')
+class SampleApplyDetailAPI(Resource):
+    """获取样品申请详情 - GET /api/samples/{apply_no}"""
+
+    def get(self, apply_no):
+        apply = SampleApply.query.filter_by(apply_no=apply_no).first()
+        if not apply:
+            return {'code': 404, 'message': '申请不存在'}, 404
+
+        return {
+            'code': 200,
+            'message': 'success',
+            'data': apply.to_api_detail_dict()
+        }
+
+
+@samples_ns.route('/<string:apply_no>/receive')
+class SampleReceiveAPI(Resource):
+    """确认收货 - POST /api/samples/{apply_no}/receive"""
+
+    def post(self, apply_no):
+        apply = SampleApply.query.filter_by(apply_no=apply_no).first()
+        if not apply:
+            return {'code': 404, 'message': '申请不存在'}, 404
+
+        if apply.ship_status != 1:
+            return {'code': 400, 'message': '该申请尚未发货'}, 400
+
+        apply.ship_status = 2
+        apply.receive_time = datetime.now()
+        db.session.commit()
+
+        return {'code': 200, 'message': '确认收货成功'}
+
+
+@samples_ns.route('/<string:apply_no>/cancel')
+class SampleCancelAPI(Resource):
+    """取消申请 - POST /api/samples/{apply_no}/cancel"""
+
+    @require_login
+    def post(self, apply_no):
+        apply = SampleApply.query.filter_by(apply_no=apply_no).first()
+        if not apply:
+            return {'code': 404, 'message': '申请不存在'}, 404
+
+        user_id = get_current_user_id()
+        if apply.user_id != user_id:
+            return {'code': 403, 'message': '无权操作'}, 403
+
+        if apply.status != 0:
+            return {'code': 400, 'message': '该申请无法取消'}, 400
+
+        apply.status = 3
+        db.session.commit()
+
+        return {'code': 200, 'message': '申请已取消'}
 
 
 @api.route('/category/admin/list')

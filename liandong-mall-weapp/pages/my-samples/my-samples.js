@@ -1,4 +1,5 @@
 const { isLogin } = require('../../utils/user');
+const sampleService = require('../../services/sampleService');
 
 Page({
   data: {
@@ -45,24 +46,30 @@ Page({
   },
 
   // 加载样品申请列表
-  loadSampleList() {
-    // 从本地存储获取申请记录（模拟数据）
-    const applications = wx.getStorageSync('sampleApplications') || [];
-    
-    // 如果没有数据，创建一些模拟数据
-    let sampleList = applications;
-    if (sampleList.length === 0) {
-      sampleList = this.getMockData();
+  async loadSampleList() {
+    wx.showLoading({ title: '加载中...' });
+    try {
+      const res = await sampleService.getSamples({
+        status: this.data.currentFilter === 'all' ? '' : this.data.currentFilter,
+        page: this.data.page,
+        pageSize: this.data.pageSize
+      });
+
+      if (res.code === 200) {
+        this.setData({
+          sampleList: res.data.list || [],
+          filterText: this.filterMap[this.data.currentFilter],
+          hasMore: res.data.list && res.data.list.length >= this.data.pageSize
+        });
+      } else {
+        wx.showToast({ title: res.message || '加载失败', icon: 'none' });
+      }
+    } catch (error) {
+      console.error('加载样品申请列表失败:', error);
+      wx.showToast({ title: '加载失败', icon: 'none' });
+    } finally {
+      wx.hideLoading();
     }
-
-    // 根据当前筛选条件过滤
-    const filteredList = this.filterList(sampleList, this.data.currentFilter);
-
-    this.setData({
-      sampleList: filteredList,
-      filterText: this.filterMap[this.data.currentFilter],
-      hasMore: false // 模拟没有更多数据
-    });
   },
 
   // 获取模拟数据

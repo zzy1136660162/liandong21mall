@@ -1,3 +1,5 @@
+const sampleService = require('../../services/sampleService');
+
 Page({
   data: {
     application: {},
@@ -12,23 +14,26 @@ Page({
   },
 
   // 加载申请详情
-  loadApplicationDetail(applicationId) {
-    // 从本地存储获取数据
-    const applications = wx.getStorageSync('sampleApplications') || [];
-    let application = applications.find(item => item.id === applicationId);
-    
-    // 如果没有找到，使用模拟数据
-    if (!application) {
-      application = this.getMockDetail(applicationId);
+  async loadApplicationDetail(applicationId) {
+    wx.showLoading({ title: '加载中...' });
+    try {
+      const res = await sampleService.getSampleDetail(applicationId);
+      if (res.code === 200) {
+        const application = res.data;
+        const statusDesc = this.getStatusDesc(application.status, application.shipStatus);
+        this.setData({
+          application,
+          statusDesc
+        });
+      } else {
+        wx.showToast({ title: res.message || '加载失败', icon: 'none' });
+      }
+    } catch (error) {
+      console.error('加载申请详情失败:', error);
+      wx.showToast({ title: '加载失败', icon: 'none' });
+    } finally {
+      wx.hideLoading();
     }
-
-    // 设置状态描述
-    const statusDesc = this.getStatusDesc(application.status, application.shipStatus);
-
-    this.setData({
-      application,
-      statusDesc
-    });
   },
 
   // 获取模拟详情数据

@@ -67,8 +67,9 @@ def register_api(app):
     api.add_namespace(order_ns, path='/api/product/order')
     api.add_namespace(favorite_ns, path='/api/product/favorite')
 
-    from apps.xp_product.api import api as xp_product_api
+    from apps.xp_product.api import api as xp_product_api, samples_ns
     api.add_namespace(xp_product_api, path='/api/xp_product')
+    api.add_namespace(samples_ns, path='/api/samples')
 
     from apps.sp_product.sp_product_detail_api import sp_product_detail_ns
     api.add_namespace(sp_product_detail_ns, path='/api/sp_product_detail')
