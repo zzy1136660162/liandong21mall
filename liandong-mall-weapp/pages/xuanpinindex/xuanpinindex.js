@@ -78,6 +78,13 @@ Page({
     }
   },
 
+  // 跳转到人才库
+  goToTalentPool() {
+    wx.navigateTo({
+      url: '/pages/rd_index/rd_index'
+    });
+  },
+
   // 加载搜索历史
   loadSearchHistory() {
     const history = wx.getStorageSync('searchHistory') || [];

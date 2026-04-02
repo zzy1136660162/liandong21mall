@@ -1,4 +1,17 @@
 <view class="page">
+  <!-- 自定义导航栏 -->
+  <view class="custom-nav">
+    <view class="nav-content">
+      <view class="nav-title">选品中心</view>
+      <view class="nav-right">
+        <view class="talent-btn" bindtap="goToTalentPool">
+          <text class="talent-icon">👥</text>
+          <text class="talent-text">人才库</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
   <!-- 顶部白色区域 -->
   <view class="header">
     <!-- 搜索栏 -->
