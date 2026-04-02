@@ -4,79 +4,94 @@
 
 const categories = [
   {
-    id: 'nasal_care',
+    id: '疼痛舒缓',
+    name: '疼痛舒缓',
+    icon: '💊'
+  },
+  {
+    id: '鼻部护理',
     name: '鼻部护理',
     icon: '👃'
   },
   {
-    id: 'pain_relief',
-    name: '缓解疼痛',
-    icon: '💊'
-  },
-  {
-    id: 'eye_care',
-    name: '护眼',
+    id: '眼部护理',
+    name: '眼部护理',
     icon: '👁️'
   },
   {
-    id: 'sub_health',
-    name: '调理亚健康',
-    icon: '💪'
-  },
-  {
-    id: 'kidney_care',
-    name: '固肾养肾',
-    icon: '🌿'
-  },
-  {
-    id: 'body_odor',
-    name: '狐臭护理',
+    id: '皮肤护理',
+    name: '皮肤护理',
     icon: '🧴'
   },
   {
-    id: 'skin_care',
-    name: '美肤护肤',
-    icon: '✨'
-  },
-  {
-    id: 'facial_rehab',
-    name: '面瘫康复',
-    icon: '🏥'
-  },
-  {
-    id: 'women_health',
+    id: '女性调理',
     name: '女性调理',
     icon: '🌸'
   },
   {
-    id: 'solid_drink',
+    id: '男性养护',
+    name: '男性养护',
+    icon: '💪'
+  },
+  {
+    id: '小儿护理',
+    name: '小儿护理',
+    icon: '👶'
+  },
+  {
+    id: '纤体瘦身',
+    name: '纤体瘦身',
+    icon: '🏃'
+  },
+  {
+    id: '养发护发',
+    name: '养发护发',
+    icon: '💇'
+  },
+  {
+    id: '泡浴养生',
+    name: '泡浴养生',
+    icon: '🛁'
+  },
+  {
+    id: '人参滋补',
+    name: '人参滋补',
+    icon: '🌿'
+  },
+  {
+    id: '阿胶膏滋',
+    name: '阿胶膏滋',
+    icon: '🫙'
+  },
+  {
+    id: '草本茶饮',
+    name: '草本茶饮',
+    icon: '🍵'
+  },
+  {
+    id: '固体饮料',
     name: '固体饮料',
     icon: '🥤'
   },
   {
-    id: 'tablet_candy',
+    id: '压片糖果',
     name: '压片糖果',
     icon: '🍬'
   },
   {
-    id: 'herbal_paste',
-    name: '膏滋',
-    icon: '🫙'
+    id: '营养颗粒',
+    name: '营养颗粒',
+    icon: '💊'
   },
   {
-    id: 'herbal_drink',
+    id: '植物饮品',
     name: '植物饮品',
-    icon: '🍵'
+    icon: '🧃'
   },
   {
-    id: 'prepared_wine',
+    id: '配制酒',
     name: '配制酒',
     icon: '🍷'
-  },
-  {
-    id: 'tea_substitute',
-    name: '代用茶',
-    icon: '🍃'
   }
 ];
 

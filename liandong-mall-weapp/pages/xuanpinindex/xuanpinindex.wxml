@@ -19,50 +19,59 @@
         <view class="category-item {{currentCategory === 'all' ? 'active' : ''}}" bindtap="switchCategory" data-category="all">
           <text class="category-text">首页</text>
         </view>
-        <view class="category-item {{currentCategory === 'nasal_care' ? 'active' : ''}}" bindtap="goToCategory" data-category="nasal_care">
+        <view class="category-item {{currentCategory === '疼痛舒缓' ? 'active' : ''}}" bindtap="goToCategory" data-category="疼痛舒缓">
+          <text class="category-text">疼痛舒缓</text>
+        </view>
+        <view class="category-item {{currentCategory === '鼻部护理' ? 'active' : ''}}" bindtap="goToCategory" data-category="鼻部护理">
           <text class="category-text">鼻部护理</text>
         </view>
-        <view class="category-item {{currentCategory === 'pain_relief' ? 'active' : ''}}" bindtap="goToCategory" data-category="pain_relief">
-          <text class="category-text">缓解疼痛</text>
+        <view class="category-item {{currentCategory === '眼部护理' ? 'active' : ''}}" bindtap="goToCategory" data-category="眼部护理">
+          <text class="category-text">眼部护理</text>
         </view>
-        <view class="category-item {{currentCategory === 'eye_care' ? 'active' : ''}}" bindtap="goToCategory" data-category="eye_care">
-          <text class="category-text">护眼</text>
+        <view class="category-item {{currentCategory === '皮肤护理' ? 'active' : ''}}" bindtap="goToCategory" data-category="皮肤护理">
+          <text class="category-text">皮肤护理</text>
         </view>
-        <view class="category-item {{currentCategory === 'sub_health' ? 'active' : ''}}" bindtap="goToCategory" data-category="sub_health">
-          <text class="category-text">调理亚健康</text>
-        </view>
-        <view class="category-item {{currentCategory === 'kidney_care' ? 'active' : ''}}" bindtap="goToCategory" data-category="kidney_care">
-          <text class="category-text">固肾养肾</text>
-        </view>
-        <view class="category-item {{currentCategory === 'body_odor' ? 'active' : ''}}" bindtap="goToCategory" data-category="body_odor">
-          <text class="category-text">狐臭护理</text>
-        </view>
-        <view class="category-item {{currentCategory === 'skin_care' ? 'active' : ''}}" bindtap="goToCategory" data-category="skin_care">
-          <text class="category-text">美肤护肤</text>
-        </view>
-        <view class="category-item {{currentCategory === 'facial_rehab' ? 'active' : ''}}" bindtap="goToCategory" data-category="facial_rehab">
-          <text class="category-text">面瘫康复</text>
-        </view>
-        <view class="category-item {{currentCategory === 'women_health' ? 'active' : ''}}" bindtap="goToCategory" data-category="women_health">
+        <view class="category-item {{currentCategory === '女性调理' ? 'active' : ''}}" bindtap="goToCategory" data-category="女性调理">
           <text class="category-text">女性调理</text>
         </view>
-        <view class="category-item {{currentCategory === 'solid_drink' ? 'active' : ''}}" bindtap="goToCategory" data-category="solid_drink">
+        <view class="category-item {{currentCategory === '男性养护' ? 'active' : ''}}" bindtap="goToCategory" data-category="男性养护">
+          <text class="category-text">男性养护</text>
+        </view>
+        <view class="category-item {{currentCategory === '小儿护理' ? 'active' : ''}}" bindtap="goToCategory" data-category="小儿护理">
+          <text class="category-text">小儿护理</text>
+        </view>
+        <view class="category-item {{currentCategory === '纤体瘦身' ? 'active' : ''}}" bindtap="goToCategory" data-category="纤体瘦身">
+          <text class="category-text">纤体瘦身</text>
+        </view>
+        <view class="category-item {{currentCategory === '养发护发' ? 'active' : ''}}" bindtap="goToCategory" data-category="养发护发">
+          <text class="category-text">养发护发</text>
+        </view>
+        <view class="category-item {{currentCategory === '泡浴养生' ? 'active' : ''}}" bindtap="goToCategory" data-category="泡浴养生">
+          <text class="category-text">泡浴养生</text>
+        </view>
+        <view class="category-item {{currentCategory === '人参滋补' ? 'active' : ''}}" bindtap="goToCategory" data-category="人参滋补">
+          <text class="category-text">人参滋补</text>
+        </view>
+        <view class="category-item {{currentCategory === '阿胶膏滋' ? 'active' : ''}}" bindtap="goToCategory" data-category="阿胶膏滋">
+          <text class="category-text">阿胶膏滋</text>
+        </view>
+        <view class="category-item {{currentCategory === '草本茶饮' ? 'active' : ''}}" bindtap="goToCategory" data-category="草本茶饮">
+          <text class="category-text">草本茶饮</text>
+        </view>
+        <view class="category-item {{currentCategory === '固体饮料' ? 'active' : ''}}" bindtap="goToCategory" data-category="固体饮料">
           <text class="category-text">固体饮料</text>
         </view>
-        <view class="category-item {{currentCategory === 'tablet_candy' ? 'active' : ''}}" bindtap="goToCategory" data-category="tablet_candy">
+        <view class="category-item {{currentCategory === '压片糖果' ? 'active' : ''}}" bindtap="goToCategory" data-category="压片糖果">
           <text class="category-text">压片糖果</text>
         </view>
-        <view class="category-item {{currentCategory === 'herbal_paste' ? 'active' : ''}}" bindtap="goToCategory" data-category="herbal_paste">
-          <text class="category-text">膏滋</text>
+        <view class="category-item {{currentCategory === '营养颗粒' ? 'active' : ''}}" bindtap="goToCategory" data-category="营养颗粒">
+          <text class="category-text">营养颗粒</text>
         </view>
-        <view class="category-item {{currentCategory === 'herbal_drink' ? 'active' : ''}}" bindtap="goToCategory" data-category="herbal_drink">
+        <view class="category-item {{currentCategory === '植物饮品' ? 'active' : ''}}" bindtap="goToCategory" data-category="植物饮品">
           <text class="category-text">植物饮品</text>
         </view>
-        <view class="category-item {{currentCategory === 'prepared_wine' ? 'active' : ''}}" bindtap="goToCategory" data-category="prepared_wine">
+        <view class="category-item {{currentCategory === '配制酒' ? 'active' : ''}}" bindtap="goToCategory" data-category="配制酒">
           <text class="category-text">配制酒</text>
-        </view>
-        <view class="category-item {{currentCategory === 'tea_substitute' ? 'active' : ''}}" bindtap="goToCategory" data-category="tea_substitute">
-          <text class="category-text">代用茶</text>
         </view>
       </view>
     </scroll-view>

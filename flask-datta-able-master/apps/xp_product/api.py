@@ -529,6 +529,15 @@ class ActivityProductListAPI(Resource):
         elif activity_type == 'brand':
             query = query.filter_by(is_brand=1)
             title = '品牌专区'
+        elif activity_type == 'video':
+            query = query.filter_by(is_recommend=1)
+            title = '视频热卖'
+        elif activity_type == 'merchant':
+            query = query.filter_by(is_brand=1)
+            title = '商家优选'
+        elif activity_type == 'cheap':
+            query = query.filter(Product.price <= 50)
+            title = '低价好卖'
         else:
             title = '活动商品'
         

@@ -1,2 +1,49 @@
 <!--pages/activity/follow/activity_follow.wxml-->
-<text>pages/activity/follow/activity_follow.wxml</text>
+<view class="page">
+  <view class="header">
+    <view class="nav-bar">
+      <view class="back-btn" bindtap="goBack">
+        <text class="back-icon">←</text>
+      </view>
+      <text class="page-title">{{title}}</text>
+    </view>
+  </view>
+
+  <view class="activity-banner">
+    <image class="banner-bg" src="https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260313142240238_666195763220.png" mode="aspectFill"/>
+    <view class="banner-content">
+      <text class="banner-title">同行跟选</text>
+      <text class="banner-desc">精选同行热销商品，跟卖更省心</text>
+    </view>
+  </view>
+
+  <view class="product-list">
+    <view class="product-item" wx:for="{{products}}" wx:key="id" bindtap="goToProductDetail" data-id="{{item.id}}">
+      <image class="product-image" src="{{item.image}}" mode="aspectFill"/>
+      <view class="product-info">
+        <view class="product-title">{{item.name}}</view>
+        <view class="product-tags">
+          <text class="tag follow">跟选</text>
+          <text class="tag">{{item.commissionRate}}%佣</text>
+        </view>
+        <view class="product-price">
+          <text class="price">¥{{item.price}}</text>
+          <text class="sales">{{item.sales}}</text>
+        </view>
+        <view class="commission-info">
+          <text class="commission">赚¥{{item.commissionAmount}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="load-more" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+  <view class="no-more" wx:if="{{!hasMore && products.length > 0}}">
+    <text>没有更多了</text>
+  </view>
+  <view class="empty" wx:if="{{!loading && products.length === 0}}">
+    <text>暂无商品</text>
+  </view>
+</view>
