@@ -23,28 +23,35 @@ Page({
     try {
       wx.showLoading({ title: '加载中' });
       
-      const res = await api.get('/api/user/talent/status');
+      const data = await api.get('/api/user/talent/status');
       
       wx.hideLoading();
       
-      if (res.code === 200) {
+      if (data) {
         this.setData({
-          status: res.data.status,
-          statusText: res.data.statusText,
-          applyTime: res.data.applyTime,
-          auditTime: res.data.auditTime,
-          rejectReason: res.data.rejectReason
+          status: data.status,
+          statusText: data.statusText,
+          applyTime: data.applyTime,
+          auditTime: data.auditTime,
+          rejectReason: data.rejectReason
+        });
+      } else {
+        this.setData({
+          status: 'NONE',
+          statusText: '未申请',
+          applyTime: '',
+          auditTime: '',
+          rejectReason: ''
         });
       }
     } catch (error) {
       wx.hideLoading();
       console.error('加载状态失败:', error);
       
-      // 模拟数据
       this.setData({
-        status: 'PENDING',
-        statusText: '审核中',
-        applyTime: '2024-01-15 10:30:00',
+        status: 'NONE',
+        statusText: '未申请',
+        applyTime: '',
         auditTime: '',
         rejectReason: ''
       });

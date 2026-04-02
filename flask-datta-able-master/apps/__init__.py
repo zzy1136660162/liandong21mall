@@ -26,6 +26,9 @@ def register_blueprints(app):
         module = import_module('apps.{}.routes'.format(module_name))
         if hasattr(module, 'blueprint'):
             app.register_blueprint(module.blueprint)
+    
+    from apps.region_api import region_bp
+    app.register_blueprint(region_bp)
 
 
 def register_api(app):

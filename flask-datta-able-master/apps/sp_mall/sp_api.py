@@ -66,6 +66,33 @@ class SpCategoryDetail(Resource):
         return success_response(category)
 
 
+@sp_category_ns.route('/products')
+class SpCategoryProducts(Resource):
+    @sp_category_ns.doc('获取分类商品列表')
+    def get(self):
+        """获取指定分类的商品列表（支持搜索和排序）"""
+        category_id = request.args.get('categoryId')
+        keyword = request.args.get('keyword', '')
+        sort_type = request.args.get('sortType')
+        sort_order = request.args.get('sortOrder', 'desc')
+        page = request.args.get('page', 1, type=int)
+        page_size = request.args.get('pageSize', 10, type=int)
+        
+        if not category_id:
+            return error_response('请传入分类ID')
+        
+        result = SpProductService.get_category_products(
+            category_id=category_id,
+            keyword=keyword if keyword else None,
+            sort_type=sort_type if sort_type else None,
+            sort_order=sort_order,
+            page=page,
+            page_size=page_size
+        )
+        
+        return success_response(result)
+
+
 # ========== 商品相关API ==========
 
 @sp_product_ns.route('/list')

@@ -81,6 +81,7 @@
                                                         <td>{{ demand.submit_time.strftime('%Y-%m-%d %H:%M') if demand.submit_time else '-' }}</td>
                                                         <td>
                                                             <a href="{{ url_for('demand_admin.detail', demand_id=demand.id) }}" class="btn btn-sm btn-info">查看</a>
+                                                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteDemand({{ demand.id }})">删除</button>
                                                         </td>
                                                     </tr>
                                                     {% else %}
@@ -120,4 +121,83 @@
     </div>
 </div>
 
-{% endblock content %}
+<!-- 删除确认模态框 -->
+<div class="modal" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">确认删除</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>确定要删除这条需求吗？</p>
+                <p class="text-danger">删除后将无法恢复！</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">确认删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let deleteTargetId = null;
+
+function deleteDemand(id) {
+    deleteTargetId = id;
+    var modal = document.getElementById('deleteModal');
+    modal.style.display = 'block';
+    modal.classList.add('show');
+    document.body.classList.add('modal-open');
+    
+    var backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop fade show';
+    document.body.appendChild(backdrop);
+}
+
+function closeDeleteModal() {
+    var modal = document.getElementById('deleteModal');
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+    document.body.classList.remove('modal-open');
+    var backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) backdrop.remove();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var confirmBtn = document.getElementById('confirmDeleteBtn');
+    var cancelBtn = document.querySelector('#deleteModal .close');
+    var modal = document.getElementById('deleteModal');
+    
+    confirmBtn.addEventListener('click', function() {
+        if (!deleteTargetId) return;
+        
+        closeDeleteModal();
+        
+        fetch('/demand_admin/delete/' + deleteTargetId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+                if (data.code === 200) {
+                    location.reload();
+                } else {
+                    alert('删除失败: ' + data.message);
+                }
+            })
+        .catch(error => {
+            alert('删除失败: ' + error);
+        });
+    });
+    
+    cancelBtn.addEventListener('click', closeDeleteModal);
+});
+</script>
+
+ {% endblock content %}

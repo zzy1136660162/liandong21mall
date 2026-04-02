@@ -14,59 +14,72 @@
                                 <div class="col-lg-8">
                                     <div class="page-header-title">
                                         <div class="d-inline">
-                                            <h4>商品管理</h4>
+                                            <h4>商品列表</h4>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="page-body">
-                            <div class="row">
-                                <div class="col-lg-3 col-md-6">
-                                    <div class="card">
-                                        <div class="card-block">
-                                            <h5>商品总数</h5>
-                                            <h3 class="text-c-blue">0</h3>
+                            <div class="card">
+                                <div class="card-block">
+                                    <div class="row mb-3">
+                                        <div class="col-lg-12">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <select class="form-control" id="categoryId">
+                                                        <option value="">全部分类</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <select class="form-control" id="status">
+                                                        <option value="">全部状态</option>
+                                                        <option value="1">上架</option>
+                                                        <option value="0">下架</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control" id="keyword" placeholder="搜索商品名称">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <button class="btn btn-primary" onclick="loadProducts(1)">搜索</button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-3 col-md-6">
-                                    <div class="card">
-                                        <div class="card-block">
-                                            <h5>在售商品</h5>
-                                            <h3 class="text-c-green">0</h3>
+                                    <div class="row mb-3">
+                                        <div class="col-lg-12">
+                                            <button class="btn btn-success" onclick="addProduct()">添加商品</button>
+                                            <button class="btn btn-danger" onclick="batchDelete()">批量删除</button>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-3 col-md-6">
-                                    <div class="card">
-                                        <div class="card-block">
-                                            <h5>待审核</h5>
-                                            <h3 class="text-c-yellow">0</h3>
-                                        </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th><input type="checkbox" id="checkAll"></th>
+                                                    <th>ID</th>
+                                                    <th>商品名称</th>
+                                                    <th>主图</th>
+                                                    <th>分类</th>
+                                                    <th>价格</th>
+                                                    <th>库存</th>
+                                                    <th>销量</th>
+                                                    <th>状态</th>
+                                                    <th>排序</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="productTable">
+                                                <tr>
+                                                    <td colspan="11" class="text-center">加载中...</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
-                                </div>
-                                <div class="col-lg-3 col-md-6">
-                                    <div class="card">
-                                        <div class="card-block">
-                                            <h5>今日新增</h5>
-                                            <h3 class="text-c-red">0</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="card">
-                                        <div class="card-block">
-                                            <p>欢迎使用商品管理模块</p>
-                                            <ul>
-                                                <li><a href="/admin/product/list">商品列表</a></li>
-                                                <li><a href="/admin/product/category">商品分类</a></li>
-                                                <li><a href="/admin/product/commission">佣金管理</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                                    <nav>
+                                        <ul class="pagination" id="pagination"></ul>
+                                    </nav>
                                 </div>
                             </div>
                         </div>
@@ -76,4 +89,180 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="productModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productModalTitle">添加商品</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="productModalContent">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
+
+{% block javascripts %}
+<script>
+let currentPage = 1;
+let pageSize = 10;
+
+$(document).ready(function() {
+    loadCategories();
+    loadProducts(1);
+});
+
+function loadCategories() {
+    fetch('/api/categories')
+        .then(res => res.json())
+        .then(res => {
+            if (res.code === 200) {
+                let html = '<option value="">全部分类</option>';
+                res.data.forEach(cat => {
+                    html += `<option value="${cat.id}">${cat.name}</option>`;
+                });
+                $('#categoryId').html(html);
+            }
+        });
+}
+
+function loadProducts(page = 1) {
+    currentPage = page;
+    const categoryId = $('#categoryId').val();
+    const status = $('#status').val();
+    const keyword = $('#keyword').val();
+
+    fetch(`/api/products/list/admin?page=${page}&page_size=${pageSize}&category_id=${categoryId}&status=${status}&keyword=${keyword}`)
+        .then(res => res.json())
+        .then(res => {
+            if (res.code === 200) {
+                renderTable(res.data.list);
+                renderPagination(res.data.total);
+            } else {
+                $('#productTable').html('<tr><td colspan="11" class="text-center">加载失败</td></tr>');
+            }
+        })
+        .catch(err => {
+            console.error('加载商品列表失败:', err);
+            $('#productTable').html('<tr><td colspan="11" class="text-center">加载失败</td></tr>');
+        });
+}
+
+function renderTable(list) {
+    const tbody = document.getElementById('productTable');
+    if (!list || list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center">暂无数据</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = list.map(item => `
+        <tr>
+            <td><input type="checkbox" class="product-check" value="${item.id}"></td>
+            <td>${item.id}</td>
+            <td>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="${item.main_image}" style="width: 40px; height: 40px; object-fit: cover;" onerror="this.src='/static/assets/images/no-image.png'">
+                    <span style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.name}</span>
+                </div>
+            </td>
+            <td>${item.category_name || '-'}</td>
+            <td>¥${item.price}</td>
+            <td>${item.stock}</td>
+            <td>${item.sales}</td>
+            <td>
+                <span class="badge badge-${item.status === 1 ? 'success' : 'warning'}">${item.status === 1 ? '上架' : '下架'}</span>
+            </td>
+            <td>${item.sort}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="editProduct(${item.id})">编辑</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${item.id})">删除</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderPagination(total) {
+    const totalPages = Math.ceil(total / pageSize);
+    const ul = document.getElementById('pagination');
+    let html = '';
+
+    if (currentPage > 1) {
+        html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadProducts(${currentPage - 1})">上一页</a></li>`;
+    }
+
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === currentPage) {
+            html += `<li class="page-item active"><a class="page-link" href="javascript:void(0)">${i}</a></li>`;
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadProducts(${i})">${i}</a></li>`;
+        }
+    }
+
+    if (currentPage < totalPages) {
+        html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadProducts(${currentPage + 1})">下一页</a></li>`;
+    }
+
+    ul.innerHTML = html;
+}
+
+function addProduct() {
+    window.location.href = '/admin/product/add';
+}
+
+function editProduct(id) {
+    window.location.href = `/admin/product/edit?id=${id}`;
+}
+
+function deleteProduct(id) {
+    if (!confirm('确定要删除这个商品吗？')) return;
+    fetch(`/api/products/${id}/admin`, {
+        method: 'DELETE',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.code === 200) {
+            alert('删除成功');
+            loadProducts(currentPage);
+        } else {
+            alert(res.message || '删除失败');
+        }
+    })
+    .catch(err => {
+        console.error('删除商品失败:', err);
+        alert('删除失败');
+    });
+}
+
+function batchDelete() {
+    const checks = document.querySelectorAll('.product-check:checked');
+    if (checks.length === 0) {
+        alert('请选择要删除的商品');
+        return;
+    }
+    if (!confirm('确定要删除选中的 ' + checks.length + ' 个商品吗？')) return;
+
+    const ids = Array.from(checks).map(cb => cb.value);
+    Promise.all(ids.map(id =>
+        fetch(`/api/products/${id}/admin`, { method: 'DELETE' }).then(res => res.json())
+    )).then(results => {
+        alert('批量删除完成');
+        loadProducts(currentPage);
+    }).catch(err => {
+        console.error('批量删除失败:', err);
+        alert('批量删除失败');
+    });
+}
+
+document.getElementById('checkAll').addEventListener('change', function() {
+    document.querySelectorAll('.product-check').forEach(cb => cb.checked = this.checked);
+});
+</script>
+{% endblock javascripts %}

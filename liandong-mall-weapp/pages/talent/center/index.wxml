@@ -3,7 +3,7 @@
   <!-- 顶部渐变区域 -->
   <view class="header">
     <!-- 达人信息卡片 -->
-    <view class="talent-card">
+    <view class="talent-card" wx:if="{{isTalent}}">
       <view class="talent-badge">
         <text class="badge-icon">🏅</text>
         <text class="badge-text">认证达人</text>
@@ -17,10 +17,84 @@
         </view>
       </view>
     </view>
+
+    <!-- 非达人用户 -->
+    <view class="non-talent-card" wx:else>
+      <view class="talent-badge">
+        <text class="badge-icon">🎯</text>
+        <text class="badge-text">成为达人</text>
+      </view>
+      <view class="non-talent-content">
+        <text class="non-talent-title">您还不是达人</text>
+        <text class="non-talent-desc">成为达人后可以享受专属权益，开始您的达人之旅吧！</text>
+      </view>
+    </view>
   </view>
 
-  <!-- 功能入口 -->
-  <view class="function-section">
+  <!-- 达人条件（仅非达人显示） -->
+  <view class="conditions-section" wx:if="{{!isTalent}}">
+    <view class="section-title">成为达人条件</view>
+    <view class="conditions-list">
+      <view class="condition-item">
+        <view class="condition-icon">
+          <text class="icon-text">✓</text>
+        </view>
+        <view class="condition-content">
+          <text class="condition-title">完成实名认证</text>
+          <text class="condition-desc">使用真实姓名和手机号进行认证</text>
+        </view>
+      </view>
+      <view class="condition-item">
+        <view class="condition-icon">
+          <text class="icon-text">✓</text>
+        </view>
+        <view class="condition-content">
+          <text class="condition-title">拥有推广意向</text>
+          <text class="condition-desc">对产品推广有浓厚兴趣</text>
+        </view>
+      </view>
+      <view class="condition-item">
+        <view class="condition-icon">
+          <text class="icon-text">✓</text>
+        </view>
+        <view class="condition-content">
+          <text class="condition-title">具备社交能力</text>
+          <text class="condition-desc">有一定的社交网络或推广渠道</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 达人权益 -->
+    <view class="benefits-box">
+      <view class="benefits-title">成为达人你将获得</view>
+      <view class="benefits-grid">
+        <view class="benefit-item">
+          <text class="benefit-icon">🏅</text>
+          <text class="benefit-text">专属达人标识</text>
+        </view>
+        <view class="benefit-item">
+          <text class="benefit-icon">💰</text>
+          <text class="benefit-text">推广佣金奖励</text>
+        </view>
+        <view class="benefit-item">
+          <text class="benefit-icon">📦</text>
+          <text class="benefit-text">免费样品申领</text>
+        </view>
+        <view class="benefit-item">
+          <text class="benefit-icon">🔬</text>
+          <text class="benefit-text">参与产品研发</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 申请按钮 -->
+    <view class="apply-btn-box">
+      <view class="apply-btn" bindtap="goToApply">立即申请成为达人</view>
+    </view>
+  </view>
+
+  <!-- 功能入口（仅达人显示） -->
+  <view class="function-section" wx:if="{{isTalent}}">
     <view class="section-title">达人功能</view>
     
     <view class="function-list">
@@ -62,8 +136,8 @@
     </view>
   </view>
 
-  <!-- 数据概览 -->
-  <view class="stats-section">
+  <!-- 数据概览（仅达人显示） -->
+  <view class="stats-section" wx:if="{{isTalent}}">
     <view class="section-title">数据概览</view>
     <view class="stats-grid">
       <view class="stat-item">

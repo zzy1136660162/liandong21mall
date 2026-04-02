@@ -17,6 +17,10 @@
         <image class="action-icon-img" src="/images/我的需求 (2).png" mode="aspectFit"></image>
         <text class="action-text">我的需求</text>
       </view>
+      <view class="action-item" bindtap="goToTalentPool">
+        <view class="action-icon submit-icon">🎯</view>
+        <text class="action-text">人才库</text>
+      </view>
     </view>
   </view>
 
@@ -78,13 +82,5 @@
   <view class="footer-text">
     <text>专业定制 · 品质保障 · 全程跟踪</text>
   </view>
-</view>
-
-<!-- 浮动提交按钮 -->
-<view class="fab" bindtap="goToSubmit">+</view>
-
-<!-- 客服入口 -->
-<view class="customer-service-btn" bindtap="goToChat">
-  <text class="service-icon">💬</text>
 </view>
 

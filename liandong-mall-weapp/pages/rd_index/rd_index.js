@@ -8,11 +8,16 @@ Page({
   onLoad() {
     this.loadRecentDemands()
   },
+  onShow() {
+    this.loadRecentDemands()
+  },
   loadRecentDemands() {
+    const submitterId = app.globalData.userId;
     wx.request({
       url: `${app.globalData.apiBaseUrl}/demand/list`,
       method: 'GET',
       data: {
+        submitterId,
         page: 1,
         pageSize: 3
       },
@@ -44,6 +49,18 @@ Page({
   goToList() {
     wx.navigateTo({
       url: '/pages/demandList/demandList'
+    })
+  },
+  goToTalentPool() {
+    const token = wx.getStorageSync('token')
+    if (!token) {
+      wx.navigateTo({
+        url: '/pages/login/index'
+      })
+      return
+    }
+    wx.navigateTo({
+      url: '/pages/talent_pool/index/index'
     })
   },
   goToDetail(e) {
