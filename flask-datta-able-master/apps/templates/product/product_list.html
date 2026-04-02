@@ -2,30 +2,6 @@
 
 {% block title %} 商品管理 {% endblock %}
 
-{% block stylesheets %}
-<style>
-    /* 修复侧边菜单栏遮挡内容 */
-    .pcoded-main-container {
-        margin-left: 260px !important;
-        padding-top: 0px !important;
-    }
-    
-    .page-wrapper {
-        padding-top: 0px !important;
-    }
-    
-    .page-header {
-        margin-bottom: 5px !important;
-        padding-bottom: 5px !important;
-        padding-top: 5px !important;
-    }
-    
-    .main-body {
-        padding-top: 0 !important;
-    }
-</style>
-{% endblock stylesheets %}
-
 {% block content %}
 <div class="pcoded-main-container">
     <div class="pcoded-wrapper">
@@ -42,19 +18,19 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
-                                    <button class="btn btn-primary" data-toggle="modal" data-target="#addProductModal">
-                                        <i class="feather icon-plus"></i> 添加商品
-                                    </button>
-                                </div>
                             </div>
                         </div>
                         <div class="page-body">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="card">
-                                        <div class="card-block table-border-style">
-                                            <div class="row mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-header-right">
+                                        <button class="btn btn-primary" data-toggle="modal" data-target="#addProductModal">
+                                            <i class="feather icon-plus"></i> 添加商品
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-block">
+                                    <div class="row mb-3">
                                         <div class="col-md-3">
                                             <select class="form-control" id="categoryFilter">
                                                 <option value="">全部分类</option>
@@ -100,15 +76,7 @@
                                                 <tr>
                                                     <td>{{ product.id }}</td>
                                                     <td>
-                                                        <div class="product-image-cell">
-                                                            {% if product.main_image %}
-                                                            <img src="{{ product.main_image }}" alt="{{ product.name }}" class="product-thumb" onerror="this.src='/static/assets/images/default-product.png'">
-                                                            {% else %}
-                                                            <div class="no-image-placeholder">
-                                                                <i class="feather icon-image"></i>
-                                                            </div>
-                                                            {% endif %}
-                                                        </div>
+                                                        <img src="{{ product.main_image }}" alt="商品图片" style="width: 60px; height: 60px;">
                                                     </td>
                                                     <td>{{ product.name }}</td>
                                                     <td>{{ product.category_id }}</td>
@@ -212,22 +180,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>商品主图</label>
-                                <div class="image-upload-container">
-                                    <div class="main-image-upload" id="mainImageUpload">
-                                        <input type="file" id="mainImageInput" accept="image/*" style="display: none;" onchange="handleMainImageUpload(this)">
-                                        <div class="upload-placeholder" onclick="document.getElementById('mainImageInput').click()">
-                                            <i class="feather icon-camera"></i>
-                                            <span>点击上传主图</span>
-                                        </div>
-                                        <img id="mainImagePreview" class="image-preview" style="display: none;">
-                                        <button type="button" class="btn btn-sm btn-danger remove-image" onclick="removeMainImage()" style="display: none;">
-                                            <i class="feather icon-trash-2"></i>
-                                        </button>
-                                    </div>
-                                    <input type="hidden" name="mainImage" id="mainImageUrl" required>
-                                    <small class="form-text text-muted">建议尺寸: 800x800px, 支持jpg/png格式</small>
-                                </div>
+                                <label>主图URL</label>
+                                <input type="text" class="form-control" name="mainImage" required>
                             </div>
                         </div>
                     </div>
@@ -274,21 +228,6 @@
                     <div class="form-group">
                         <label>商品简介</label>
                         <textarea class="form-control" name="brief" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>商品详情图 <small class="text-muted">(最多5张)</small></label>
-                        <div class="detail-images-upload" id="detailImagesUpload">
-                            <div class="upload-list" id="detailImagesList">
-                                <!-- 已上传的图片将显示在这里 -->
-                            </div>
-                            <div class="upload-add" onclick="document.getElementById('detailImagesInput').click()" id="addDetailImageBtn">
-                                <i class="feather icon-plus"></i>
-                                <span>添加图片</span>
-                            </div>
-                            <input type="file" id="detailImagesInput" accept="image/*" multiple style="display: none;" onchange="handleDetailImagesUpload(this)">
-                            <input type="hidden" name="detailImages" id="detailImagesUrls">
-                        </div>
-                        <small class="form-text text-muted">建议尺寸: 800x800px, 支持jpg/png格式, 最多上传5张</small>
                     </div>
                     <div class="row">
                         <div class="col-md-3">
@@ -343,14 +282,6 @@ function addProduct() {
     const formData = new FormData(document.getElementById('addProductForm'));
     const data = Object.fromEntries(formData);
     
-    // 处理详情图数据
-    const detailImagesStr = document.getElementById('detailImagesUrls').value;
-    if (detailImagesStr) {
-        data.detailImages = JSON.parse(detailImagesStr);
-    } else {
-        data.detailImages = [];
-    }
-    
     fetch('/admin/product/add', {
         method: 'POST',
         headers: {
@@ -370,7 +301,7 @@ function addProduct() {
 }
 
 function editProduct(id) {
-    window.location.href = `/admin/product/product/edit/${id}`;
+    window.location.href = `/admin/product/edit/${id}`;
 }
 
 function toggleStatus(id) {
@@ -417,377 +348,5 @@ function filterProducts() {
     
     window.location.href = url;
 }
-
-// 图片上传相关函数
-let detailImagesArray = [];
-
-// 处理主图上传
-function handleMainImageUpload(input) {
-    const file = input.files[0];
-    if (!file) return;
-
-    // 验证文件类型
-    if (!file.type.startsWith('image/')) {
-        alert('请选择图片文件');
-        return;
-    }
-
-    // 验证文件大小 (最大5MB)
-    if (file.size > 5 * 1024 * 1024) {
-        alert('图片大小不能超过5MB');
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    // 显示上传中状态
-    const uploadPlaceholder = document.querySelector('#mainImageUpload .upload-placeholder');
-    uploadPlaceholder.innerHTML = '<i class="feather icon-loader"></i><span>上传中...</span>';
-
-    fetch('/admin/upload/image', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(result => {
-        if (result.code === 200) {
-            // 上传成功，显示预览
-            const preview = document.getElementById('mainImagePreview');
-            const removeBtn = document.querySelector('#mainImageUpload .remove-image');
-            const urlInput = document.getElementById('mainImageUrl');
-
-            preview.src = result.data.url;
-            preview.style.display = 'block';
-            removeBtn.style.display = 'block';
-            uploadPlaceholder.style.display = 'none';
-            urlInput.value = result.data.url;
-        } else {
-            alert('上传失败: ' + result.message);
-            uploadPlaceholder.innerHTML = '<i class="feather icon-camera"></i><span>点击上传主图</span>';
-        }
-    })
-    .catch(error => {
-        console.error('上传错误:', error);
-        alert('上传失败，请重试');
-        uploadPlaceholder.innerHTML = '<i class="feather icon-camera"></i><span>点击上传主图</span>';
-    });
-}
-
-// 删除主图
-function removeMainImage() {
-    const preview = document.getElementById('mainImagePreview');
-    const removeBtn = document.querySelector('#mainImageUpload .remove-image');
-    const uploadPlaceholder = document.querySelector('#mainImageUpload .upload-placeholder');
-    const urlInput = document.getElementById('mainImageUrl');
-    const fileInput = document.getElementById('mainImageInput');
-
-    preview.src = '';
-    preview.style.display = 'none';
-    removeBtn.style.display = 'none';
-    uploadPlaceholder.style.display = 'flex';
-    uploadPlaceholder.innerHTML = '<i class="feather icon-camera"></i><span>点击上传主图</span>';
-    urlInput.value = '';
-    fileInput.value = '';
-}
-
-// 处理详情图上传
-function handleDetailImagesUpload(input) {
-    const files = Array.from(input.files);
-    const maxImages = 5;
-
-    // 检查是否超过最大数量
-    if (detailImagesArray.length + files.length > maxImages) {
-        alert(`最多只能上传${maxImages}张图片`);
-        return;
-    }
-
-    files.forEach(file => {
-        // 验证文件类型
-        if (!file.type.startsWith('image/')) {
-            alert(`${file.name} 不是图片文件，已跳过`);
-            return;
-        }
-
-        // 验证文件大小
-        if (file.size > 5 * 1024 * 1024) {
-            alert(`${file.name} 超过5MB，已跳过`);
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('file', file);
-
-        fetch('/admin/upload/image', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (result.code === 200) {
-                detailImagesArray.push(result.data.url);
-                updateDetailImagesDisplay();
-            } else {
-                alert(`${file.name} 上传失败: ${result.message}`);
-            }
-        })
-        .catch(error => {
-            console.error('上传错误:', error);
-            alert(`${file.name} 上传失败`);
-        });
-    });
-
-    // 清空input，允许重复选择相同文件
-    input.value = '';
-}
-
-// 更新详情图显示
-function updateDetailImagesDisplay() {
-    const listContainer = document.getElementById('detailImagesList');
-    const urlsInput = document.getElementById('detailImagesUrls');
-    const addBtn = document.getElementById('addDetailImageBtn');
-
-    listContainer.innerHTML = '';
-    detailImagesArray.forEach((url, index) => {
-        const item = document.createElement('div');
-        item.className = 'upload-item';
-        item.innerHTML = `
-            <img src="${url}" alt="详情图${index + 1}">
-            <div class="upload-item-actions">
-                <button type="button" class="btn btn-sm btn-danger" onclick="removeDetailImage(${index})">
-                    <i class="feather icon-trash-2"></i>
-                </button>
-            </div>
-        `;
-        listContainer.appendChild(item);
-    });
-
-    // 更新隐藏字段
-    urlsInput.value = JSON.stringify(detailImagesArray);
-
-    // 控制添加按钮显示
-    if (detailImagesArray.length >= 5) {
-        addBtn.style.display = 'none';
-    } else {
-        addBtn.style.display = 'flex';
-    }
-}
-
-// 删除详情图
-function removeDetailImage(index) {
-    detailImagesArray.splice(index, 1);
-    updateDetailImagesDisplay();
-}
-
-// 重置表单时清空图片
-function resetProductForm() {
-    removeMainImage();
-    detailImagesArray = [];
-    updateDetailImagesDisplay();
-    document.getElementById('addProductForm').reset();
-}
-
-// 监听模态框关闭事件（使用原生JS）
-document.addEventListener('DOMContentLoaded', function() {
-    var modal = document.getElementById('addProductModal');
-    if (modal) {
-        // Bootstrap模态框关闭事件
-        modal.addEventListener('hidden.bs.modal', function () {
-            resetProductForm();
-        });
-        
-        // 点击取消按钮时也要重置
-        var cancelBtn = modal.querySelector('.btn-secondary[data-dismiss="modal"]');
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', function() {
-                resetProductForm();
-            });
-        }
-    }
-});
 </script>
-
-<style>
-/* 图片上传样式 */
-.image-upload-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.main-image-upload {
-    position: relative;
-    width: 150px;
-    height: 150px;
-    border: 2px dashed #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.main-image-upload:hover {
-    border-color: #409eff;
-}
-
-.upload-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    color: #999;
-}
-
-.upload-placeholder i {
-    font-size: 32px;
-    margin-bottom: 8px;
-}
-
-.upload-placeholder span {
-    font-size: 12px;
-}
-
-.image-preview {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.remove-image {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    padding: 2px 6px;
-    border-radius: 4px;
-}
-
-/* 详情图上传样式 */
-.detail-images-upload {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.upload-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.upload-item {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #ddd;
-}
-
-.upload-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.upload-item-actions {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.upload-item:hover .upload-item-actions {
-    opacity: 1;
-}
-
-.upload-add {
-    width: 100px;
-    height: 100px;
-    border: 2px dashed #ddd;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: #999;
-    transition: all 0.3s;
-}
-
-.upload-add:hover {
-    border-color: #409eff;
-    color: #409eff;
-}
-
-.upload-add i {
-    font-size: 24px;
-    margin-bottom: 4px;
-}
-
-.upload-add span {
-    font-size: 12px;
-}
-
-/* 商品列表图片样式 */
-.product-image-cell {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f5f5f5;
-    border-radius: 4px;
-    overflow: hidden;
-    margin: 0 auto;
-}
-
-.product-thumb {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    display: block;
-}
-
-.no-image-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 60px;
-    height: 60px;
-    color: #ccc;
-    font-size: 24px;
-}
-
-/* 确保图片列显示 */
-table th:nth-child(2),
-table td:nth-child(2) {
-    width: 80px !important;
-    min-width: 80px !important;
-    max-width: 80px !important;
-    text-align: center !important;
-    vertical-align: middle !important;
-    display: table-cell !important;
-    overflow: visible !important;
-}
-
-/* 强制显示图片单元格内容 */
-table td:nth-child(2) * {
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-/* 修复表格响应式问题 */
-.table-responsive table {
-    min-width: 1000px !important;
-}
-</style>
 {% endblock %}

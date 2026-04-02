@@ -6,7 +6,7 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 from apps import db
-from apps.sample.models import SampleApply
+from apps.xp_product.models import SampleApply
 from apps.product.models import Product
 from datetime import datetime
 

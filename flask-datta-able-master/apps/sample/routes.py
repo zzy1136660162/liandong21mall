@@ -4,8 +4,8 @@
 """
 
 from flask import Blueprint, render_template, request, jsonify
-from apps.sample.models import SampleApply
 from apps import db
+from apps.xp_product.models import SampleApply
 
 blueprint = Blueprint('sample', __name__, url_prefix='/admin/sample')
 
