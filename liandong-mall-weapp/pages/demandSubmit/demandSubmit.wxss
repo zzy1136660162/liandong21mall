@@ -156,37 +156,6 @@
   align-items: center;
 }
 
-/* 人才库入口 */
-.talent-pool-section {
-  padding: 0 30rpx 30rpx;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.talent-pool-btn {
-  width: 100%;
-  height: 88rpx;
-  border-radius: 44rpx;
-  background: linear-gradient(135deg, #1890ff 0%, #69c0ff 100%);
-  color: #fff;
-  font-size: 30rpx;
-  font-weight: 500;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4rpx 16rpx rgba(24, 144, 255, 0.25);
-}
-
-.talent-pool-btn::after {
-  border: none;
-}
-
-.talent-pool-btn:active {
-  transform: scale(0.98);
-  opacity: 0.9;
-}
-
 .submit-btn {
   width: 100%;
   height: 96rpx;
