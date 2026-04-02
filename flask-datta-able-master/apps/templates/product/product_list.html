@@ -7,11 +7,21 @@
     /* 修复侧边菜单栏遮挡内容 */
     .pcoded-main-container {
         margin-left: 260px !important;
-        padding-top: 60px !important;
+        padding-top: 0px !important;
     }
     
     .page-wrapper {
-        padding-top: 20px !important;
+        padding-top: 0px !important;
+    }
+    
+    .page-header {
+        margin-bottom: 5px !important;
+        padding-bottom: 5px !important;
+        padding-top: 5px !important;
+    }
+    
+    .main-body {
+        padding-top: 0 !important;
     }
 </style>
 {% endblock stylesheets %}
@@ -360,7 +370,7 @@ function addProduct() {
 }
 
 function editProduct(id) {
-    window.location.href = `/admin/product/edit/${id}`;
+    window.location.href = `/admin/product/product/edit/${id}`;
 }
 
 function toggleStatus(id) {

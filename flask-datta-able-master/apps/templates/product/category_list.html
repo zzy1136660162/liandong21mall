@@ -46,22 +46,18 @@
                                                     </thead>
                                                     <tbody>
                                                         {% for category in categories %}
-                                                        {% set parent = None %}
-                                                        {% for c in categories %}
-                                                            {% if c.id == category.parent_id %}
-                                                                {% set parent = c %}
-                                                            {% endif %}
-                                                        {% endfor %}
                                                         <tr>
                                                             <td>{{ category.id }}</td>
                                                             <td>{{ category.name }}</td>
                                                             <td>
                                                                 {% if category.parent_id == 0 %}
                                                                 <span class="text-muted">-</span>
-                                                                {% elif parent %}
-                                                                {{ parent.name }}
                                                                 {% else %}
-                                                                <span class="text-muted">-</span>
+                                                                    {% for c in categories %}
+                                                                        {% if c.id == category.parent_id %}
+                                                                            <strong>{{ c.name }}</strong>
+                                                                        {% endif %}
+                                                                    {% endfor %}
                                                                 {% endif %}
                                                             </td>
                                                             <td>
@@ -117,6 +113,14 @@
             <div class="modal-body">
                 <form id="addCategoryForm">
                     <div class="form-group">
+                        <label>父分类</label>
+                        <select class="form-control" name="parentId">
+                            <option value="0">无（作为一级分类）</option>
+                            <option value="42">体表保健</option>
+                            <option value="2">功能食品</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>分类名称</label>
                         <input type="text" class="form-control" name="categoryName" required>
                     </div>
@@ -144,6 +148,59 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
                 <button type="button" class="btn btn-primary" onclick="addCategory()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑分类</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editCategoryForm">
+                    <input type="hidden" id="categoryId" name="categoryId">
+                    <div class="form-group">
+                        <label>父分类</label>
+                        <select class="form-control" id="parentId" name="parentId">
+                            <option value="0">无（作为一级分类）</option>
+                            <option value="42">体表保健</option>
+                            <option value="2">功能食品</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>分类名称</label>
+                        <input type="text" class="form-control" id="categoryName" name="categoryName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>分类编码</label>
+                        <input type="text" class="form-control" id="categoryCode" name="categoryCode" required>
+                    </div>
+                    <div class="form-group">
+                        <label>图标URL</label>
+                        <input type="text" class="form-control" id="categoryIcon" name="icon">
+                    </div>
+                    <div class="form-group">
+                        <label>排序</label>
+                        <input type="number" class="form-control" id="sort" name="sort" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select class="form-control" id="status" name="status">
+                            <option value="1">启用</option>
+                            <option value="0">禁用</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveCategory()">保存</button>
             </div>
         </div>
     </div>
@@ -206,6 +263,29 @@ function deleteCategory(id) {
             }
         });
     }
+}
+
+function saveCategory() {
+    const id = document.getElementById('categoryId').value;
+    const formData = new FormData(document.getElementById('editCategoryForm'));
+    const data = Object.fromEntries(formData);
+    
+    fetch(`/admin/product/category/update/${id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.code === 200) {
+            alert('保存成功');
+            location.reload();
+        } else {
+            alert(result.message);
+        }
+    });
 }
 </script>
 

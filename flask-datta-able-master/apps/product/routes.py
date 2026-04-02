@@ -82,6 +82,35 @@ def category_delete(category_id):
         return jsonify({'code': 500, 'message': str(e), 'data': None})
 
 
+@blueprint.route('/category/update/<int:category_id>', methods=['POST'])
+def category_update(category_id):
+    """更新商品分类"""
+    category = XPCategory.query.get(category_id)
+    
+    if not category:
+        return jsonify({'code': 404, 'message': '分类不存在', 'data': None})
+    
+    data = request.get_json()
+    
+    try:
+        category.name = data.get('categoryName', category.name)
+        category.parent_id = data.get('parentId', category.parent_id)
+        category.icon = data.get('icon', category.icon)
+        category.sort = data.get('sort', category.sort)
+        category.status = data.get('status', category.status)
+        
+        if category.parent_id == 0:
+            category.level = 1
+        else:
+            category.level = 2
+        
+        db.session.commit()
+        return jsonify({'code': 200, 'message': '更新成功', 'data': None})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'code': 500, 'message': str(e), 'data': None})
+
+
 @blueprint.route('/product')
 @blueprint.route('/list')
 def product_list():
@@ -165,6 +194,45 @@ def product_toggle_status(product_id):
         product.status = 0 if product.status == 1 else 1
         db.session.commit()
         return jsonify({'code': 200, 'message': '状态更新成功', 'data': None})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'code': 500, 'message': str(e), 'data': None})
+
+
+@blueprint.route('/product/edit/<int:product_id>')
+def product_edit_page(product_id):
+    """编辑商品页面"""
+    product = XPProduct.query.get(product_id)
+    if not product:
+        return '商品不存在', 404
+    
+    categories = XPCategory.query.filter_by(status=1).order_by(XPCategory.sort).all()
+    return render_template('product/product_edit.html', product=product, categories=categories)
+
+
+@blueprint.route('/product/update/<int:product_id>', methods=['POST'])
+def product_update(product_id):
+    """更新商品"""
+    product = XPProduct.query.get(product_id)
+    
+    if not product:
+        return jsonify({'code': 404, 'message': '商品不存在', 'data': None})
+    
+    data = request.get_json()
+    
+    try:
+        product.name = data.get('name', product.name)
+        product.category_id = data.get('categoryId', product.category_id)
+        product.price = data.get('price', product.price)
+        product.vip_price = data.get('vipPrice', product.vip_price)
+        product.stock = data.get('stock', product.stock)
+        product.main_image = data.get('mainImage', product.main_image)
+        product.detail_images = data.get('detailImages', product.detail_images)
+        product.description = data.get('description', product.description)
+        product.status = data.get('status', product.status)
+        
+        db.session.commit()
+        return jsonify({'code': 200, 'message': '更新成功', 'data': None})
     except Exception as e:
         db.session.rollback()
         return jsonify({'code': 500, 'message': str(e), 'data': None})

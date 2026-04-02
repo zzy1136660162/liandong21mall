@@ -1,0 +1,225 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} 编辑商品 {% endblock %}
+
+{% block stylesheets %}
+<style>
+    .pcoded-main-container {
+        margin-left: 260px !important;
+        padding-top: 0px !important;
+    }
+    
+    .page-wrapper {
+        padding-top: 0px !important;
+    }
+    
+    .page-header {
+        margin-bottom: 5px !important;
+        padding-bottom: 5px !important;
+        padding-top: 5px !important;
+    }
+    
+    .main-body {
+        padding-top: 0 !important;
+    }
+    
+    .product-image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="page-header">
+                            <div class="row align-items-end">
+                                <div class="col-lg-8">
+                                    <div class="page-header-title">
+                                        <div class="d-inline">
+                                            <h4>编辑商品</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 text-right">
+                                    <a href="/admin/product" class="btn btn-secondary">返回列表</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="page-body">
+                            <div class="card">
+                                <div class="card-body">
+                                    <form id="editProductForm">
+                                        <input type="hidden" id="productId" value="{{ product.id }}">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>商品名称</label>
+                                                    <input type="text" class="form-control" id="name" value="{{ product.name }}" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>商品分类</label>
+                                                    <select class="form-control" id="categoryId">
+                                                        {% for category in categories %}
+                                                        <option value="{{ category.id }}" {% if category.id == product.category_id %}selected{% endif %}>{{ category.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>价格</label>
+                                                    <input type="number" class="form-control" id="price" value="{{ product.price }}" step="0.01" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>会员价</label>
+                                                    <input type="number" class="form-control" id="vipPrice" value="{{ product.vip_price }}" step="0.01">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>库存</label>
+                                                    <input type="number" class="form-control" id="stock" value="{{ product.stock }}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>主图</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="mainImage" value="{{ product.main_image }}">
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-primary" onclick="uploadImage('main')">上传图片</button>
+                                                </div>
+                                            </div>
+                                            {% if product.main_image %}
+                                            <img src="{{ product.main_image }}" class="product-image mt-2" id="mainImagePreview">
+                                            {% endif %}
+                                        </div>
+                                        <div class="form-group">
+                                            <label>详情图</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="detailImages" value="{{ product.detail_images }}">
+                                                <div class="input-group-append">
+                                                    <button type="button" class="btn btn-primary" onclick="uploadImage('detail')">上传图片</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>商品描述</label>
+                                            <textarea class="form-control" id="description" rows="4">{{ product.description }}</textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>状态</label>
+                                            <select class="form-control" id="status">
+                                                <option value="1" {% if product.status == 1 %}selected{% endif %}>上架</option>
+                                                <option value="0" {% if product.status == 0 %}selected{% endif %}>下架</option>
+                                            </select>
+                                        </div>
+                                        <div class="text-center">
+                                            <button type="button" class="btn btn-primary" onclick="saveProduct()">保存</button>
+                                            <a href="/admin/product" class="btn btn-secondary">取消</a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="file" id="imageUpload" style="display:none" accept="image/*">
+
+<script>
+let currentUploadType = '';
+
+document.getElementById('imageUpload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    fetch('/admin/product/upload/image', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.code === 200) {
+            const url = result.data.url;
+            if (currentUploadType === 'main') {
+                document.getElementById('mainImage').value = url;
+                let preview = document.getElementById('mainImagePreview');
+                if (!preview) {
+                    preview = document.createElement('img');
+                    preview.id = 'mainImagePreview';
+                    preview.className = 'product-image mt-2';
+                    document.getElementById('mainImage').parentNode.appendChild(preview);
+                }
+                preview.src = url;
+            } else {
+                const detailInput = document.getElementById('detailImages');
+                detailInput.value = detailInput.value ? detailInput.value + ',' + url : url;
+            }
+        } else {
+            alert(result.message);
+        }
+    });
+});
+
+function uploadImage(type) {
+    currentUploadType = type;
+    document.getElementById('imageUpload').click();
+}
+
+function saveProduct() {
+    const id = document.getElementById('productId').value;
+    const data = {
+        name: document.getElementById('name').value,
+        categoryId: document.getElementById('categoryId').value,
+        price: parseFloat(document.getElementById('price').value),
+        vipPrice: parseFloat(document.getElementById('vipPrice').value) || 0,
+        stock: parseInt(document.getElementById('stock').value),
+        mainImage: document.getElementById('mainImage').value,
+        detailImages: document.getElementById('detailImages').value,
+        description: document.getElementById('description').value,
+        status: parseInt(document.getElementById('status').value)
+    };
+    
+    fetch(`/admin/product/update/${id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.code === 200) {
+            alert('保存成功');
+            window.location.href = '/admin/product';
+        } else {
+            alert(result.message);
+        }
+    });
+}
+</script>
+{% endblock %}
+</content>
