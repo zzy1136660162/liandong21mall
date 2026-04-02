@@ -2,21 +2,24 @@ const productService = require('../../services/productService.js');
 const categoryData = require('../../utils/category-data.js');
 
 const categoryNameMap = {
-  'nasal_care': '鼻部护理',
-  'pain_relief': '缓解疼痛',
-  'eye_care': '护眼',
-  'sub_health': '调理亚健康',
-  'kidney_care': '固肾养肾',
-  'body_odor': '狐臭护理',
-  'skin_care': '美肤护肤',
-  'facial_rehab': '面瘫康复',
-  'women_health': '女性调理',
-  'solid_drink': '固体饮料',
-  'tablet_candy': '压片糖果',
-  'herbal_paste': '膏滋',
-  'herbal_drink': '植物饮品',
-  'prepared_wine': '配制酒',
-  'tea_substitute': '代用茶'
+  '疼痛舒缓': '疼痛舒缓',
+  '鼻部护理': '鼻部护理',
+  '眼部护理': '眼部护理',
+  '皮肤护理': '皮肤护理',
+  '女性调理': '女性调理',
+  '男性养护': '男性养护',
+  '小儿护理': '小儿护理',
+  '纤体瘦身': '纤体瘦身',
+  '养发护发': '养发护发',
+  '泡浴养生': '泡浴养生',
+  '人参滋补': '人参滋补',
+  '阿胶膏滋': '阿胶膏滋',
+  '草本茶饮': '草本茶饮',
+  '固体饮料': '固体饮料',
+  '压片糖果': '压片糖果',
+  '营养颗粒': '营养颗粒',
+  '植物饮品': '植物饮品',
+  '配制酒': '配制酒'
 };
 
 Page({
@@ -107,10 +110,10 @@ Page({
 
   // 显示更多分类
   showMoreCategories() {
+    const categories = ['疼痛舒缓', '鼻部护理', '眼部护理', '皮肤护理', '女性调理', '男性养护', '小儿护理', '纤体瘦身', '养发护发', '泡浴养生', '人参滋补', '阿胶膏滋', '草本茶饮', '固体饮料', '压片糖果', '营养颗粒', '植物饮品', '配制酒'];
     wx.showActionSheet({
-      itemList: ['鼻部护理', '缓解疼痛', '护眼', '调理亚健康', '固肾养肾', '狐臭护理', '美肤护肤', '面瘫康复', '女性调理', '固体饮料', '压片糖果', '膏滋', '植物饮品', '配制酒', '代用茶'],
+      itemList: categories,
       success: (res) => {
-        const categories = ['nasal_care', 'pain_relief', 'eye_care', 'sub_health', 'kidney_care', 'body_odor', 'skin_care', 'facial_rehab', 'women_health', 'solid_drink', 'tablet_candy', 'herbal_paste', 'herbal_drink', 'prepared_wine', 'tea_substitute'];
         this.switchMainCategory({ currentTarget: { dataset: { category: categories[res.tapIndex] } } });
       }
     });

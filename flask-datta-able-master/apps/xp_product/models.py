@@ -71,6 +71,7 @@ class Product(db.Model):
     weight = db.Column(db.Numeric(8, 2))
     description = db.Column(db.Text)
     specifications = db.Column(db.JSON)
+    shop_id = db.Column(db.BigInteger, nullable=False)
     is_brand = db.Column(db.SmallInteger, default=0)
     is_cashback = db.Column(db.SmallInteger, default=0)
     is_trust = db.Column(db.SmallInteger, default=0)

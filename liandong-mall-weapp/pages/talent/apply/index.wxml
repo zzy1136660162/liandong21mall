@@ -45,11 +45,19 @@
       <view class="item-label">
         <text class="label-text">所在地区</text>
       </view>
-      <view class="picker-value" bindtap="openRegionPicker">
-        <text wx:if="{{region.length > 0}}" class="picker-text">{{region[0]}} {{region[1]}} {{region[2]}}</text>
-        <text wx:else class="placeholder">请选择所在地区</text>
-        <text class="picker-arrow">></text>
-      </view>
+      <picker
+        mode="multiSelector"
+        range="{{[provinces, cities, districts]}}"
+        value="{{regionIndex}}"
+        bindchange="onRegionChange"
+        bindcolumnchange="onColumnChange"
+      >
+        <view class="picker-value">
+          <text wx:if="{{region.length > 0}}" class="picker-text">{{region[0]}} {{region[1]}} {{region[2]}}</text>
+          <text wx:else class="placeholder">请选择省/市/区</text>
+          <text class="picker-arrow">›</text>
+        </view>
+      </picker>
     </view>
 
     <!-- 申请理由 -->
@@ -119,16 +127,8 @@
     </view>
   </view>
 
-  <!-- 提交区域 -->
+  <!-- 提交按钮 -->
   <view class="submit-section">
-    <button 
-      class="submit-btn"
-      bindtap="submitApply"
-      disabled="{{isSubmitting}}"
-    >
-      <text wx:if="{{!isSubmitting}}">提交申请</text>
-      <text wx:else>提交中...</text>
-    </button>
-    <text class="submit-tip">提交后我们将在1-3个工作日内审核</text>
+    <view class="submit-btn" bindtap="submitApply">提交申请</view>
   </view>
 </view>

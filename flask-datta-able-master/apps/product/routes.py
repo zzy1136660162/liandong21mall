@@ -118,24 +118,30 @@ def product_list():
 @blueprint.route('/product/add', methods=['POST'])
 def product_add():
     """添加商品"""
+    import time
     data = request.get_json()
     
-    product = Product(
+    # 生成商品编号
+    product_no = f'P{time.strftime("%Y%m%d%H%M%S")}{str(time.time())[-6:]}'
+    
+    product = XPProduct(
+        product_no=product_no,
+        name=data.get('productName'),
         category_id=data.get('categoryId'),
-        product_name=data.get('productName'),
-        product_code=data.get('productCode'),
         main_image=data.get('mainImage'),
+        images=data.get('detailImages', []),
         price=data.get('price'),
         original_price=data.get('originalPrice'),
-        member_price=data.get('memberPrice'),
+        supply_price=data.get('memberPrice') or 0,
         stock=data.get('stock', 0),
         sales=data.get('sales', 0),
-        brief=data.get('brief'),
+        subtitle=data.get('brief'),
         status=data.get('status', 1),
         is_hot=data.get('isHot', 0),
         is_new=data.get('isNew', 0),
         is_recommend=data.get('isRecommend', 0),
-        sort=data.get('sort', 0)
+        sort=data.get('sort', 0),
+        shop_id=1  # 默认店铺ID
     )
     
     try:
@@ -150,7 +156,7 @@ def product_add():
 @blueprint.route('/product/toggle-status/<int:product_id>', methods=['PUT'])
 def product_toggle_status(product_id):
     """切换商品状态"""
-    product = Product.query.get(product_id)
+    product = XPProduct.query.get(product_id)
     
     if not product:
         return jsonify({'code': 404, 'message': '商品不存在', 'data': None})
@@ -167,7 +173,7 @@ def product_toggle_status(product_id):
 @blueprint.route('/product/delete/<int:product_id>', methods=['DELETE'])
 def product_delete(product_id):
     """删除商品"""
-    product = Product.query.get(product_id)
+    product = XPProduct.query.get(product_id)
     
     if not product:
         return jsonify({'code': 404, 'message': '商品不存在', 'data': None})
@@ -251,3 +257,55 @@ def commission_list():
     """佣金管理页面"""
     # 强制刷新模板缓存
     return render_template('product/commission.html', cache_timeout=0)
+
+
+@blueprint.route('/upload/image', methods=['POST'])
+def upload_image():
+    """上传图片"""
+    import os
+    import time
+    from werkzeug.utils import secure_filename
+    from flask import current_app
+
+    if 'file' not in request.files:
+        return jsonify({'code': 400, 'message': '没有文件', 'data': None})
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'code': 400, 'message': '没有选择文件', 'data': None})
+
+    # 验证文件类型
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+    filename = secure_filename(file.filename)
+    ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
+
+    if ext not in allowed_extensions:
+        return jsonify({'code': 400, 'message': '不支持的文件类型，请上传png/jpg/jpeg/gif/webp格式图片', 'data': None})
+
+    try:
+        # 创建上传目录
+        upload_folder = os.path.join(current_app.root_path, 'static', 'uploads', 'products')
+        os.makedirs(upload_folder, exist_ok=True)
+
+        # 生成唯一文件名
+        timestamp = int(time.time() * 1000)
+        new_filename = f'{timestamp}_{filename}'
+        filepath = os.path.join(upload_folder, new_filename)
+
+        # 保存文件
+        file.save(filepath)
+
+        # 返回文件URL
+        file_url = f'/static/uploads/products/{new_filename}'
+
+        return jsonify({
+            'code': 200,
+            'message': '上传成功',
+            'data': {
+                'url': file_url,
+                'filename': new_filename,
+                'original_name': filename
+            }
+        })
+    except Exception as e:
+        return jsonify({'code': 500, 'message': f'上传失败: {str(e)}', 'data': None})

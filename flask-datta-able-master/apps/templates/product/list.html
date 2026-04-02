@@ -21,55 +21,65 @@
                             </div>
                         </div>
                         <div class="page-body">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <form method="get" class="form-inline">
-                                                <select name="category_id" class="form-control mr-2">
-                                                    <option value="">全部分类</option>
-                                                </select>
-                                                <select name="status" class="form-control mr-2">
-                                                    <option value="">全部状态</option>
-                                                    <option value="1">上架</option>
-                                                    <option value="0">下架</option>
-                                                </select>
-                                                <input type="text" name="keyword" class="form-control mr-2" placeholder="搜索商品名称">
-                                                <button type="submit" class="btn btn-primary">搜索</button>
-                                            </form>
-                                        </div>
-                                        <div class="card-block table-border-style">
-                                            <div class="table-responsive">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th><input type="checkbox" id="checkAll"></th>
-                                                            <th>ID</th>
-                                                            <th>商品名称</th>
-                                                            <th>主图</th>
-                                                            <th>分类</th>
-                                                            <th>价格</th>
-                                                            <th>库存</th>
-                                                            <th>销量</th>
-                                                            <th>状态</th>
-                                                            <th>排序</th>
-                                                            <th>操作</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="productTable">
-                                                        <tr>
-                                                            <td colspan="12" class="text-center">加载中...</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                            <div class="card">
+                                <div class="card-block">
+                                    <div class="row mb-3">
+                                        <div class="col-lg-12">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <select class="form-control" id="categoryId">
+                                                        <option value="">全部分类</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <select class="form-control" id="status">
+                                                        <option value="">全部状态</option>
+                                                        <option value="1">上架</option>
+                                                        <option value="0">下架</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control" id="keyword" placeholder="搜索商品名称">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <button class="btn btn-primary" onclick="loadProducts(1)">搜索</button>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="card-footer">
-                                            <nav>
-                                                <ul class="pagination" id="pagination"></ul>
-                                            </nav>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-lg-12">
+                                            <button class="btn btn-success" onclick="addProduct()">添加商品</button>
+                                            <button class="btn btn-danger" onclick="batchDelete()">批量删除</button>
                                         </div>
                                     </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th><input type="checkbox" id="checkAll"></th>
+                                                    <th>ID</th>
+                                                    <th>商品名称</th>
+                                                    <th>主图</th>
+                                                    <th>分类</th>
+                                                    <th>价格</th>
+                                                    <th>库存</th>
+                                                    <th>销量</th>
+                                                    <th>状态</th>
+                                                    <th>排序</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="productTable">
+                                                <tr>
+                                                    <td colspan="11" class="text-center">加载中...</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <nav>
+                                        <ul class="pagination" id="pagination"></ul>
+                                    </nav>
                                 </div>
                             </div>
                         </div>
@@ -81,53 +91,60 @@
 </div>
 {% endblock %}
 
-{% block javascript %}
+{% block javascripts %}
 <script>
 let currentPage = 1;
 let pageSize = 10;
 
-function loadProducts() {
-    const params = new URLSearchParams(window.location.search);
-    const categoryId = params.get('category_id') || '';
-    const status = params.get('status') || '';
-    const keyword = params.get('keyword') || '';
-    
-    fetch(`/api/products/list/admin?page=${currentPage}&page_size=${pageSize}&category_id=${categoryId}&status=${status}&keyword=${keyword}`)
+$(document).ready(function() {
+    loadProducts(1);
+});
+
+function loadProducts(page = 1) {
+    currentPage = page;
+    const categoryId = $('#categoryId').val() || '';
+    const status = $('#status').val() || '';
+    const keyword = $('#keyword').val() || '';
+
+    fetch(`/api/products/list/admin?page=${page}&page_size=${pageSize}&category_id=${categoryId}&status=${status}&keyword=${keyword}`)
         .then(res => res.json())
         .then(res => {
             if (res.code === 200) {
                 renderTable(res.data.list);
                 renderPagination(res.data.total);
+            } else {
+                $('#productTable').html('<tr><td colspan="11" class="text-center">加载失败</td></tr>');
             }
+        })
+        .catch(err => {
+            console.error('加载商品列表失败:', err);
+            $('#productTable').html('<tr><td colspan="11" class="text-center">加载失败</td></tr>');
         });
 }
 
 function renderTable(list) {
     const tbody = document.getElementById('productTable');
     if (!list || list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="12" class="text-center">暂无数据</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center">暂无数据</td></tr>';
         return;
     }
-    
+
     tbody.innerHTML = list.map(item => `
         <tr>
             <td><input type="checkbox" class="product-check" value="${item.id}"></td>
             <td>${item.id}</td>
             <td>
-                <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.name}">
-                    ${item.name}
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="${item.main_image}" style="width: 40px; height: 40px; object-fit: cover;" onerror="this.src='/static/assets/images/no-image.png'">
+                    <span style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.name}</span>
                 </div>
             </td>
-            <td><img src="${item.main_image}" style="width: 50px; height: 50px; object-fit: cover;" onerror="this.src='/static/assets/images/no-image.png'"></td>
             <td>${item.category_name || '-'}</td>
             <td>¥${item.price}</td>
             <td>${item.stock}</td>
             <td>${item.sales}</td>
             <td>
-                <label class="switch switch-primary">
-                    <input type="checkbox" ${item.status === 1 ? 'checked' : ''} onchange="toggleStatus(${item.id}, this.checked)">
-                    <span class="slider"></span>
-                </label>
+                <span class="badge badge-${item.status === 1 ? 'success' : 'warning'}">${item.status === 1 ? '上架' : '下架'}</span>
             </td>
             <td>${item.sort}</td>
             <td>
@@ -142,42 +159,28 @@ function renderPagination(total) {
     const totalPages = Math.ceil(total / pageSize);
     const ul = document.getElementById('pagination');
     let html = '';
-    
+
     if (currentPage > 1) {
-        html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="goPage(${currentPage - 1})">上一页</a></li>`;
+        html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadProducts(${currentPage - 1})">上一页</a></li>`;
     }
-    
+
     for (let i = 1; i <= totalPages; i++) {
         if (i === currentPage) {
             html += `<li class="page-item active"><a class="page-link" href="javascript:void(0)">${i}</a></li>`;
         } else {
-            html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="goPage(${i})">${i}</a></li>`;
+            html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadProducts(${i})">${i}</a></li>`;
         }
     }
-    
+
     if (currentPage < totalPages) {
-        html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="goPage(${currentPage + 1})">下一页</a></li>`;
+        html += `<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="loadProducts(${currentPage + 1})">下一页</a></li>`;
     }
-    
+
     ul.innerHTML = html;
 }
 
-function goPage(page) {
-    currentPage = page;
-    loadProducts();
-}
-
-function toggleStatus(id, status) {
-    fetch(`/api/products/${id}/admin`, {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({status: status ? 1 : 0})
-    }).then(res => res.json()).then(res => {
-        if (res.code !== 200) {
-            alert('操作失败');
-            loadProducts();
-        }
-    });
+function addProduct() {
+    window.location.href = '/admin/product/add';
 }
 
 function editProduct(id) {
@@ -186,21 +189,47 @@ function editProduct(id) {
 
 function deleteProduct(id) {
     if (!confirm('确定要删除这个商品吗？')) return;
-    fetch(`/api/products/${id}/admin`, {method: 'DELETE'})
-        .then(res => res.json())
-        .then(res => {
-            if (res.code === 200) {
-                loadProducts();
-            } else {
-                alert(res.message || '删除失败');
-            }
-        });
+    fetch(`/api/products/${id}/admin`, {
+        method: 'DELETE',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.code === 200) {
+            alert('删除成功');
+            loadProducts(currentPage);
+        } else {
+            alert(res.message || '删除失败');
+        }
+    })
+    .catch(err => {
+        console.error('删除商品失败:', err);
+        alert('删除失败');
+    });
+}
+
+function batchDelete() {
+    const checks = document.querySelectorAll('.product-check:checked');
+    if (checks.length === 0) {
+        alert('请选择要删除的商品');
+        return;
+    }
+    if (!confirm('确定要删除选中的 ' + checks.length + ' 个商品吗？')) return;
+
+    const ids = Array.from(checks).map(cb => cb.value);
+    Promise.all(ids.map(id =>
+        fetch(`/api/products/${id}/admin`, { method: 'DELETE' }).then(res => res.json())
+    )).then(results => {
+        alert('批量删除完成');
+        loadProducts(currentPage);
+    }).catch(err => {
+        console.error('批量删除失败:', err);
+        alert('批量删除失败');
+    });
 }
 
 document.getElementById('checkAll').addEventListener('change', function() {
     document.querySelectorAll('.product-check').forEach(cb => cb.checked = this.checked);
 });
-
-loadProducts();
 </script>
-{% endblock %}
+{% endblock javascripts %}

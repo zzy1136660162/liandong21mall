@@ -7,6 +7,7 @@ from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 from apps.product.services import ProductService, CartService, OrderService, ProductFavoriteService
 from apps.product.models import Product
+from apps.xp_product.models import Product as XPProduct
 from apps import db
 from datetime import datetime
 
@@ -412,16 +413,16 @@ class FavoriteCount(Resource):
 class ProductListAdmin(Resource):
     @api.doc('管理员获取商品列表')
     def get(self):
-        """管理员获取商品列表（带分页和搜索）"""
+        """管理员获取商品列表（带分页和搜索）- 使用xp_products表"""
         page = request.args.get('page', 1, type=int)
         page_size = request.args.get('page_size', 10, type=int)
         keyword = request.args.get('keyword', '')
         
-        query = Product.query
+        query = XPProduct.query
         if keyword:
-            query = query.filter(Product.product_name.like(f'%{keyword}%'))
+            query = query.filter(XPProduct.name.like(f'%{keyword}%'))
         
-        pagination = query.order_by(Product.created_at.desc()).paginate(
+        pagination = query.order_by(XPProduct.created_at.desc()).paginate(
             page=page, per_page=page_size, error_out=False
         )
         
@@ -432,9 +433,9 @@ class ProductListAdmin(Resource):
             commission_amount = price * commission_rate / 100 if price else 0
             items.append({
                 'id': p.id,
-                'name': p.product_name,
-                'productName': p.product_name,
-                'productCode': p.product_code,
+                'name': p.name,
+                'productName': p.name,
+                'productCode': p.product_no,
                 'price': float(p.price) if p.price else 0,
                 'originalPrice': float(p.original_price) if p.original_price else 0,
                 'stock': p.stock or 0,
@@ -443,9 +444,9 @@ class ProductListAdmin(Resource):
                 'commission_rate': commission_rate,
                 'commissionRate': commission_rate,
                 'commissionAmount': round(commission_amount, 2),
-                'normal_rate': float(p.normal_rate) if p.normal_rate else 20.0,
-                'premium_rate': float(p.premium_rate) if p.premium_rate else 25.0,
-                'top_rate': float(p.top_rate) if p.top_rate else 30.0,
+                'normal_rate': float(p.normal_rate) if p.normal_rate else 10.0,
+                'premium_rate': float(p.premium_rate) if p.premium_rate else 15.0,
+                'top_rate': float(p.top_rate) if p.top_rate else 20.0,
                 'settlement_type': p.settlement_type or 1,
                 'createdAt': p.created_at.strftime('%Y-%m-%d %H:%M:%S') if p.created_at else ''
             })
@@ -466,7 +467,7 @@ class ProductListAdmin(Resource):
 class CommissionUpdate(Resource):
     @api.doc('更新商品佣金')
     def put(self, product_id):
-        """更新单个商品的佣金设置"""
+        """更新单个商品的佣金设置 - 使用xp_products表"""
         data = request.get_json()
         commission_rate = data.get('commissionRate')
         commission_amount = data.get('commissionAmount')
@@ -475,7 +476,7 @@ class CommissionUpdate(Resource):
         top_rate = data.get('topRate') or data.get('top_rate')
         settlement_type = data.get('settlementType') or data.get('settlement_type')
         
-        product = Product.query.get(product_id)
+        product = XPProduct.query.get(product_id)
         if not product:
             return {'code': 404, 'message': '商品不存在'}, 404
         
@@ -504,7 +505,7 @@ class CommissionUpdate(Resource):
 class CommissionBatchUpdate(Resource):
     @api.doc('批量更新商品佣金')
     def post(self):
-        """批量更新商品佣金"""
+        """批量更新商品佣金 - 使用xp_products表"""
         data = request.get_json()
         updates = data.get('updates', [])
         
@@ -514,11 +515,11 @@ class CommissionBatchUpdate(Resource):
             commission_rate = item.get('commissionRate') or item.get('commission_rate')
             commission_amount = item.get('commissionAmount') or item.get('commission_amount')
             normal_rate = item.get('normalRate') or item.get('normal_rate')
-            premium_rate = item.get('premiumRate') or item.get('premium_rate')
-            top_rate = item.get('topRate') or item.get('top_rate')
+            premium_rate = item.get('premiumRate') or data.get('premium_rate')
+            top_rate = item.get('topRate') or data.get('top_rate')
             settlement_type = item.get('settlementType') or item.get('settlement_type')
             
-            product = Product.query.get(product_id)
+            product = XPProduct.query.get(product_id)
             if product:
                 if commission_rate is not None:
                     product.commission_rate = commission_rate

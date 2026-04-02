@@ -10,13 +10,81 @@ Page({
       intro: ''
     },
     region: [],
-    isSubmitting: false
+    regionIndex: [0, 0, 0],
+    isSubmitting: false,
+    provinces: [],
+    cities: [],
+    districts: [],
+    provincesData: [],
+    citiesData: {},
+    districtsData: {}
   },
 
   onLoad() {
+    this.loadRegionData();
   },
 
-  // 输入框变化
+  loadRegionData() {
+    wx.showLoading({ title: '加载中...' });
+    
+    wx.request({
+      url: 'http://localhost:5000/api/region/data',
+      method: 'GET',
+      success: (res) => {
+        wx.hideLoading();
+        
+        if (res.data.code === 200 && res.data.data && res.data.data.length > 0) {
+          const regionData = res.data.data;
+          
+          const provincesData = regionData.map(p => ({ code: p.code, name: p.name }));
+          const citiesData = {};
+          const districtsData = {};
+          
+          regionData.forEach(province => {
+            citiesData[province.code] = province.children.map(c => ({ code: c.code, name: c.name }));
+            
+            province.children.forEach(city => {
+              districtsData[city.code] = city.children.map(d => ({ code: d.code, name: d.name }));
+            });
+          });
+          
+          const firstProvince = provincesData[0];
+          let firstCities = [];
+          let firstDistricts = [];
+          
+          if (firstProvince && citiesData[firstProvince.code]) {
+            firstCities = citiesData[firstProvince.code];
+            const firstCity = firstCities[0];
+            if (firstCity && districtsData[firstCity.code]) {
+              firstDistricts = districtsData[firstCity.code];
+            }
+          }
+          
+          this.setData({
+            provinces: provincesData.map(p => p.name),
+            provincesData: provincesData,
+            citiesData: citiesData,
+            districtsData: districtsData,
+            cities: firstCities.map(c => c.name),
+            districts: firstDistricts.map(d => d.name)
+          });
+        } else {
+          wx.showToast({
+            title: '地区数据为空',
+            icon: 'none'
+          });
+        }
+      },
+      fail: () => {
+        wx.hideLoading();
+        wx.showToast({
+          title: '加载地区数据失败',
+          icon: 'none'
+        });
+      }
+    });
+  },
+
   onInputChange(e) {
     const { field } = e.currentTarget.dataset;
     const { value } = e.detail;
@@ -26,25 +94,51 @@ Page({
     });
   },
 
-  // 地区选择变化
   onRegionChange(e) {
-    this.setData({
-      region: e.detail.value
-    });
+    const value = e.detail.value;
+    const { provinces, cities, districts } = this.data;
+    
+    if (value[0] >= 0 && value[1] >= 0 && value[2] >= 0) {
+      this.setData({
+        region: [provinces[value[0]], cities[value[1]], districts[value[2]]],
+        regionIndex: value
+      });
+    }
   },
 
-  // 打开地区选择器
-  openRegionPicker() {
-    wx.chooseLocation({
-      success: (res) => {
-        this.setData({
-          region: [res.province, res.city, res.district]
-        });
-      }
-    });
+  onColumnChange(e) {
+    const column = e.detail.column;
+    const value = e.detail.value;
+    const { provincesData, citiesData, districtsData, regionIndex } = this.data;
+    
+    if (column === 0) {
+      const province = provincesData[value];
+      if (!province) return;
+      
+      const newCities = citiesData[province.code] || [];
+      const firstCity = newCities[0] || { code: '', name: '' };
+      const newDistricts = districtsData[firstCity.code] || [];
+      
+      this.setData({
+        cities: newCities.map(c => c.name),
+        districts: newDistricts.map(d => d.name),
+        regionIndex: [value, 0, 0]
+      });
+    } else if (column === 1) {
+      const province = provincesData[regionIndex[0]];
+      if (!province) return;
+      
+      const cities = citiesData[province.code] || [];
+      const city = cities[value] || { code: '', name: '' };
+      const newDistricts = districtsData[city.code] || [];
+      
+      this.setData({
+        districts: newDistricts.map(d => d.name),
+        regionIndex: [regionIndex[0], value, 0]
+      });
+    }
   },
 
-  // 提交申请
   async submitApply() {
     if (this.data.isSubmitting) {
       return;
@@ -52,7 +146,6 @@ Page({
 
     const { formData } = this.data;
     
-    // 检查必填字段
     if (!formData.realName) {
       wx.showToast({
         title: '请输入真实姓名',
@@ -114,25 +207,16 @@ Page({
 
       const res = await api.post('/api/user/talent/apply', params);
 
-      if (res.code === 200) {
-        wx.showToast({
-          title: '申请提交成功',
-          icon: 'success'
+      wx.showToast({
+        title: '申请提交成功',
+        icon: 'success'
+      });
+      
+      setTimeout(() => {
+        wx.redirectTo({
+          url: '/pages/talent/status/index'
         });
-        
-        // 跳转到状态页
-        setTimeout(() => {
-          wx.redirectTo({
-            url: '/pages/talent/status/index'
-          });
-        }, 1500);
-      } else {
-        wx.showToast({
-          title: res.message || '提交失败',
-          icon: 'none'
-        });
-        this.setData({ isSubmitting: false });
-      }
+      }, 1500);
     } catch (error) {
       console.error('提交申请失败:', error);
       wx.showToast({

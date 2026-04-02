@@ -3,11 +3,12 @@ const { talentApi } = require('../../../utils/api.js');
 
 Page({
   data: {
+    isTalent: false,
     talentInfo: {
       avatar: '',
-      realName: '张三',
-      region: '湖北省武汉市',
-      auditTime: '2024-01-15'
+      realName: '',
+      region: '',
+      auditTime: ''
     },
     stats: {
       promotionCount: 0,
@@ -29,18 +30,48 @@ Page({
     wx.showLoading({ title: '加载中' });
     
     talentApi.getTalentInfo()
-      .then(res => {
+      .then(data => {
         wx.hideLoading();
-        if (res.code === 200) {
+        if (data && data.isTalent) {
           this.setData({
-            talentInfo: res.data.talentInfo || this.data.talentInfo,
-            stats: res.data.stats || this.data.stats
+            isTalent: true,
+            talentInfo: data.talentInfo || this.data.talentInfo,
+            stats: data.stats || this.data.stats
+          });
+        } else {
+          this.setData({
+            isTalent: false,
+            talentInfo: {
+              avatar: '',
+              realName: '',
+              region: '',
+              auditTime: ''
+            },
+            stats: {
+              promotionCount: 0,
+              sampleCount: 0,
+              demandCount: 0
+            }
           });
         }
       })
       .catch(error => {
         wx.hideLoading();
-        console.error('加载达人信息失败:', error);
+        console.log('不是达人或加载失败:', error);
+        this.setData({
+          isTalent: false,
+          talentInfo: {
+            avatar: '',
+            realName: '',
+            region: '',
+            auditTime: ''
+          },
+          stats: {
+            promotionCount: 0,
+            sampleCount: 0,
+            demandCount: 0
+          }
+        });
       });
   },
 
@@ -62,6 +93,13 @@ Page({
   goToRdDemand() {
     wx.switchTab({
       url: '/pages/rd_index/rd_index'
+    });
+  },
+
+  // 跳转到达人申请页面
+  goToApply() {
+    wx.navigateTo({
+      url: '/pages/talent/apply/index'
     });
   }
 });

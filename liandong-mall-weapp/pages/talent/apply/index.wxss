@@ -218,3 +218,24 @@
   font-size: 26rpx;
   color: #999;
 }
+
+.picker-value {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24rpx;
+  border: 2rpx solid #e8e8e8;
+  border-radius: 12rpx;
+  background: #fafafa;
+  height: 80rpx;
+}
+
+.picker-text {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.picker-arrow {
+  font-size: 28rpx;
+  color: #ccc;
+}

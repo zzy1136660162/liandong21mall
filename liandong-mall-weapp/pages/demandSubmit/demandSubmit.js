@@ -77,6 +77,13 @@ Page({
     return true;
   },
 
+  // 跳转到人才库
+  goToTalentPool() {
+    wx.navigateTo({
+      url: '/pages/talent_pool/index/index'
+    });
+  },
+
   // 提交表单
   submitForm() {
     if (!this.validateForm()) {

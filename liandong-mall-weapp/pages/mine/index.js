@@ -347,7 +347,7 @@ Page({
 
   goToAddress() {
     wx.navigateTo({
-      url: '/pages/address/list/index'
+      url: '/pages/sp_Address_page/sp_Address_page'
     });
   },
 

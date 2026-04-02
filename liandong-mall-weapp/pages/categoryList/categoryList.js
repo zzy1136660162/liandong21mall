@@ -66,15 +66,21 @@ Page({
     this.setData({ loading: true })
     
     try {
-      // 模拟加载商品数据
-      const mockProducts = this.getMockProducts()
+      const result = await this.getCategoryProducts()
       
-      this.setData({
-        products: [...this.data.products, ...mockProducts],
-        page: this.data.page + 1,
-        hasMore: mockProducts.length === this.data.pageSize,
-        loading: false
-      })
+      if (result && result.products) {
+        this.setData({
+          products: [...this.data.products, ...result.products],
+          page: this.data.page + 1,
+          hasMore: result.products.length === this.data.pageSize,
+          loading: false
+        })
+      } else {
+        this.setData({
+          loading: false,
+          hasMore: false
+        })
+      }
     } catch (error) {
       this.setData({ loading: false })
       wx.showToast({
@@ -84,17 +90,39 @@ Page({
     }
   },
 
-  getMockProducts() {
-    // 模拟商品数据
-    const baseProducts = [
-      { id: 1, name: '陀谷堂·酸枣仁小丸子（新老包装随机发）', price: '59.90', image: 'https://picsum.photos/300/300?random=1' },
-      { id: 2, name: '龍耀·肚脐丸', price: '29.90', image: 'https://picsum.photos/300/300?random=2' },
-      { id: 3, name: '龍耀·植物硒蛋白肽', price: '99.00', image: 'https://picsum.photos/300/300?random=3' },
-      { id: 4, name: '陀谷堂·赶黄草', price: '98.00', image: 'https://picsum.photos/300/300?random=4' },
-      { id: 5, name: '养生堂·维生素C', price: '45.00', image: 'https://picsum.photos/300/300?random=5' },
-      { id: 6, name: '同仁堂·阿胶糕', price: '128.00', image: 'https://picsum.photos/300/300?random=6' }
-    ]
-    return baseProducts
+  getCategoryProducts() {
+    return new Promise((resolve, reject) => {
+      wx.request({
+        url: 'http://localhost:5000/api/sp/category/products',
+        method: 'GET',
+        data: {
+          categoryId: this.data.categoryId,
+          keyword: this.data.searchKeyword,
+          sortType: this.data.sortType,
+          sortOrder: this.data.sortOrder,
+          page: this.data.page,
+          pageSize: this.data.pageSize
+        },
+        success: (res) => {
+          if (res.data.code === 200) {
+            resolve(res.data.data)
+          } else {
+            wx.showToast({
+              title: res.data.message || '获取商品失败',
+              icon: 'none'
+            })
+            reject(res.data)
+          }
+        },
+        fail: (err) => {
+          wx.showToast({
+            title: '网络请求失败',
+            icon: 'none'
+          })
+          reject(err)
+        }
+      })
+    })
   },
 
   onReachBottom() {
@@ -104,7 +132,7 @@ Page({
   goToProductDetail(e) {
     const { id } = e.currentTarget.dataset
     wx.navigateTo({
-      url: `/pages/product-detail/product-detail?id=${id}`
+      url: `/pages/sp_Details/sp_Details?id=${id}`
     })
   },
 

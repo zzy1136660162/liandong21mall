@@ -15,34 +15,26 @@ Page({
     banners: [
       {
         id: 1,
-        image: 'https://picsum.photos/750/280?random=101',
-        title: '新人高佣专场',
-        subtitle: '佣金提升30% 限时开启',
-        type: 'activity',
-        link: '/pages/rank/rank'
-      },
-      {
-        id: 2,
-        image: 'https://picsum.photos/750/280?random=102',
-        title: '春日爆品计划',
-        subtitle: '已售10万+ 佣金25%',
-        type: 'product',
-        productId: 6
-      },
-      {
-        id: 3,
-        image: 'https://picsum.photos/750/280?random=103',
-        title: '正品保障・极速发货',
-        subtitle: '7天无理由退换',
-        type: 'brand',
+        image: 'https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260401150239363_667839762599.png',
+        title: '',
+        subtitle: '',
+        type: 'banner',
         link: ''
       },
       {
-        id: 4,
-        image: 'https://picsum.photos/750/280?random=104',
-        title: '申请样品攻略',
-        subtitle: '免费领样 轻松带货',
-        type: 'guide',
+        id: 2,
+        image: 'https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260401150358040_667839841277.png',
+        title: '',
+        subtitle: '',
+        type: 'banner',
+        link: ''
+      },
+      {
+        id: 3,
+        image: 'https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260401150638900_667840002138.png',
+        title: '',
+        subtitle: '',
+        type: 'banner',
         link: ''
       }
     ],
