@@ -24,6 +24,8 @@ Page({
   },
 
   onLoad(options) {
+    this.setData({ options });
+    
     // 检查登录状态，未登录则跳转登录页
     if (!isLogin()) {
       wx.showModal({
@@ -32,8 +34,12 @@ Page({
         confirmText: '去登录',
         success: (res) => {
           if (res.confirm) {
+            let redirectUrl = '/pages/sample-apply/sample-apply';
+            if (options.productId) {
+              redirectUrl += `?productId=${options.productId}`;
+            }
             wx.redirectTo({
-              url: '/pages/login/index?redirect=/pages/sample-apply/sample-apply'
+              url: `/pages/login/index?redirect=${encodeURIComponent(redirectUrl)}`
             });
           }
         }

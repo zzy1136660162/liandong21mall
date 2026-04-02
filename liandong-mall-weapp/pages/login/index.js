@@ -160,18 +160,18 @@ Page({
 
         setTimeout(() => {
           const url = decodeURIComponent(redirect);
+          const urlPath = url.split('?')[0];
           
           const tabBarPages = ['/pages/mine/index', '/pages/index/index', '/pages/xuanpinindex/xuanpinindex', '/pages/rd_index/rd_index', '/pages/Product_list_page/Product_list_page'];
           
-          if (tabBarPages.includes(url)) {
+          if (tabBarPages.includes(urlPath)) {
             wx.switchTab({ url });
           } else if (url.startsWith('/pages')) {
             const pages = getCurrentPages();
-            const redirectPath = url.split('?')[0];
             
             let pageExists = false;
             for (let i = 0; i < pages.length - 1; i++) {
-              if (pages[i].route === redirectPath || pages[i].route === redirectPath.slice(1)) {
+              if (pages[i].route === urlPath || pages[i].route === urlPath.slice(1)) {
                 pageExists = true;
                 break;
               }

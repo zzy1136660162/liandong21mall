@@ -73,6 +73,63 @@ const checkLogin = (redirect = '') => {
 };
 
 /**
+ * 带参数的登录检查
+ * @param {string} redirect 登录成功后的跳转地址
+ * @param {object} params 登录成功跳转时传递的参数
+ * @returns {boolean} 是否已登录
+ */
+const checkLoginWithParams = (redirect = '', params = {}) => {
+  if (!isLogin()) {
+    let url = '/pages/login/index';
+    let queryParts = [];
+    if (redirect) {
+      queryParts.push(`redirect=${encodeURIComponent(redirect)}`);
+    }
+    for (let key in params) {
+      if (params.hasOwnProperty(key)) {
+        queryParts.push(`${key}=${encodeURIComponent(params[key])}`);
+      }
+    }
+    if (queryParts.length > 0) {
+      url += '?' + queryParts.join('&');
+    }
+    wx.navigateTo({
+      url: url
+    });
+    return false;
+  }
+  return true;
+};
+
+/**
+ * 登录成功后跳转
+ * @param {string} url 跳转地址
+ * @param {object} params 传递的参数
+ */
+const loginSuccessRedirect = (url, params = {}) => {
+  if (!url) return;
+  
+  let fullUrl = url;
+  let queryParts = [];
+  for (let key in params) {
+    if (params.hasOwnProperty(key)) {
+      queryParts.push(`${key}=${encodeURIComponent(params[key])}`);
+    }
+  }
+  if (queryParts.length > 0) {
+    fullUrl += '?' + queryParts.join('&');
+  }
+  
+  if (url.startsWith('/pages/') && url.includes('/index')) {
+    wx.switchTab({ url: fullUrl });
+  } else if (url.startsWith('/pages/')) {
+    wx.redirectTo({ url: fullUrl });
+  } else {
+    wx.navigateTo({ url: fullUrl });
+  }
+};
+
+/**
  * 退出登录
  * @param {function} callback 退出后的回调函数
  */
@@ -144,6 +201,8 @@ module.exports = {
   setToken,
   clearLoginInfo,
   checkLogin,
+  checkLoginWithParams,
+  loginSuccessRedirect,
   logout,
   isVIP,
   isTalent,
