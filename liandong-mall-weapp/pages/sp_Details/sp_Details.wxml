@@ -115,13 +115,14 @@
       </view>
     </view>
 
-    <view class="product-recommendations">
+    <view class="product-recommendations" wx:if="{{product.recommendations && product.recommendations.length > 0}}">
       <view class="section-header">
-        <text class="section-title">相关推荐</text>
+        <text class="section-title">同类商品推荐</text>
+        <text class="section-subtitle">根据销量和收藏量精选</text>
       </view>
       <view class="recommendation-grid">
-        <view 
-          wx:for="{{product.recommendations}}" 
+        <view
+          wx:for="{{product.recommendations}}"
           wx:key="id"
           class="recommendation-card"
           bindtap="goToRecommendation"
@@ -130,7 +131,10 @@
           <image class="recommendation-image" src="{{item.image}}" mode="aspectFill" lazy-load="{{true}}" />
           <view class="recommendation-info">
             <text class="recommendation-name">{{item.name}}</text>
-            <view class="recommendation-price">¥{{item.price}}</view>
+            <view class="recommendation-bottom">
+              <text class="recommendation-price">¥{{item.price}}</text>
+              <text class="recommendation-sales">{{item.sales}}人买</text>
+            </view>
           </view>
         </view>
       </view>

@@ -27,6 +27,10 @@ def register_blueprints(app):
         if hasattr(module, 'blueprint'):
             app.register_blueprint(module.blueprint)
 
+    from apps.sp_mall_admin import sp_banner_admin_bp, sp_filter_category_admin_bp
+    app.register_blueprint(sp_banner_admin_bp)
+    app.register_blueprint(sp_filter_category_admin_bp)
+
 
 def register_api(app):
     """注册REST API"""
@@ -67,13 +71,16 @@ def register_api(app):
     api.add_namespace(sp_product_detail_ns, path='/api/sp_product_detail')
 
     from apps.sp_mall.sp_api import (
-        sp_product_ns, sp_category_ns, sp_cart_ns, sp_order_ns, sp_address_ns
+        sp_product_ns, sp_category_ns, sp_cart_ns, sp_order_ns, sp_address_ns, sp_banner_ns
     )
+    from apps.sp_mall.sp_filter_category_api import sp_filter_category_ns
     api.add_namespace(sp_product_ns, path='/api/sp/product')
     api.add_namespace(sp_category_ns, path='/api/sp/category')
     api.add_namespace(sp_cart_ns, path='/api/sp/cart')
     api.add_namespace(sp_order_ns, path='/api/sp/order')
     api.add_namespace(sp_address_ns, path='/api/sp/address')
+    api.add_namespace(sp_banner_ns, path='/api/sp/banner')
+    api.add_namespace(sp_filter_category_ns, path='/api/sp/filter_category')
 
     from apps.sample.api import api as sample_api
     api.add_namespace(sample_api, path='/api/samples')

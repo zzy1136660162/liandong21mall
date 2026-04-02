@@ -119,7 +119,7 @@
                 <li class="nav-item pcoded-menu-caption">
                     <label>商品订单管理</label>
                 </li>
-                <li data-username="商品订单管理 商品分类 商品管理 订单管理"
+                <li data-username="商品订单管理 商品分类 商品管理 订单管理 轮播图管理 筛选类别管理"
                     class="nav-item pcoded-hasmenu {% if 'sp' in segment %} active {% endif %}">
                     <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i class="feather icon-shopping-bag"></i></span><span
                             class="pcoded-mtext">商品订单管理</span></a>
@@ -129,6 +129,12 @@
                         </li>
                         <li class="{% if 'sp/product' in segment %}active{% endif %}">
                             <a href="/admin/sp/product" class="">商品管理</a>
+                        </li>
+                        <li class="{% if 'sp/banner' in segment %}active{% endif %}">
+                            <a href="/admin/sp/banner" class="">轮播图管理</a>
+                        </li>
+                        <li class="{% if 'sp/filter-category' in segment %}active{% endif %}">
+                            <a href="/admin/sp/filter-category" class="">筛选类别管理</a>
                         </li>
                         <li class="{% if 'sp/order' in segment %}active{% endif %}">
                             <a href="/admin/sp/order" class="">订单管理</a>

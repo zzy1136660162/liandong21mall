@@ -13,6 +13,7 @@ from apps.member.models import UserMember, MemberLevel
 from datetime import datetime, timedelta
 import random
 import string
+import re
 from flask import request
 
 
@@ -44,7 +45,7 @@ def fix_images_list(images):
     """修复图片列表，确保所有图片都是完整URL"""
     if not images:
         return []
-    
+
     if isinstance(images, str):
         # 如果是JSON字符串，解析后处理
         import json
@@ -52,11 +53,33 @@ def fix_images_list(images):
             images = json.loads(images)
         except:
             return [fix_image_url(images)]
-    
+
     if isinstance(images, list):
         return [fix_image_url(img) for img in images if img]
-    
+
     return [fix_image_url(images)]
+
+
+def fix_html_image_urls(html_content):
+    """修复HTML内容中的图片URL，确保都是完整URL"""
+    if not html_content:
+        return html_content
+
+    # 使用正则表达式找到所有 img 标签的 src 属性
+    def fix_src(match):
+        src = match.group(1)
+        # 如果已经是完整URL，直接返回
+        if src.startswith('http://') or src.startswith('https://'):
+            return match.group(0)
+        # 修复相对路径
+        fixed_url = fix_image_url(src)
+        return f'src="{fixed_url}"'
+
+    # 匹配 img 标签的 src 属性
+    pattern = r'src="([^"]*)"'
+    fixed_html = re.sub(pattern, fix_src, html_content)
+
+    return fixed_html
 
 
 class SpProductService:
@@ -113,11 +136,21 @@ class SpProductService:
             return None
         
         product_dict = product.to_dict(include_detail=True)
-        
+
         # 修复图片URL
         product_dict['mainImage'] = fix_image_url(product_dict.get('mainImage'))
         product_dict['images'] = fix_images_list(product_dict.get('images'))
-        
+
+        # 如果images数组为空，确保至少使用mainImage
+        if not product_dict['images']:
+            product_dict['images'] = [product_dict['mainImage']] if product_dict['mainImage'] else []
+
+        # 修复商品详情HTML中的图片URL
+        product_dict['description'] = fix_html_image_urls(product_dict.get('description')) if product_dict.get('description') else ''
+
+        # 添加image字段作为mainImage的别名
+        product_dict['image'] = product_dict['mainImage']
+
         product_dict['id'] = product_dict['productId']
         product_dict['name'] = product_dict['productName']
         product_dict['title'] = product_dict['productName']
@@ -199,14 +232,63 @@ class SpProductService:
         product_dict['tuanzhangName'] = '飞鸽传媒团长精选'
         product_dict['tuanzhangAvatar'] = 'https://picsum.photos/80/80?random=20'
         product_dict['tuanzhangDesc'] = '聊高佣·帮申样·响应快'
-        
+
         product_dict['reviewList'] = []
-        
-        # 获取推荐商品并修复图片URL
-        recommendations = SpProductService.get_recommend_products(6)
+
+        recommendations = SpProductService.get_related_products(product_id, product.category_id, 6)
         product_dict['recommendations'] = recommendations
-        
+
         return product_dict
+
+    @staticmethod
+    def get_related_products(product_id, category_id, limit=6):
+        """获取同类商品推荐，基于销售量和收藏量计算"""
+        if not category_id:
+            return SpProductService.get_hot_products(limit)
+
+        products = SpProduct.query.filter(
+            SpProduct.status == 1,
+            SpProduct.id != product_id,
+            SpProduct.category_id == category_id
+        ).all()
+
+        product_scores = []
+        for p in products:
+            sales_score = p.sales * 1.0
+            favorite_score = 0
+            if hasattr(p, 'favorite_count'):
+                favorite_score = p.favorite_count * 2.0
+
+            total_score = sales_score + favorite_score
+
+            product_scores.append({
+                'product': p,
+                'score': total_score
+            })
+
+        product_scores.sort(key=lambda x: x['score'], reverse=True)
+
+        top_products = product_scores[:limit]
+        result = []
+        for item in top_products:
+            p = item['product']
+            result.append({
+                'productId': p.id,
+                'id': p.id,
+                'productName': p.product_name,
+                'name': p.product_name,
+                'mainImage': fix_image_url(p.main_image),
+                'image': fix_image_url(p.main_image),
+                'price': float(p.price),
+                'originalPrice': float(p.original_price) if p.original_price else None,
+                'memberPrice': float(p.member_price) if p.member_price else float(p.price),
+                'stock': p.stock,
+                'sales': p.sales,
+                'isHot': p.is_hot == 1,
+                'isNew': p.is_new == 1
+            })
+
+        return result
     
     @staticmethod
     def get_hot_products(limit=10):
@@ -846,6 +928,40 @@ class SpAddressService:
         """获取用户地址列表"""
         addresses = SpAddress.query.filter_by(user_id=user_id).order_by(SpAddress.is_default.desc(), SpAddress.updated_at.desc()).all()
         return [address.to_dict() for address in addresses]
+
+
+class SpBannerService:
+    """轮播图服务"""
+    
+    @staticmethod
+    def get_banners(position=None):
+        """获取轮播图列表"""
+        from apps.sp_mall.sp_banner_models import SpBanner
+        
+        query = SpBanner.query.filter_by(status=1)
+        
+        if position:
+            query = query.filter_by(position=position)
+        
+        banners = query.order_by(SpBanner.sort.desc(), SpBanner.created_at.desc()).all()
+        
+        result = []
+        for banner in banners:
+            banner_dict = banner.to_dict()
+            banner_dict['imageUrl'] = fix_image_url(banner_dict['imageUrl'])
+            result.append(banner_dict)
+        
+        return result
+    
+    @staticmethod
+    def get_home_banners():
+        """获取首页轮播图"""
+        return SpBannerService.get_banners('home')
+    
+    @staticmethod
+    def get_mall_banners():
+        """获取商品页轮播图"""
+        return SpBannerService.get_banners('mall')
     
     @staticmethod
     def get_address_by_id(address_id, user_id=None):

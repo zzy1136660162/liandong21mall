@@ -1,15 +1,9 @@
 const { productApi, cartApi, favoriteApi } = require('../../utils/sp_api.js')
+const bannerService = require('../../services/bannerService.js')
 
 Page({
   data: {
-    filterTabs: [
-      { id: 0, name: '全部' },
-      { id: 1, name: '护肤' },
-      { id: 2, name: '彩妆' },
-      { id: 3, name: '个护' },
-      { id: 4, name: '食品' },
-      { id: 5, name: '家居' }
-    ],
+    filterTabs: [],
     currentFilter: 0,
     products: [],
     loading: false,
@@ -21,6 +15,14 @@ Page({
     productScrollTop: 0,
     refreshing: false,
     banners: [],
+    bannerCurrent: 0,
+    bannerAutoplay: true,
+    bannerInterval: 3000,
+    bannerDuration: 500,
+    bannerCircular: true,
+    bannerIndicatorDots: true,
+    bannerLoading: true,
+    bannerError: false,
     cartProductIds: []
   },
 
@@ -28,6 +30,7 @@ Page({
   scrollThrottle: 50,
 
   async onLoad(options) {
+    await this.loadFilterCategories()
     this.loadBanners()
     this.loadProducts()
     this.loadCartInfo()
@@ -37,13 +40,116 @@ Page({
     this.loadCartInfo()
   },
 
-  async loadBanners() {
+  async loadFilterCategories() {
     try {
-      const banners = await productApi.getRecommendProducts(5)
-      this.setData({ banners })
+      const categories = await productApi.getFilterCategories()
+      if (categories && categories.length > 0) {
+        const filterTabs = [
+          { id: 0, name: '全部', code: 'all' },
+          ...categories.map(cat => ({
+            id: cat.id,
+            name: cat.name,
+            code: cat.code
+          }))
+        ]
+        this.setData({ filterTabs })
+      }
+    } catch (error) {
+      console.error('加载筛选类别失败:', error)
+      this.setData({
+        filterTabs: [
+          { id: 0, name: '全部', code: 'all' }
+        ]
+      })
+    }
+  },
+
+  async loadBanners() {
+    this.setData({
+      bannerLoading: true,
+      bannerError: false
+    })
+
+    try {
+      const banners = await bannerService.getMallBanners(true)
+
+      if (banners && banners.length > 0) {
+        this.setData({
+          banners: banners,
+          bannerLoading: false,
+          bannerAutoplay: banners.length > 1
+        })
+
+        bannerService.preloadImages(banners)
+      } else {
+        const defaultBanners = bannerService.getDefaultBanners()
+        this.setData({
+          banners: defaultBanners,
+          bannerLoading: false,
+          bannerAutoplay: true
+        })
+
+        bannerService.preloadImages(defaultBanners)
+      }
     } catch (error) {
       console.error('加载轮播图失败:', error)
+      const defaultBanners = bannerService.getDefaultBanners()
+      this.setData({
+        banners: defaultBanners,
+        bannerLoading: false,
+        bannerError: true,
+        bannerAutoplay: true
+      })
+
+      wx.showToast({
+        title: '轮播图加载失败，已使用默认图',
+        icon: 'none',
+        duration: 2000
+      })
     }
+  },
+
+  onBannerImageLoad(e) {
+    const index = e.currentTarget.dataset.index
+    const banners = this.data.banners
+    if (banners[index]) {
+      banners[index].isLoaded = true
+      this.setData({ banners })
+    }
+  },
+
+  onBannerImageError(e) {
+    const index = e.currentTarget.dataset.index
+    const banners = this.data.banners
+    if (banners[index]) {
+      banners[index].loadFailed = true
+      banners[index].image = 'https://picsum.photos/750/400?random=error'
+      this.setData({ banners })
+    }
+  },
+
+  onBannerChange(e) {
+    if (e.detail.source) {
+      this.setData({
+        bannerCurrent: e.detail.current
+      })
+    }
+  },
+
+  onBannerTap(e) {
+    const index = e.currentTarget.dataset.index
+    const banner = this.data.banners[index]
+
+    if (!banner) {
+      return
+    }
+
+    bannerService.handleBannerClick(banner, getApp())
+  },
+
+  refreshBanners() {
+    bannerService.clearCache()
+    this.loadBanners()
   },
 
   async loadProducts() {

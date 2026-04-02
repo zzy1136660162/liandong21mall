@@ -63,6 +63,21 @@ Page({
 
     try {
       const product = await this.getProductDetail(this.data.productId)
+
+      // 确保至少有一张图片显示
+      if (!product.images || product.images.length === 0) {
+        if (product.mainImage) {
+          product.images = [product.mainImage]
+        } else if (product.image) {
+          product.images = [product.image]
+        } else {
+          product.images = ['/images/default-product.png']
+        }
+      }
+
+      // 确保所有图片URL都是完整的
+      product.images = product.images.filter(img => img && img.length > 0)
+
       this.setData({
         product: product,
         currentIndex: 0

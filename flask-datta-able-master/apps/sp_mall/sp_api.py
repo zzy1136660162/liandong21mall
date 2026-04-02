@@ -9,7 +9,8 @@ from flask import request
 from flask_restx import Namespace, Resource, fields
 from apps.sp_mall.sp_services import (
     SpProductService, SpCartService, 
-    SpOrderService, SpAddressService
+    SpOrderService, SpAddressService,
+    SpBannerService
 )
 from apps.sp_mall.sp_models import SpOrder, SpOrderItem, SpProduct, SpCart, SpAddress
 from apps import db
@@ -21,6 +22,7 @@ sp_category_ns = Namespace('category', description='商品分类API')
 sp_cart_ns = Namespace('cart', description='购物车API')
 sp_order_ns = Namespace('order', description='订单API')
 sp_address_ns = Namespace('address', description='地址API')
+sp_banner_ns = Namespace('banner', description='轮播图API')
 
 
 def success_response(data=None, message='success'):
@@ -562,3 +564,33 @@ class SpAddressSetDefault(Resource):
             return error_response('地址不存在')
         
         return success_response(address, '设置成功')
+
+
+# ========== 轮播图相关API ==========
+
+@sp_banner_ns.route('/list')
+class SpBannerList(Resource):
+    @sp_banner_ns.doc('获取轮播图列表')
+    def get(self):
+        """获取轮播图列表"""
+        position = request.args.get('position')
+        banners = SpBannerService.get_banners(position)
+        return success_response(banners)
+
+
+@sp_banner_ns.route('/home')
+class SpHomeBannerList(Resource):
+    @sp_banner_ns.doc('获取首页轮播图')
+    def get(self):
+        """获取首页轮播图"""
+        banners = SpBannerService.get_home_banners()
+        return success_response(banners)
+
+
+@sp_banner_ns.route('/mall')
+class SpMallBannerList(Resource):
+    @sp_banner_ns.doc('获取商品页轮播图')
+    def get(self):
+        """获取商品页轮播图"""
+        banners = SpBannerService.get_mall_banners()
+        return success_response(banners)

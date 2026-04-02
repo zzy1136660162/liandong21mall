@@ -94,7 +94,20 @@ const productApi = {
     getRecommendProducts: (limit = 10) => api.get('/api/sp/product/recommend', { limit }),
 
     searchProducts: (keyword, page = 1, pageSize = 10) =>
-        api.get('/api/sp/product/search', { keyword, page, pageSize })
+        api.get('/api/sp/product/search', { keyword, page, pageSize }),
+
+    getBanners: (position = null) => {
+        if (position) {
+            return api.get('/api/sp/banner/list', { position })
+        }
+        return api.get('/api/sp/banner/list')
+    },
+
+    getHomeBanners: () => api.get('/api/sp/banner/home'),
+
+    getMallBanners: () => api.get('/api/sp/banner/mall'),
+
+    getFilterCategories: (status = 1) => api.get('/api/sp/filter_category/list', { status })
 }
 
 const cartApi = {
