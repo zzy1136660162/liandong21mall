@@ -11,33 +11,7 @@ Page({
     pageSize: 10,
     loading: false,
     hasMore: true,
-    // Banner轮播图
-    banners: [
-      {
-        id: 1,
-        image: 'https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260401150239363_667839762599.png',
-        title: '',
-        subtitle: '',
-        type: 'banner',
-        link: ''
-      },
-      {
-        id: 2,
-        image: 'https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260401150358040_667839841277.png',
-        title: '',
-        subtitle: '',
-        type: 'banner',
-        link: ''
-      },
-      {
-        id: 3,
-        image: 'https://www.lslnii.com/upload/NFSImgFile/appl/images/2025/12/20260401150638900_667840002138.png',
-        title: '',
-        subtitle: '',
-        type: 'banner',
-        link: ''
-      }
-    ],
+    banners: [],
     // 二级筛选
     filterOptions: {
       commission: [
@@ -70,8 +44,30 @@ Page({
 
   onLoad() {
     this.checkLoginStatus();
+    this.loadBanners();
     this.loadProducts();
     this.loadSearchHistory();
+  },
+
+  // 加载轮播图
+  async loadBanners() {
+    try {
+      const res = await productService.getXpBanners();
+      if (res && res.length > 0) {
+        this.setData({
+          banners: res.map(banner => ({
+            id: banner.id,
+            image: banner.image,
+            title: banner.title || '',
+            subtitle: '',
+            link: banner.link || '',
+            linkType: banner.linkType || ''
+          }))
+        });
+      }
+    } catch (error) {
+      console.error('加载轮播图失败:', error);
+    }
   },
 
   // 检查登录状态

@@ -108,5 +108,12 @@ module.exports = {
    */
   getXpProductDetail(id) {
     return get(`${API_XP_PRODUCT}/${id}`);
+  },
+
+  /**
+   * 获取选品轮播图
+   */
+  getXpBanners() {
+    return get(`${API_XP_PRODUCT}/banners`);
   }
 };

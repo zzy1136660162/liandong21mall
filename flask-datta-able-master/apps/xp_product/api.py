@@ -7,7 +7,7 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 from apps import db
-from apps.xp_product.models import Product, Category, SampleApply
+from apps.xp_product.models import Product, Category, SampleApply, XpBanner
 from datetime import datetime
 
 api = Namespace('product', description='商品选品模块')
@@ -1015,4 +1015,16 @@ class LogisticsQueryAPI(Resource):
                 'statusText': '运输中',
                 'traces': traces
             }
+        }
+
+
+@api.route('/banners')
+class BannerListAPI(Resource):
+    """获取轮播图列表 - GET /api/xp_product/banners"""
+    def get(self):
+        banners = XpBanner.query.filter_by(status=1).order_by(XpBanner.sort.desc(), XpBanner.id.asc()).all()
+        return {
+            'code': 200,
+            'message': 'success',
+            'data': [b.to_api_dict() for b in banners]
         }

@@ -304,6 +304,43 @@ class SampleApply(db.Model):
             }] if self.product_id else []
         }
 
+
+class XpBanner(db.Model):
+    """选品轮播图表"""
+    __tablename__ = 'xp_banners'
+
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(100), nullable=False, comment='标题')
+    image = db.Column(db.String(500), nullable=False, comment='图片URL')
+    link = db.Column(db.String(500), nullable=True, comment='跳转链接')
+    link_type = db.Column(db.String(20), nullable=True, comment='链接类型：product-商品，category-分类，url-网页')
+    sort = db.Column(db.Integer, default=0, comment='排序')
+    status = db.Column(db.SmallInteger, default=1, comment='状态：0-禁用，1-启用')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'image': self.image,
+            'link': self.link,
+            'linkType': self.link_type,
+            'sort': self.sort,
+            'status': self.status,
+            'createdAt': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
+            'updatedAt': self.updated_at.strftime('%Y-%m-%d %H:%M:%S') if self.updated_at else None
+        }
+
+    def to_api_dict(self):
+        return {
+            'id': str(self.id),
+            'title': self.title,
+            'image': self.image,
+            'link': self.link or '',
+            'linkType': self.link_type or ''
+        }
+
     def to_api_detail_dict(self):
         status_map = {0: 'pending', 1: 'approved', 2: 'rejected', 3: 'cancelled'}
         ship_status_map = {0: 'not_shipped', 1: 'shipped', 2: 'received'}
