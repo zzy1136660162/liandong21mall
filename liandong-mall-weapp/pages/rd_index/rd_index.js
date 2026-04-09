@@ -47,6 +47,13 @@ Page({
     })
   },
   goToList() {
+    const token = wx.getStorageSync('token')
+    if (!token) {
+      wx.navigateTo({
+        url: '/pages/login/index'
+      })
+      return
+    }
     wx.navigateTo({
       url: '/pages/demandList/demandList'
     })

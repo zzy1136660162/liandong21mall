@@ -1,4 +1,4 @@
-const chatService = require('../../utils/chatService');
+7const chatService = require('../../utils/chatService');
 const app = getApp();
 
 // 调试日志
